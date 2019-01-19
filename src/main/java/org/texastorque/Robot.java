@@ -12,7 +12,7 @@ public class Robot extends TorqueIterative {
     private ArrayList<Subsystem> subsystems;
 	private Subsystem driveBase = DriveBase.getInstance();
 
-	private Input humanInput = HumanInput.getInstance();
+	private HumanInput humanInput = HumanInput.getInstance();
 
 	public void robotInit() {
 		initSubsystems();
@@ -36,7 +36,6 @@ public class Robot extends TorqueIterative {
 
 	public void teleopInit() {
 		for (Subsystem system : subsystems) {
-			system.setInput(humanInput);
 			system.teleopInit();
 		}
 	}
@@ -47,7 +46,7 @@ public class Robot extends TorqueIterative {
 
 	@Override
 	public void teleopContinuous() {
-		((HumanInput)humanInput).update();
+		humanInput.update();
 		for (Subsystem system : subsystems) {
 			system.teleopContinuous();
 		}

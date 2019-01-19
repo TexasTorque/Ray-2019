@@ -1,5 +1,9 @@
 package org.texastorque.inputs;
 
+/**
+ * Deprecated
+ */
+/*
 public class Input {
 
     private static Input instance;
@@ -18,4 +22,4 @@ public class Input {
 
     //Other subsystems
 
-}
+}*/

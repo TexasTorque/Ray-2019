@@ -11,6 +11,11 @@ public class DriveBase extends Subsystem {
 
     private static DriveBase instance;
 
+    public enum DBMode {
+        TELEOP, VISION;
+    }
+    private DBMode mode;
+
     private TorqueMotor leftFore;
 	private TorqueMotor leftRear;
 	private TorqueMotor rightFore;
@@ -39,14 +44,13 @@ public class DriveBase extends Subsystem {
     public void autoInit() {
         leftSpeed = 0.0;
         rightSpeed = 0.0;
-        // setGears();
     }
 
     @Override
     public void teleopInit() {
+        mode = DBMode.TELEOP;
         leftSpeed = 0.0;
         rightSpeed = 0.0;
-    //    setGears();
     }
 
     @Override
@@ -57,11 +61,19 @@ public class DriveBase extends Subsystem {
 
     @Override
     public void teleopContinuous() {
-        leftSpeed = input.getDBLeftSpeed();
-        rightSpeed = input.getDBRightSpeed();
+        mode = humanInput.getDBMode();
 
-        output();
+        if (mode == DBMode.TELEOP) {
+            leftSpeed = humanInput.getDBLeftSpeed();
+            rightSpeed = humanInput.getDBRightSpeed();
+            output();
+        }
+        else if (mode == DBMode.VISION) {
+            output();
+        }
     }
+
+    private int i = 0;
 
     @Override
     public void output() {
@@ -80,7 +92,10 @@ public class DriveBase extends Subsystem {
         leftFore.set(leftSpeed);
 		leftRear.set(leftSpeed);
 		rightFore.set(rightSpeed);
-		rightRear.set(rightSpeed);
+        rightRear.set(rightSpeed);
+
+        if (i++ % 100 == 0)
+            System.out.println(mode);
     }
 
     @Override
@@ -92,6 +107,10 @@ public class DriveBase extends Subsystem {
     @Override
     public void disabledContinuous() {
         output();
+    }
+
+    public void setMode(DBMode mode) {
+        this.mode = mode;
     }
 
     public boolean getLeftHighGear() {
