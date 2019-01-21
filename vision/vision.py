@@ -47,11 +47,10 @@ def findTarget(frame, mask):
 
         for i, left in leftTargets:
             for j, right in rightTargets:
-                if approx(distance(left[1], right[1]), approxWidth*4, error = 0.2):
+                if left[1][0] < right[1][0] and approx(distance(left[1], right[1]), approxWidth*4, error = 0.2):
                     targetPairs.append((left, right))
 
         centers = list(filter(lambda c : c != 0, [centerPoint(left[1], left[2], right[1], right[2]) for left, right in targetPairs]))
-
         if centers:
             target = min(centers, key=lambda m : distance(m, (WIDTH/2, HEIGHT/2)))
             cv.circle(frame, target, 4, (0, 255, 0), -1)
