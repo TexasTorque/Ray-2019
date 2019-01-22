@@ -7,13 +7,13 @@ HEIGHT = 240
 ########## VISION LOGIC ##########
 
 def findTarget(frame, mask):
-    ret, contours, hierarchy = cv.findContours(mask, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+    contours, hierarchy = cv.findContours(mask, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
 
     if contours:
         areas = {i: cv.contourArea(cnt) for i, cnt in enumerate(contours)}
         areas = minValue(areas, 200)
         if not areas:
-            return None
+            return 0
 
         boxes = {}
         for i, area in areas.items():
@@ -52,9 +52,11 @@ def findTarget(frame, mask):
 
         centers = list(filter(lambda c : c != 0, [centerPoint(left[1], left[2], right[1], right[2]) for left, right in targetPairs]))
         if centers:
-            target = min(centers, key=lambda m : distance(m, (WIDTH/2, HEIGHT/2)))
-            cv.circle(frame, target, 4, (0, 255, 0), -1)
-            return target
+            #target = min(centers, key=lambda m : distance(m, (WIDTH/2, HEIGHT/2)))
+            for c in centers:
+                cv.circle(frame, c, 4, (0, 255, 0), -1)
+            return centers
+    return 0
 
 def findHatch():
     pass
