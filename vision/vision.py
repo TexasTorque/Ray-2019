@@ -11,9 +11,9 @@ def findTarget(frame, mask):
     contours, hierarchy = cv.findContours(mask, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
 
     if contours:
-        # Construct dictionary that maps indices to contour areas, then discard areas that are too small.
+        # Construct dictionary that maps indices to contour areas, then discard areas that are too small or too big.
         areas = {i: cv.contourArea(cnt) for i, cnt in enumerate(contours)}
-        areas = minValue(areas, 200)
+        areas = limitValue(areas, 100, 16000)
         if not areas:
             return 0
 
@@ -32,7 +32,7 @@ def findTarget(frame, mask):
             top2 = box[1]
             bottom = box[3]
 
-            if inRange(distance(top2, bottom) / distance(top1, top2), 2, 5):
+            if inRange(distance(top2, bottom) / distance(top1, top2), 2, 6):
                 cv.drawContours(frame, [np.int0(boxes[i])], 0, (0, 255, 0), 2)
                 cv.circle(frame, (top1[0], top1[1]), 2, (255, 0, 0), -1)
                 cv.circle(frame, (top2[0], top2[1]), 2, (0, 0, 255), -1)
@@ -63,7 +63,7 @@ def findTarget(frame, mask):
         if centers:
             for c in centers:
                 cv.circle(frame, c, 2, (0, 255, 0), -1)
-                cv.putText(frame, 'A', c, cv.FONT_HERSHEY_PLAIN, 1, (0, 255, 0))
+                cv.putText(frame, 'A', (c[0]+3, c[1]+3), cv.FONT_HERSHEY_PLAIN, 1, (0, 255, 0))
             return centers
     return 0
 
@@ -86,8 +86,8 @@ def adjustGamma(image, gamma=1.0):
 	# apply gamma correction using the lookup table
 	return cv.LUT(image, table)
 
-def minValue(dict, minVal):
-    return {i: value for i, value in dict.items() if value > minVal}
+def limitValue(dict, minVal, maxVal):
+    return {i: value for i, value in dict.items() if value >= minVal and value <= maxVal}
 
 def outliers(dict, minVal=100, s=2):
     mean = np.mean(list(dict.values()))
@@ -154,8 +154,8 @@ def main():
         upperTarget = np.array([105, 255, 255])
 
         # Crappy webcam, blue
-        lowerTarget = np.array([90, 60, 120])
-        upperTarget = np.array([110, 90, 155])
+        # lowerTarget = np.array([90, 60, 120])
+        # upperTarget = np.array([110, 90, 155])
 
         maskTarget = cv.inRange(hsv, lowerTarget, upperTarget)
         # maskTarget = cv.dilate(maskTarget, kernel, iterations = 1)
