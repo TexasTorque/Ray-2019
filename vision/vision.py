@@ -1,5 +1,6 @@
 import cv2 as cv
 import numpy as np
+import util
 
 WIDTH = 320
 HEIGHT = 240
@@ -13,7 +14,7 @@ def findTarget(frame, mask):
     if contours:
         # Construct dictionary that maps indices to contour areas, then discard areas that are too small or too big.
         areas = {i: cv.contourArea(cnt) for i, cnt in enumerate(contours)}
-        areas = limitValue(areas, 100, 16000)
+        areas = util.limitValue(areas, 100, 16000)
         if not areas:
             return 0
 
@@ -32,12 +33,12 @@ def findTarget(frame, mask):
             top2 = box[1]
             bottom = box[3]
 
-            if inRange(distance(top2, bottom) / distance(top1, top2), 2, 6):
+            if util.inRange(util.distance(top2, bottom) / util.distance(top1, top2), 2, 6):
                 cv.drawContours(frame, [np.int0(boxes[i])], 0, (0, 255, 0), 2)
                 cv.circle(frame, (top1[0], top1[1]), 2, (255, 0, 0), -1)
                 cv.circle(frame, (top2[0], top2[1]), 2, (0, 0, 255), -1)
                 cv.circle(frame, (bottom[0], bottom[1]), 2, (0, 0, 255), -1)
-                approxWidth += distance(top1, top2)
+                approxWidth += util.distance(top1, top2)
 
                 if top1[0] < top2[0]:
                     targets[i] = ('L', top2, bottom)
@@ -55,11 +56,11 @@ def findTarget(frame, mask):
         # Find pairs of left and right targets that pair to form a valid vision target
         for i, left in leftTargets:
             for j, right in rightTargets:
-                if left[1][0] < right[1][0] and approx(distance(left[1], right[1]), approxWidth*4, error = 0.2):
+                if left[1][0] < right[1][0] and util.approx(util.distance(left[1], right[1]), approxWidth*4, error=0.2):
                     targetPairs.append((left, right))
 
         # Calculate center of vision target by drawing diagonals
-        centers = list(filter(lambda c : c != 0, [centerPoint(left[1], left[2], right[1], right[2]) for left, right in targetPairs]))
+        centers = list(filter(lambda c : c != 0, [util.centerPoint(left[1], left[2], right[1], right[2]) for left, right in targetPairs]))
         if centers:
             for c in centers:
                 cv.circle(frame, c, 2, (0, 255, 0), -1)
@@ -72,60 +73,6 @@ def findHatch():
 
 def findCargo():
     pass
-
-
-########## UTIL ##########
-
-def adjustGamma(image, gamma=1.0):
-	# build a lookup table mapping the pixel values [0, 255] to
-	# their adjusted gamma values
-	invGamma = 1.0 / gamma
-	table = np.array([((i / 255.0) ** invGamma) * 255
-		for i in np.arange(0, 256)]).astype("uint8")
- 
-	# apply gamma correction using the lookup table
-	return cv.LUT(image, table)
-
-def limitValue(dict, minVal, maxVal):
-    return {i: value for i, value in dict.items() if value >= minVal and value <= maxVal}
-
-def outliers(dict, minVal=100, s=2):
-    mean = np.mean(list(dict.values()))
-    std = np.std(list(dict.values()))
-    return {i: value for i, value in dict.items() if value-mean > s*std and value > minVal}
-
-def slope(tuple1, tuple2):
-    if tuple1[0] == tuple2[0]:
-        return 0
-    return (tuple2[1] - tuple1[1]) / (tuple2[0] - tuple1[0])
-
-def distance(tuple1, tuple2):
-    return ((tuple1[0] - tuple2[0])**2 + (tuple1[1] - tuple2[1])**2)**0.5
-
-def midpoint(tuple1, tuple2):
-    return ((tuple1[0] + tuple2[0]) // 2, (tuple1[1] + tuple2[1]) // 2)
-
-def centerPoint(tupleA1, tupleA2, tupleB1, tupleB2):
-    if tupleA1[0] == tupleB2[0] or tupleA2[0] == tupleB1[0]:
-        return 0
-
-    m1 = (tupleA1[1] - tupleB2[1]) / (tupleA1[0] - tupleB2[0])
-    b1 = tupleA1[1] - m1*tupleA1[0]
-    m2 = (tupleA2[1] - tupleB1[1]) / (tupleA2[0] - tupleB1[0])
-    b2 = tupleA2[1] - m2*tupleA2[0]
-
-    if m1 == m2:
-        return 0
-    else:
-        x = int((b2 - b1) / (m1 - m2))
-        y = int(m1 * x + b1)
-        return (x, y)
-
-def approx(num1, num2, error=0.05):
-    return abs(num1-num2) / (num1+num2) <= error
-
-def inRange(num, lower, upper):
-    return num >= lower and num <= upper
 
 
 ########## MAIN ##########
