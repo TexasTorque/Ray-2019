@@ -2,14 +2,26 @@ package org.texastorque.inputs;
 
 public class Feedback {
 
-    private static Feedback instance;
+    private static volatile Feedback instance;
 
     private Feedback() {
 
     }
 
-    public static synchronized Feedback getInstance() {
-        return instance == null ? instance = new Feedback() : instance;
+    // Read encoders
+
+    // Read RPi feedback from NetworkTables
+
+    // Read line-following sensors
+
+    public static Feedback getInstance() {
+        if (instance == null) {
+            synchronized (Feedback.class) {
+                if (instance == null)
+                    instance = new Feedback();
+            }
+        }
+        return instance;
     }
 
 }
