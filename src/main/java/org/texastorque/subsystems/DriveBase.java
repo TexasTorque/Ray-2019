@@ -3,6 +3,7 @@ package org.texastorque.subsystems;
 import org.texastorque.inputs.State.RobotState;
 import org.texastorque.constants.Ports;
 import org.texastorque.torquelib.component.TorqueMotor;
+import edu.wpi.first.wpilibj.smartdashboard.*;
 
 import edu.wpi.first.wpilibj.VictorSP;
 // import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
@@ -12,7 +13,7 @@ public class DriveBase extends Subsystem {
 
     private static volatile DriveBase instance;
     private RobotState currentState;
-
+    private SmartDashboard dashboard;
     private TorqueMotor leftFore;
 	private TorqueMotor leftRear;
 	private TorqueMotor rightFore;
@@ -78,6 +79,7 @@ public class DriveBase extends Subsystem {
         else if (currentState == RobotState.LINE) {
             // Read feedback for NetworkTables input, calculate output
             feedback.lineLeftTrue();
+            smartDashboard();  
             output();
         }
         else if (currentState == RobotState.VISION) {
@@ -124,7 +126,13 @@ public class DriveBase extends Subsystem {
     }
 
     @Override
-    public void smartDashboard() {}
+    public void smartDashboard() {
+        dashboard.putBoolean("Left", feedback.lineLeftTrue());
+        dashboard.putBoolean("Right", feedback.lineRightTrue());
+        dashboard.putBoolean("Middle", feedback.lineMidTrue());
+    }
+
+  
 
     public static DriveBase getInstance() {
         if (instance == null) {
