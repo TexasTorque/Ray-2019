@@ -1,8 +1,8 @@
 package org.texastorque.subsystems;
 
-public class Arm extends Subsystem {
+public class Pivot extends Subsystem {
 
-    public static volatile Arm instance;
+    public static volatile Pivot instance;
 
     @Override
     public void autoInit() {
@@ -44,11 +44,11 @@ public class Arm extends Subsystem {
 
     }
 
-    public static Arm getInstance() {
+    public static Pivot getInstance() {
         if (instance == null) {
-            synchronized (Arm.class) {
+            synchronized (Pivot.class) {
                 if (instance == null)
-                    instance = new Arm();
+                    instance = new Pivot();
             }
         }
         return instance;

@@ -26,7 +26,7 @@ public class Input {
     public void updateState() {
         if (driver.getXButtonPressed()) {
             if (state.getRobotState() == RobotState.TELEOP) {
-                state.setRobotState(RobotState.VISION);
+                state.setRobotState(RobotState.LINE);
             }
             else {
                 state.setRobotState(RobotState.TELEOP);

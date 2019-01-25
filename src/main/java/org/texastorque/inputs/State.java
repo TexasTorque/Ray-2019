@@ -5,9 +5,9 @@ public class State {
     private static volatile State instance;
 
     public enum RobotState {
-        AUTO, TELEOP, VISION, LINE;
+        AUTO, TELEOP, LINE, VISION;
     }
-    private RobotState robotState = RobotState.AUTO;
+    private RobotState robotState = RobotState.LINE;
 
     public RobotState getRobotState() {
         return robotState;

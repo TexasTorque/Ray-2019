@@ -81,8 +81,8 @@ def main():
     kernel = np.ones((5, 5), np.uint8)
 
     capture = cv.VideoCapture(0)
-    capture.set(3, WIDTH)
-    capture.set(4, HEIGHT)
+    capture.set(cv.CV_CAP_PROP_FRAME_WIDTH, WIDTH)
+    capture.set(cv.CV_CAP_PROP_FRAME_HEIGHT, HEIGHT)
 
     while 1:
         if cv.waitKey(5) & 0xFF == 27:
