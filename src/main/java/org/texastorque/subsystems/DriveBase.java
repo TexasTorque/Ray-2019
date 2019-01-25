@@ -1,5 +1,6 @@
 package org.texastorque.subsystems;
 
+import org.texastorque.inputs.State.RobotState;
 import org.texastorque.constants.Ports;
 import org.texastorque.torquelib.component.TorqueMotor;
 
@@ -9,12 +10,8 @@ import edu.wpi.first.wpilibj.VictorSP;
 
 public class DriveBase extends Subsystem {
 
-    private static DriveBase instance;
-
-    public enum DBMode {
-        TELEOP, VISION;
-    }
-    private DBMode mode;
+    private static volatile DriveBase instance;
+    private RobotState currentState;
 
     private TorqueMotor leftFore;
 	private TorqueMotor leftRear;
@@ -48,32 +45,47 @@ public class DriveBase extends Subsystem {
 
     @Override
     public void teleopInit() {
-        mode = DBMode.TELEOP;
         leftSpeed = 0.0;
         rightSpeed = 0.0;
     }
 
     @Override
+    public void disabledInit() {
+        leftSpeed = 0.0;
+        rightSpeed = 0.0;
+    }
+
+    @Override
+    public void disabledContinuous() {
+        output();
+    }
+
+    @Override
     public void autoContinuous() {
-        //Do something
+        // Do something
         output();
     }
 
     @Override
     public void teleopContinuous() {
-        mode = humanInput.getDBMode();
+        currentState = state.getRobotState();
 
-        if (mode == DBMode.TELEOP) {
-            leftSpeed = humanInput.getDBLeftSpeed();
-            rightSpeed = humanInput.getDBRightSpeed();
+        if (currentState == RobotState.TELEOP) {
+            leftSpeed = input.getDBLeftSpeed();
+            rightSpeed = input.getDBRightSpeed();
             output();
         }
-        else if (mode == DBMode.VISION) {
+        else if (currentState == RobotState.LINE) {
+            // Read feedback for NetworkTables input, calculate output
+            feedback.lineLeftTrue();
             output();
         }
+        else if (currentState == RobotState.VISION) {
+            // Read feedback for NetworkTables input, calculate output
+            output();
+        }
+        
     }
-
-    private int i = 0;
 
     @Override
     public void output() {
@@ -93,24 +105,6 @@ public class DriveBase extends Subsystem {
 		leftRear.set(leftSpeed);
 		rightFore.set(rightSpeed);
         rightRear.set(rightSpeed);
-
-        if (i++ % 100 == 0)
-            System.out.println(mode);
-    }
-
-    @Override
-    public void disabledInit() {
-        leftSpeed = 0.0;
-        rightSpeed = 0.0;
-    }
-
-    @Override
-    public void disabledContinuous() {
-        output();
-    }
-
-    public void setMode(DBMode mode) {
-        this.mode = mode;
     }
 
     public boolean getLeftHighGear() {
@@ -132,7 +126,13 @@ public class DriveBase extends Subsystem {
     @Override
     public void smartDashboard() {}
 
-    public static synchronized DriveBase getInstance() {
-		return (instance == null) ? instance = new DriveBase() : instance;
-	}
+    public static DriveBase getInstance() {
+        if (instance == null) {
+            synchronized (DriveBase.class) {
+                if (instance == null)
+                    instance = new DriveBase();
+            }
+        }
+        return instance;
+    }
 }
