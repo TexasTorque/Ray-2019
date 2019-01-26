@@ -27,6 +27,8 @@ public class DriveBase extends Subsystem {
     private boolean rightHighGear = false;
     
     private static boolean clockwise = true;
+    private boolean angle;
+    private int fakeBinary = 0;
 
     private DriveBase() {
         leftFore = new TorqueMotor(new VictorSP(Ports.DB_LEFT_FORE_MOTOR), clockwise);
@@ -78,9 +80,31 @@ public class DriveBase extends Subsystem {
         }
         else if (currentState == RobotState.LINE) {
             // Read feedback for NetworkTables input, calculate output
-            feedback.lineLeftTrue();
+
             smartDashboard();  
-            output();
+            while (feedback.lineLeftTrue() || feedback.lineRightTrue()) {
+                if (feedback.lineLeftTrue())
+                    fakeBinary+= 100;
+                if (feedback.lineMidTrue())
+                    fakeBinary+= 10;
+                if (feedback.lineRightTrue())
+                    fakeBinary+= 1;
+                if (angle)
+                    fakeBinary+= 1000;
+                switch (fakeBinary) {
+                    case 1100: rightSpeed += 0.5;
+                    case 1110: rightSpeed += 0.3;
+                    case 1001: rightSpeed += 0.2;
+                    case 1011: rightSpeed += 0.1;
+                    case 0001: leftSpeed += 0.5;
+                    case 0011: leftSpeed += 0.3;
+                    case 0100: leftSpeed += 0.2;
+                    case 0110: leftSpeed += 0.1;
+                }
+                fakeBinary = 0;
+                output();
+            }
+            
         }
         else if (currentState == RobotState.VISION) {
             // Read feedback for NetworkTables input, calculate output
