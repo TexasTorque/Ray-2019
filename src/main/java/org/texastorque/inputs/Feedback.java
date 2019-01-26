@@ -2,6 +2,7 @@ package org.texastorque.inputs;
 
 import org.texastorque.constants.Ports;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.networktables.*;
 
 public class Feedback {
 

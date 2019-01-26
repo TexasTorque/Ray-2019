@@ -93,18 +93,26 @@ public class DriveBase extends Subsystem {
                     fakeBinary+= 1000;
                 switch (fakeBinary) {
                     case 1100: rightSpeed += 0.5;
+                        break;
                     case 1110: rightSpeed += 0.3;
+                        break;
                     case 1001: rightSpeed += 0.2;
+                        break;
                     case 1011: rightSpeed += 0.1;
+                        break;
                     case 0001: leftSpeed += 0.5;
+                        break;
                     case 0011: leftSpeed += 0.3;
+                        break;
                     case 0100: leftSpeed += 0.2;
+                        break;
                     case 0110: leftSpeed += 0.1;
+                        break;
                 }
                 fakeBinary = 0;
                 output();
             }
-            
+
         }
         else if (currentState == RobotState.VISION) {
             // Read feedback for NetworkTables input, calculate output
