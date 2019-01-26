@@ -2,11 +2,13 @@ package org.texastorque.inputs;
 
 import org.texastorque.constants.Ports;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.networktables.*;
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
 
 public class Feedback {
 
     private static volatile Feedback instance;
+    private boolean angle;
+
 
     // Sensors
     private final DigitalInput lineLeft;
@@ -15,6 +17,8 @@ public class Feedback {
     
 
     private Feedback() {
+        NetworkTable table = NetworkTable.getTable("angle"); 
+        angle = table.getBoolean("angle", false);  
         lineLeft = new DigitalInput(Ports.FB_LINE_LEFT);
         lineMid = new DigitalInput(Ports.FB_LINE_MID);
         lineRight = new DigitalInput(Ports.FB_LINE_RIGHT);
@@ -25,7 +29,11 @@ public class Feedback {
 
     // Read RPi feedback from NetworkTables
 
+    public boolean getAngle(){
+        return angle;
+    }
     // Read line sensors
+
 
     public boolean lineLeftTrue() {
         return lineLeft.get();

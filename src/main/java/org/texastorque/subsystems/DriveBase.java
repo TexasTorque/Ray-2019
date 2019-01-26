@@ -27,11 +27,11 @@ public class DriveBase extends Subsystem {
     private boolean rightHighGear = false;
     
     private static boolean clockwise = true;
-    private boolean angle;
+    private boolean angle = true;
     private int fakeBinary = 0;
 
     private DriveBase() {
-        leftFore = new TorqueMotor(new VictorSP(Ports.DB_LEFT_FORE_MOTOR), clockwise);
+        leftFore = new TorqueMotor(new VictorSP(Ports.DB_LEFT_FORE_MOTOR), !clockwise);
 		leftRear = new TorqueMotor(new VictorSP(Ports.DB_LEFT_REAR_MOTOR), !clockwise);
 		rightFore = new TorqueMotor(new VictorSP(Ports.DB_RIGHT_FORE_MOTOR), clockwise);
         rightRear = new TorqueMotor(new VictorSP(Ports.DB_RIGHT_REAR_MOTOR), clockwise);
@@ -80,9 +80,11 @@ public class DriveBase extends Subsystem {
         }
         else if (currentState == RobotState.LINE) {
             // Read feedback for NetworkTables input, calculate output
+            //angle = feedback.getAngle();
+            
+                rightSpeed = input.getDBRightSpeed();
+                leftSpeed = input.getDBLeftSpeed();
 
-            smartDashboard();  
-            while (feedback.lineLeftTrue() || feedback.lineRightTrue()) {
                 if (feedback.lineLeftTrue())
                     fakeBinary+= 100;
                 if (feedback.lineMidTrue())
@@ -91,7 +93,7 @@ public class DriveBase extends Subsystem {
                     fakeBinary+= 1;
                 if (angle)
                     fakeBinary+= 1000;
-                switch (fakeBinary) {
+                switch (fakeBinary){
                     case 1100: rightSpeed += 0.5;
                         break;
                     case 1110: rightSpeed += 0.3;
@@ -107,12 +109,13 @@ public class DriveBase extends Subsystem {
                     case 0100: leftSpeed += 0.2;
                         break;
                     case 0110: leftSpeed += 0.1;
-                        break;
-                }
+                        break;       
+                }//switch cases
+                smartDashboard();
                 fakeBinary = 0;
                 output();
-            }
-
+            
+            
         }
         else if (currentState == RobotState.VISION) {
             // Read feedback for NetworkTables input, calculate output
@@ -162,6 +165,7 @@ public class DriveBase extends Subsystem {
         dashboard.putBoolean("Left", feedback.lineLeftTrue());
         dashboard.putBoolean("Right", feedback.lineRightTrue());
         dashboard.putBoolean("Middle", feedback.lineMidTrue());
+        dashboard.putNumber("fakeBinary", fakeBinary);
     }
 
   

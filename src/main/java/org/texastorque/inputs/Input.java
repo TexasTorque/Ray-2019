@@ -41,6 +41,8 @@ public class Input {
     public void updateDrive() {
 		DB_leftSpeed = -driver.getLeftYAxis() + driver.getRightXAxis();
         DB_rightSpeed = -driver.getLeftYAxis() - driver.getRightXAxis();
+        //DB_leftSpeed = driver.getLeftYAxis();
+        //DB_rightSpeed = driver.getLeftYAxis();
     }
 
     public double getDBLeftSpeed() {
