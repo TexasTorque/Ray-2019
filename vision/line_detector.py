@@ -1,11 +1,7 @@
 #--------------------------------------------------------------
 #
-# Modified example from
-# https://www.youtube.com/watch?v=XFwi3xpphCs
-# https://pastebin.com/nrh2xNNT
-#
 # Sample images, extract to images subfolder
-# https://1drv.ms/u/s!AiflSitw5xTJ3j6o1ob8J64d3ZVB
+# https://1drv.ms/u/s!AiflSitw5xTJ4Qh_MO-GWMFQwN2d
 #
 #--------------------------------------------------------------
 
