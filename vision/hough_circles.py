@@ -156,6 +156,7 @@ def ballTracking(file, img, src_type, houghParams):
         if src_type == Source.Video and cap.get(cv2.CAP_PROP_POS_FRAMES) >= cap.get(cv2.CAP_PROP_FRAME_COUNT):
             # Restart video if at end
             cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+            flag, frame = cap.retrieve()
         elif src_type == Source.Video and cap.grab() and video_paused == 0:
             if paused_frame_position is not None:
                 cap.set(cv2.CAP_PROP_POS_FRAMES, paused_frame_position)
