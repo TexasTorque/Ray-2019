@@ -73,22 +73,19 @@ public class DriveBase extends Subsystem {
         if (currentState == RobotState.TELEOP) {
             leftSpeed = input.getDBLeftSpeed();
             rightSpeed = input.getDBRightSpeed();
-            output();
-        }
-        else if (currentState == RobotState.LINE) {
-            // Read feedback for NetworkTables input, calculate output
-            feedback.lineLeftTrue();
-            output();
         }
         else if (currentState == RobotState.VISION) {
             // Read feedback for NetworkTables input, calculate output
-            output();
         }
-        
+        else if (currentState == RobotState.LINE) {
+            // Read feedback for NetworkTables input, calculate output
+        }
+
+        output();
     }
 
     @Override
-    public void output() {
+    protected void output() {
         setGears();
         /*
         if (leftHighGear)

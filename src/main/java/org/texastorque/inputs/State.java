@@ -5,7 +5,7 @@ public class State {
     private static volatile State instance;
 
     public enum RobotState {
-        AUTO, TELEOP, LINE, VISION;
+        AUTO, TELEOP, VISION, LINE;
     }
     private RobotState robotState = RobotState.LINE;
 

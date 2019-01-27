@@ -2,7 +2,8 @@ package org.texastorque.subsystems;
 
 public class Pivot extends Subsystem {
 
-    public static volatile Pivot instance;
+    private static volatile Pivot instance;
+    
 
     @Override
     public void autoInit() {
@@ -31,7 +32,7 @@ public class Pivot extends Subsystem {
 
     @Override
     public void teleopContinuous() {
-
+        
     }
 
     @Override

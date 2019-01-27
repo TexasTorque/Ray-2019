@@ -52,7 +52,7 @@ public class Input {
     }
 
     // ========== Lift ==========
-    private final double[] LF_setpoints = {0, 0, 0};
+    private final double[] LF_setpoints = {0, 10, 20};
     private volatile int LF_setpoint;
 
     public void updateLift() {}
@@ -61,14 +61,18 @@ public class Input {
         return LF_setpoints[LF_setpoint];
     }
 
-    //  ========== Arm ==========
-    private final double[] AM_setpoints = {0, 0, 0};
-    private volatile int AM_setpoint;
+    public double getLFSetpoint(int i) {
+        return LF_setpoints[i];
+    }
 
-    public void updateArm() {}
+    //  ========== Pivot ==========
+    private final double[] PT_setpoints = {0, 10, 20};
+    private volatile int PT_setpoint;
 
-    public double getAMSetpoint() {
-        return AM_setpoints[AM_setpoint];
+    public void updatePivot() {}
+
+    public double getPTSetpoint() {
+        return PT_setpoints[PT_setpoint];
     }
     
     public static Input getInstance() {

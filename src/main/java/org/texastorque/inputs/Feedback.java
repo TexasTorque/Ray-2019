@@ -1,43 +1,137 @@
 package org.texastorque.inputs;
 
 import org.texastorque.constants.Ports;
+import org.texastorque.torquelib.component.TorqueEncoder;
+
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.CounterBase.EncodingType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Feedback {
 
     private static volatile Feedback instance;
 
-    // Sensors
-    private final DigitalInput lineLeft;
-    private final DigitalInput lineMid;
-    private final DigitalInput lineRight;
+    // ========== Constants ==========
+    public static final double DISTANCE_CONVERSION = 1.0;
+    public static final double ANGLE_CONVERSION = 1.0;
+
+    // ========== Sensors ===========
+    private final TorqueEncoder DB_leftEncoder;
+    private final TorqueEncoder DB_rightEncoder;
+    private final TorqueEncoder LF_encoder;
+    private final TorqueEncoder PT_encoder;
+
+    private final DigitalInput LN_leftSensor;
+    private final DigitalInput LN_midSensor;
+    private final DigitalInput LN_rightSensor;
     
 
     private Feedback() {
-        lineLeft = new DigitalInput(Ports.FB_LINE_LEFT);
-        lineMid = new DigitalInput(Ports.FB_LINE_MID);
-        lineRight = new DigitalInput(Ports.FB_LINE_RIGHT);
+        DB_leftEncoder = new TorqueEncoder(Ports.DB_LEFT_ENCODER_A, Ports.DB_LEFT_ENCODER_B, false, EncodingType.k4X);
+        DB_rightEncoder = new TorqueEncoder(Ports.DB_LEFT_ENCODER_A, Ports.DB_LEFT_ENCODER_B, false, EncodingType.k4X);
+        LF_encoder = new TorqueEncoder(Ports.DB_LEFT_ENCODER_A, Ports.DB_LEFT_ENCODER_B, false, EncodingType.k4X);
+        PT_encoder = new TorqueEncoder(Ports.DB_LEFT_ENCODER_A, Ports.DB_LEFT_ENCODER_B, false, EncodingType.k4X);
+
+        LN_leftSensor = new DigitalInput(Ports.LN_LEFT);
+        LN_midSensor = new DigitalInput(Ports.LN_MID);
+        LN_rightSensor = new DigitalInput(Ports.LN_RIGHT);
         
     }
 
-    // Read encoders
+    public void update() {
+        updateEncoders();
+        updateLineSensors();
+    }
 
-    // Read RPi feedback from NetworkTables
 
-    // Read line sensors
+    // ========== Encoders ==========
+
+    private double DB_leftSpeed;
+    private double DB_rightSpeed;
+    private double DB_leftDistance;
+    private double DB_rightDistance;
+
+    private double LF_position;
+    private double PT_angle;
+
+    public void resetEncoders() {
+		DB_leftEncoder.reset();
+        DB_rightEncoder.reset();
+        LF_encoder.reset();
+        PT_encoder.reset();
+    }
+
+    public void updateEncoders() {
+        DB_leftEncoder.calc();
+        DB_rightEncoder.calc();
+        LF_encoder.calc();
+        PT_encoder.calc();
+
+        DB_leftSpeed = DB_leftEncoder.getRate() * DISTANCE_CONVERSION;
+		DB_rightSpeed = DB_rightEncoder.getRate() * DISTANCE_CONVERSION;
+        DB_leftDistance = DB_leftEncoder.getDistance() * DISTANCE_CONVERSION;
+        DB_rightDistance = DB_rightEncoder.getDistance() * DISTANCE_CONVERSION;
+
+        LF_position = DB_leftEncoder.getDistance();
+        PT_angle = DB_rightEncoder.getDistance() * ANGLE_CONVERSION;
+    }
+
+    public double getDBLeftSpeed() {
+        return DB_leftSpeed;
+    }
+
+    public double getDBRightSpeed() {
+        return DB_rightSpeed;
+    }
+
+    public double getDBLeftDistance() {
+        return DB_leftDistance;
+    }
+
+    public double getDBRightDistance() {
+        return DB_rightDistance;
+    }
+
+    public double getLFPosition() {
+        return LF_position;
+    }
+    
+    public double getPTPosition() {
+        return PT_angle;
+    }
+
+
+    // ========== Line sensors ==========
+
+    private boolean LN_left;
+    private boolean LN_mid;
+    private boolean LN_right;
+
+    public void updateLineSensors() {
+        LN_left = LN_leftSensor.get();
+        LN_mid = LN_midSensor.get();
+        LN_right = LN_rightSensor.get();
+    }
 
     public boolean lineLeftTrue() {
-        return lineLeft.get();
+        return LN_left;
     }
 
     public boolean lineMidTrue() {
-        return lineMid.get();
+        return LN_mid;
     }
 
     public boolean lineRightTrue() {
-        return lineRight.get();
+        return LN_right;
     }
 
+
+    // ===== RPi feedback from NetworkTables =====
+
+
+    public void smartDashboard() {
+
+    }
 
     public static Feedback getInstance() {
         if (instance == null) {
