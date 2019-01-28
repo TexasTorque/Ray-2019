@@ -12,7 +12,8 @@ public class Lift extends Subsystem {
     private static volatile Lift instance;
     private RobotState currentState;
 
-    private TorqueMotor motor;
+    private TorqueMotor motorA;
+    private TorqueMotor motorB;
 
     private final ScheduledPID liftPID;
     private double speed;
@@ -22,7 +23,8 @@ public class Lift extends Subsystem {
     private boolean clockwise;
 
     private Lift() {
-        motor = new TorqueMotor(new VictorSP(Ports.LF_MOTOR), clockwise);
+        motorA = new TorqueMotor(new VictorSP(Ports.LF_MOTOR_A), clockwise);
+        motorB = new TorqueMotor(new VictorSP(Ports.LF_MOTOR_B), clockwise);
 
         this.liftPID = new ScheduledPID.Builder(0, 0.5)
                 .setPGains(0.01)
@@ -100,7 +102,8 @@ public class Lift extends Subsystem {
 
     @Override
     protected void output() {
-        motor.set(speed);
+        motorA.set(speed);
+        motorB.set(speed);
     }
 
     @Override

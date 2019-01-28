@@ -14,8 +14,10 @@ public class Ports {
     // public static final int IN_RIGHT_SOLE_B = 3;
 
     // Lift
-    public static final int LF_MOTOR = 4;
-    public static final int PT_MOTOR = 5;
+    public static final int LF_MOTOR_A = 4;
+    public static final int LF_MOTOR_B = 5;
+    public static final int PT_MOTOR_A = 6;
+    public static final int PT_MOTOR_B = 7;
 
     // Sensors
     public static final int DB_LEFT_ENCODER_A = 0;
