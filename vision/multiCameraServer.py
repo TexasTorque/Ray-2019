@@ -111,7 +111,7 @@ xOffset = 160
 yOffset = 240
 showAllReturnedObjects = False
 
-# Weird bug where brightness would not readjust in different lighting conditions
+# Weird bug where brightness would not readjust in different lighting conditions, thus the randint()
 config = {"properties":[
     {"name":"connect_verbose","value":1},
     {"name":"raw_brightness","value":100},
@@ -265,7 +265,7 @@ class HoughCircleParams():
         self.min_radius = min_radius
         self.max_radius = max_radius
 
-def CargoDetection(cvSink, cs, frame, nt, outputStream, hsvParams, params, kernel):
+def CircleDetection(cvSink, cs, frame, nt, outputStream, hsvParams, params, kernel):
     hsv = cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
     hue, sat, val = cv2.split(hsv)
     
@@ -283,8 +283,6 @@ def CargoDetection(cvSink, cs, frame, nt, outputStream, hsvParams, params, kerne
     closing = cv2.GaussianBlur(closing,(5,5),0)
 
     # Detect circles using HoughCircles
-    # circles = cv2.HoughCircles(closing,cv2.HOUGH_GRADIENT,2,120,param1=120,param2=30,minRadius=5,maxRadius=0)
-    # circles = cv2.HoughCircles(closing,cv2.HOUGH_GRADIENT,1.4,50,param1=120,param2=30,minRadius=5,maxRadius=0)
     circles = cv2.HoughCircles(closing, cv2.HOUGH_GRADIENT, params.dp, params.min_dist,
         param1=params.param1, param2=params.param2, minRadius=params.min_radius, maxRadius=params.max_radius)
 
@@ -294,7 +292,7 @@ def CargoDetection(cvSink, cs, frame, nt, outputStream, hsvParams, params, kerne
         if showAllReturnedObjects:
             if circles is not None:
                 for i in circles[0,:]:
-                    # If the ball is far, draw it in pink
+                    # If the circle is far, draw it in pink
                     if int(round(i[2])) < 30:
                         cv2.circle(frame, (int(round(i[0])), int(round(i[1]))), int(round(i[2])), (255,0,255), 5)
                         cv2.circle(frame, (int(round(i[0])), int(round(i[1]))), 2, (255,0,255, 10))
@@ -312,34 +310,6 @@ def CargoDetection(cvSink, cs, frame, nt, outputStream, hsvParams, params, kerne
                 nt.putNumber("y", abs(int(circle[0]) - int(yOffset)))
 
     outputStream.putFrame(frame)
-    
-def HatchDetection(cvSink, cs, frame, nt, lower, upper, outputStream):
-    # Convert BGR to HSV
-    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-
-    # Threshold the HSV image to get only blue colors
-    mask = cv2.inRange(hsv, lower, upper)
-    ret, filtered = cv2.threshold(cv2.blur(mask, (5, 5)), 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
-
-    # Contours
-    _, contours, hierarchy = cv2.findContours(filtered, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-
-    result = cv2.bitwise_and(frame, frame, mask=filtered)
-
-    if contours:
-        areas = [(i, cv2.contourArea(cnt)) for i, cnt in enumerate(contours)]
-        
-        for area in areas:
-            if area[1] > 200:
-                cv2.putText(frame, str(area[0]), (0, 10), cv2.FONT_HERSHEY_PLAIN, 1, (0, 255, 0))
-                cv2.drawContours(frame, [contours[area[0]]], 0, (0,255,0), 3)
-                # box = cv.boxPoints(cv.minAreaRect(contours[0]))
-                # box = np.int0(box)
-                # cv.drawContours(frame, [box], 0, (0, 255, 0), 2)
-                break
-
-    # cv.imshow('Result', np.hstack([frame, result]))
-    outputStream.putFrame(frame) 
 
 def LineDetection(cvSink, cs, frame, nt, outputStream, hls, min_area):
     hlsVals = cv2.cvtColor(frame,cv2.COLOR_BGR2HLS)
@@ -476,26 +446,30 @@ if __name__ == "__main__":
     # Useful to see output from any image processing
     # outputStream = cs.putVideo("NameOfStream", processingWidth, processingHeight) 
 
-    # Cargo default params
+    kernel = np.ones((5,5),np.uint8)
+
+    # Cargo params
     cargoOutputStream = cs.putVideo("Cargo Detection", processingWidth, processingHeight)  
     cargoHSV = HSV(0, 7, 120, 255, 160, 255,)
     cargoParams = HoughCircleParams(1.4, 50, 120, 30, 5, 0)
-    kernel = np.ones((5,5),np.uint8)
+    
+    # Hatch params
+    hatchOutputStream = cs.putVideo("Hatch Detection", processingWidth, processingHeight)  
+    hatchHSV = HSV(20, 40, 60, 100, 186, 255)
+    hatchParams = HoughCircleParams(1.4, 50, 120, 30, 10, 50)
 
-    # hatchOutputStream = cs.putVideo("Hatch Detection", processingWidth, processingHeight)  
-    # hsv_hatch_lower = np.array([20, 150, 100])
-    # hsv_hatch_upper = np.array([30, 255, 255])
-
+    # Line params
     lineOutputStream = cs.putVideo("Line Detection", processingWidth, processingHeight)   
-    hls = HLS(0, 40, 0, 100, 225, 255)
+    lineHLS = HLS(0, 40, 0, 100, 225, 255)
+    lineMinArea = 500.0
 
     while True:
         time2, frame = cvSink.grabFrame(img)
 
         frame = cv2.resize(frame, (processingWidth, processingHeight))
 
-        CargoDetection(cvSink, cs, frame, ntinst.getTable('CargoDetection'), cargoOutputStream, cargoHSV, cargoParams, kernel)
-        
-        LineDetection(cvSink, cs, frame.copy(), ntinst.getTable('LineDetection'), lineOutputStream, hls, 500.0)
+        CircleDetection(cvSink, cs, frame, ntinst.getTable('CargoDetection'), cargoOutputStream, cargoHSV, cargoParams, kernel)
 
-        # HatchDetection(cvSink, cs, frame.copy(), ntinst.getTable('HatchDetection'), hsv_hatch_lower, hsv_hatch_upper, hatchOutputStream)
+        CircleDetection(cvSink, cs, frame.copy(), ntinst.getTable('HatchDetection'), hatchOutputStream, hatchHSV, hatchParams, kernel)
+        
+        LineDetection(cvSink, cs, frame.copy(), ntinst.getTable('LineDetection'), lineOutputStream, lineHLS, lineMinArea)
