@@ -5,8 +5,8 @@ import org.texastorque.constants.Ports;
 import org.texastorque.torquelib.component.TorqueMotor;
 
 import edu.wpi.first.wpilibj.VictorSP;
-// import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
-// import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 public class DriveBase extends Subsystem {
 
@@ -14,27 +14,29 @@ public class DriveBase extends Subsystem {
     private RobotState currentState;
 
     private TorqueMotor leftFore;
+    private TorqueMotor leftMid;
 	private TorqueMotor leftRear;
-	private TorqueMotor rightFore;
+    private TorqueMotor rightFore;
+    private TorqueMotor rightMid;
     private TorqueMotor rightRear;
- //   private DoubleSolenoid leftGearShift;
- //   private DoubleSolenoid rightGearShift;
+    private DoubleSolenoid gearShift;
     
     private double leftSpeed = 0.0;
     private double rightSpeed = 0.0;
-    private boolean leftHighGear = false;
-    private boolean rightHighGear = false;
+    private boolean highGear = false;
     
     private static boolean clockwise = true;
 
     private DriveBase() {
-        leftFore = new TorqueMotor(new VictorSP(Ports.DB_LEFT_FORE_MOTOR), clockwise);
-		leftRear = new TorqueMotor(new VictorSP(Ports.DB_LEFT_REAR_MOTOR), !clockwise);
-		rightFore = new TorqueMotor(new VictorSP(Ports.DB_RIGHT_FORE_MOTOR), clockwise);
+        leftFore = new TorqueMotor(new VictorSP(Ports.DB_LEFT_FORE_MOTOR), !clockwise);
+        leftMid = new TorqueMotor(new VictorSP(Ports.DB_LEFT_MID_MOTOR), !clockwise);
+        leftRear = new TorqueMotor(new VictorSP(Ports.DB_LEFT_REAR_MOTOR), !clockwise);
+        
+        rightFore = new TorqueMotor(new VictorSP(Ports.DB_RIGHT_FORE_MOTOR), clockwise);
+        leftMid = new TorqueMotor(new VictorSP(Ports.DB_RIGHT_MID_MOTOR), clockwise);
         rightRear = new TorqueMotor(new VictorSP(Ports.DB_RIGHT_REAR_MOTOR), clockwise);
         
-        // leftGearShift = new DoubleSolenoid(2, Ports.DB_LEFT_SOLE_A, Ports.DB_LEFT_SOLE_B);
-		// rightGearShift = new DoubleSolenoid(2, Ports.DB_RIGHT_SOLE_A, Ports.IN_RIGHT_SOLE_B);
+        gearShift = new DoubleSolenoid(2, Ports.DB_SOLE_A, Ports.DB_SOLE_B);
     }
 
     @Override
@@ -87,37 +89,29 @@ public class DriveBase extends Subsystem {
     @Override
     protected void output() {
         setGears();
-        /*
-        if (leftHighGear)
-            leftGearShift.set(Value.kForward);
+        if (highGear)
+            gearShift.set(Value.kForward);
         else
-            leftGearShift.set(Value.kReverse);
+            gearShift.set(Value.kReverse);
         
-        if (rightHighGear)
-            rightGearShift.set(Value.kForward);
-        else
-            rightGearShift.set(Value.kReverse);
-        */
         leftFore.set(leftSpeed);
-		leftRear.set(leftSpeed);
+        leftMid.set(leftSpeed);
+        leftRear.set(leftSpeed);
+        
 		rightFore.set(rightSpeed);
+		rightMid.set(rightSpeed);
         rightRear.set(rightSpeed);
     }
 
-    public boolean getLeftHighGear() {
-        return leftHighGear;
-    }
-
-    public boolean getRightHighGear() {
-        return rightHighGear;
+    public boolean getHighGear() {
+        return highGear;
     }
 
     /**
      * Potential auto transmission
      */
     private void setGears() {
-        leftHighGear = (leftSpeed < 0.5) ? false : true;
-        rightHighGear = (rightSpeed < 0.5) ? false : true;
+        highGear = input.getDBHighGear();
     }
 
     @Override
