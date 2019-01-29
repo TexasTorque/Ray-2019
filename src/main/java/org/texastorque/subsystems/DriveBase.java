@@ -11,7 +11,12 @@ import edu.wpi.first.wpilibj.VictorSP;
 
 public class DriveBase extends Subsystem {
 
-    private static volatile DriveBase instance;
+    /**
+	 *
+	 */
+	
+	private static final String FAKE_BINARY = "fakeBinary";
+	private static volatile DriveBase instance;
     private RobotState currentState;
     private SmartDashboard dashboard;
     private TorqueMotor leftFore;
@@ -27,7 +32,7 @@ public class DriveBase extends Subsystem {
     private boolean rightHighGear = false;
     
     private static boolean clockwise = true;
-    private boolean angle = true;
+    private boolean angle = false;
     private int fakeBinary = 0;
 
     private DriveBase() {
@@ -94,22 +99,14 @@ public class DriveBase extends Subsystem {
                 if (angle)
                     fakeBinary+= 1000;
                 switch (fakeBinary){
-                    case 1100: rightSpeed += 0.5;
+                    case 1100: rightSpeed = leftSpeed * 3.5;
                         break;
-                    case 1110: rightSpeed += 0.3;
+                    case 1001: rightSpeed = leftSpeed * 1.65;
                         break;
-                    case 1001: rightSpeed += 0.2;
+                    case 0001: leftSpeed = rightSpeed * 3.5;
                         break;
-                    case 1011: rightSpeed += 0.1;
-                        break;
-                    case 0001: leftSpeed += 0.5;
-                        break;
-                    case 0011: leftSpeed += 0.3;
-                        break;
-                    case 0100: leftSpeed += 0.2;
-                        break;
-                    case 0110: leftSpeed += 0.1;
-                        break;       
+                    case 0100: leftSpeed = rightSpeed * 1.65;
+                        break;      
                 }//switch cases
                 smartDashboard();
                 fakeBinary = 0;
@@ -165,7 +162,7 @@ public class DriveBase extends Subsystem {
         dashboard.putBoolean("Left", feedback.lineLeftTrue());
         dashboard.putBoolean("Right", feedback.lineRightTrue());
         dashboard.putBoolean("Middle", feedback.lineMidTrue());
-        dashboard.putNumber("fakeBinary", fakeBinary);
+        dashboard.putNumber("Fake Binary", fakeBinary);
     }
 
   

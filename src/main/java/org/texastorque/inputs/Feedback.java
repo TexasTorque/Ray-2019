@@ -16,9 +16,7 @@ public class Feedback {
     private final DigitalInput lineRight;
     
 
-    private Feedback() {
-        NetworkTable table = NetworkTable.getTable("angle"); 
-        angle = table.getBoolean("angle", false);  
+    private Feedback() { 
         lineLeft = new DigitalInput(Ports.FB_LINE_LEFT);
         lineMid = new DigitalInput(Ports.FB_LINE_MID);
         lineRight = new DigitalInput(Ports.FB_LINE_RIGHT);
