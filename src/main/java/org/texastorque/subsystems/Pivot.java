@@ -1,5 +1,8 @@
 package org.texastorque.subsystems;
 
+import org.texastorque.constants.Ports;
+import org.texastorque.inputs.State.RobotState;
+
 public class Pivot extends Subsystem {
 
     public static volatile Pivot instance;
