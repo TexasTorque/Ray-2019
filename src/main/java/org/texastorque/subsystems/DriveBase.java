@@ -4,7 +4,7 @@ import org.texastorque.inputs.State.RobotState;
 import org.texastorque.constants.Ports;
 import org.texastorque.torquelib.component.TorqueMotor;
 import edu.wpi.first.wpilibj.smartdashboard.*;
-
+import edu.wpi.first.wpilibj.networktables.*;
 import edu.wpi.first.wpilibj.VictorSP;
 // import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 // import edu.wpi.first.wpilibj.DoubleSolenoid;
@@ -14,8 +14,7 @@ public class DriveBase extends Subsystem {
     /**
 	 *
 	 */
-	
-	private static final String FAKE_BINARY = "fakeBinary";
+    private NetworkTable table;
 	private static volatile DriveBase instance;
     private RobotState currentState;
     private SmartDashboard dashboard;
@@ -32,7 +31,7 @@ public class DriveBase extends Subsystem {
     private boolean rightHighGear = false;
     
     private static boolean clockwise = true;
-    private boolean angle = false;
+    private boolean angle;
     private int fakeBinary = 0;
 
     private DriveBase() {
@@ -86,7 +85,8 @@ public class DriveBase extends Subsystem {
         else if (currentState == RobotState.LINE) {
             // Read feedback for NetworkTables input, calculate output
             //angle = feedback.getAngle();
-            
+                table = NetworkTable.getTable("Line Detection ");
+                angle = table.getBoolean("hls ", false);
                 rightSpeed = input.getDBRightSpeed();
                 leftSpeed = input.getDBLeftSpeed();
 
