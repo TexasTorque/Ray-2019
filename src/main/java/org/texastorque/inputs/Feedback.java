@@ -16,10 +16,10 @@ public class Feedback {
     public static final double ANGLE_CONVERSION = 1.0;
 
     // ========== Sensors ===========
-    private final TorqueEncoder DB_leftEncoder;
-    private final TorqueEncoder DB_rightEncoder;
-    private final TorqueEncoder LF_encoder;
-    private final TorqueEncoder PT_encoder;
+    // private final TorqueEncoder DB_leftEncoder;
+    // private final TorqueEncoder DB_rightEncoder;
+    // private final TorqueEncoder LF_encoder;
+    // private final TorqueEncoder PT_encoder;
 
     private final DigitalInput LN_leftSensor;
     private final DigitalInput LN_midSensor;
@@ -27,10 +27,10 @@ public class Feedback {
     
 
     private Feedback() {
-        DB_leftEncoder = new TorqueEncoder(Ports.DB_LEFT_ENCODER_A, Ports.DB_LEFT_ENCODER_B, false, EncodingType.k4X);
-        DB_rightEncoder = new TorqueEncoder(Ports.DB_LEFT_ENCODER_A, Ports.DB_LEFT_ENCODER_B, false, EncodingType.k4X);
-        LF_encoder = new TorqueEncoder(Ports.DB_LEFT_ENCODER_A, Ports.DB_LEFT_ENCODER_B, false, EncodingType.k4X);
-        PT_encoder = new TorqueEncoder(Ports.DB_LEFT_ENCODER_A, Ports.DB_LEFT_ENCODER_B, false, EncodingType.k4X);
+        // DB_leftEncoder = new TorqueEncoder(Ports.DB_LEFT_ENCODER_A, Ports.DB_LEFT_ENCODER_B, false, EncodingType.k4X);
+        // DB_rightEncoder = new TorqueEncoder(Ports.DB_LEFT_ENCODER_A, Ports.DB_LEFT_ENCODER_B, false, EncodingType.k4X);
+        // LF_encoder = new TorqueEncoder(Ports.DB_LEFT_ENCODER_A, Ports.DB_LEFT_ENCODER_B, false, EncodingType.k4X);
+        // PT_encoder = new TorqueEncoder(Ports.DB_LEFT_ENCODER_A, Ports.DB_LEFT_ENCODER_B, false, EncodingType.k4X);
 
         LN_leftSensor = new DigitalInput(Ports.LN_LEFT);
         LN_midSensor = new DigitalInput(Ports.LN_MID);
@@ -39,7 +39,7 @@ public class Feedback {
     }
 
     public void update() {
-        updateEncoders();
+        // updateEncoders();
         updateLineSensors();
     }
 
@@ -54,27 +54,27 @@ public class Feedback {
     private double LF_position;
     private double PT_angle;
 
-    public void resetEncoders() {
-		DB_leftEncoder.reset();
-        DB_rightEncoder.reset();
-        LF_encoder.reset();
-        PT_encoder.reset();
-    }
+    // public void resetEncoders() {
+	// 	DB_leftEncoder.reset();
+    //     DB_rightEncoder.reset();
+    //     LF_encoder.reset();
+    //     PT_encoder.reset();
+    // }
 
-    public void updateEncoders() {
-        DB_leftEncoder.calc();
-        DB_rightEncoder.calc();
-        LF_encoder.calc();
-        PT_encoder.calc();
+    // public void updateEncoders() {
+    //     DB_leftEncoder.calc();
+    //     DB_rightEncoder.calc();
+    //     LF_encoder.calc();
+    //     PT_encoder.calc();
 
-        DB_leftSpeed = DB_leftEncoder.getRate() * DISTANCE_CONVERSION;
-		DB_rightSpeed = DB_rightEncoder.getRate() * DISTANCE_CONVERSION;
-        DB_leftDistance = DB_leftEncoder.getDistance() * DISTANCE_CONVERSION;
-        DB_rightDistance = DB_rightEncoder.getDistance() * DISTANCE_CONVERSION;
+    //     DB_leftSpeed = DB_leftEncoder.getRate() * DISTANCE_CONVERSION;
+	// 	DB_rightSpeed = DB_rightEncoder.getRate() * DISTANCE_CONVERSION;
+    //     DB_leftDistance = DB_leftEncoder.getDistance() * DISTANCE_CONVERSION;
+    //     DB_rightDistance = DB_rightEncoder.getDistance() * DISTANCE_CONVERSION;
 
-        LF_position = DB_leftEncoder.getDistance();
-        PT_angle = DB_rightEncoder.getDistance() * ANGLE_CONVERSION;
-    }
+    //     LF_position = DB_leftEncoder.getDistance();
+    //     PT_angle = DB_rightEncoder.getDistance() * ANGLE_CONVERSION;
+    // }
 
     public double getDBLeftSpeed() {
         return DB_leftSpeed;
