@@ -7,8 +7,8 @@ import edu.wpi.first.wpilibj.networktables.NetworkTable;
 public class Feedback {
 
     private static volatile Feedback instance;
-    private boolean angle;
-
+    private String direction;
+    private NetworkTable table;
 
     // Sensors
     private final DigitalInput lineLeft;
@@ -28,7 +28,15 @@ public class Feedback {
     // Read RPi feedback from NetworkTables
 
     public boolean getAngle(){
-        return angle;
+        table = NetworkTable.getTable("LineDetection");
+        while (direction.equals("N/A")){
+            direction  = table.getString("tape_direction", "N/A");
+        }//while loop
+        if (direction.equals("left"))
+            return false;
+        if (direction.equals("right"))
+            return false;
+        return false;
     }
     // Read line sensors
 
