@@ -59,6 +59,7 @@ import sys
 import cv2
 import datetime
 import numpy as np
+import os
 
 from cscore import CameraServer, VideoSource, VideoMode
 #from cscore import *
@@ -100,16 +101,19 @@ team = 1477
 ntServerIpAddress = "10.14.77.2"
 server = False
 cameraConfigs = []
-printDebugging = False
 width = 320
 height = 240
-fps = 15
+fps = 30
 processingScale = 2
 processingWidth = int(width/processingScale)
 processingHeight = int(height/processingScale)
-xOffset = 160
+xOffset = 200
 yOffset = 240
 showAllReturnedObjects = False
+
+# For saving test video to the rPi
+recordVideo = False
+saveVideoDuration = 30 # seconds
 
 # Weird bug where brightness would not readjust in different lighting conditions, thus the randint()
 config = {"properties":[
@@ -265,7 +269,7 @@ class HoughCircleParams():
         self.min_radius = min_radius
         self.max_radius = max_radius
 
-def CircleDetection(cvSink, cs, frame, nt, outputStream, hsvParams, params, kernel):
+def CircleDetection(cvSink, cs, frame, nt, outputStream, hsvParams, params, kernel, objectType, radius):
     hsv = cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
     hue, sat, val = cv2.split(hsv)
     
@@ -303,15 +307,20 @@ def CircleDetection(cvSink, cs, frame, nt, outputStream, hsvParams, params, kern
         else:
             circles2 = sorted(circles[0],key=lambda x:x[2],reverse=True)
             circle = circles2[0]
-            if circle[2] > 30:
+            if circle[2] >= radius:
                 cv2.circle(frame, (int(round(circle[0])), int(round(circle[1]))), int(round(circle[2])), (0,255,0), 5)
                 cv2.circle(frame, (int(round(circle[0])), int(round(circle[1]))), 2, (0,255,0), 10)
                 nt.putNumber("x", int(circle[0]) - int(xOffset))
-                nt.putNumber("y", abs(int(circle[0]) - int(yOffset)))
+                nt.putNumber("y", abs(int(circle[1]) - int(yOffset)))
+                nt.putBoolean("{}_found".format(objectType), True)
+    else:
+        nt.putBoolean("{}_found".format(objectType), True)
+        nt.putNumber("x", 0)
+        nt.putNumber("y", 0)
 
     outputStream.putFrame(frame)
 
-def LineDetection(cvSink, cs, frame, nt, outputStream, hls, min_area):
+def LineDetection(cvSink, cs, frame, nt, outputStream, hls, minArea, maxArea):
     hlsVals = cv2.cvtColor(frame,cv2.COLOR_BGR2HLS)
     hue, lig, sat = cv2.split(hlsVals)
     kernel = np.ones((5,5),np.uint8)
@@ -322,7 +331,8 @@ def LineDetection(cvSink, cs, frame, nt, outputStream, hls, min_area):
     sthresh = cv2.inRange(np.array(sat),np.array(hls.smin),np.array(hls.smax))            
 
     # AND h l and s
-    tracking = cv2.bitwise_and(hthresh,cv2.bitwise_and(sthresh,lthresh))
+    # tracking = cv2.bitwise_and(hthresh,cv2.bitwise_and(sthresh,lthresh))
+    tracking = lthresh
 
     # Some morpholigical filtering
     dilation = cv2.dilate(tracking,kernel,iterations = 1)
@@ -349,7 +359,7 @@ def LineDetection(cvSink, cs, frame, nt, outputStream, hls, min_area):
                     # cv2.drawContours(threshold, [box], 0, (0,255,0), 3)      
                     area = cv2.contourArea(contour)
 
-                    if area > min_area:
+                    if area > minArea:
                         # print("area: {}", area)
                         cv2.drawContours(frame, [box], 0, (0,255,0), 3)
                         
@@ -367,13 +377,13 @@ def LineDetection(cvSink, cs, frame, nt, outputStream, hls, min_area):
                 max_side = max(rect[1][0], rect[1][1])
                 min_side = min(rect[1][0], rect[1][1])
 
-                # img: 320x240 = 76800 / ##. tape should not be this large within image?
-                if area > min_area and area < (processingHeight * processingWidth)/10 and abs(max_side/min_side) > 3.0:
+                if area > minArea and area < maxArea and abs(max_side/min_side) > 3.0:
                     # print('width: {}, height: {}, angle: {}, area: {}'.format(rect[1][0], rect[1][1], rect[2], area))
                     # sd.putString('center', str(rect[0][0]) + ',' + str(rect[0][1]))
                     nt.putNumber('width', rect[1][0])
                     nt.putNumber('height', rect[1][1])
                     nt.putNumber('angle', rect[2])
+                    nt.putBoolean('line_found', True)
 
                     # https://namkeenman.wordpress.com/2015/12/18/open-cv-determine-angle-of-rotatedrect-minarearect/
                     # no real way of determining which way it is angled
@@ -390,7 +400,14 @@ def LineDetection(cvSink, cs, frame, nt, outputStream, hls, min_area):
                     nt.putNumber('width', -1)
                     nt.putNumber('height', -1)
                     nt.putNumber('angle', -1)
-                    nt.putString("tape_direction", "")
+                    nt.putString('tape_direction', 'N/A')
+                    nt.putBoolean('line_found', False)
+        else:
+            nt.putNumber('width', -1)
+            nt.putNumber('height', -1)
+            nt.putNumber('angle', -1)
+            nt.putString('tape_direction', 'N/A')
+            nt.putBoolean('line_found', False)
                     
     outputStream.putFrame(frame)
 
@@ -451,25 +468,54 @@ if __name__ == "__main__":
     # Cargo params
     cargoOutputStream = cs.putVideo("Cargo Detection", processingWidth, processingHeight)  
     cargoHSV = HSV(0, 7, 120, 255, 160, 255,)
+    cargoRadius = 25
     cargoParams = HoughCircleParams(1.4, 50, 120, 30, 5, 0)
     
     # Hatch params
     hatchOutputStream = cs.putVideo("Hatch Detection", processingWidth, processingHeight)  
     hatchHSV = HSV(20, 40, 60, 100, 186, 255)
+    hatchRadius = 25
     hatchParams = HoughCircleParams(1.4, 50, 120, 30, 10, 50)
 
     # Line params
     lineOutputStream = cs.putVideo("Line Detection", processingWidth, processingHeight)   
     lineHLS = HLS(0, 40, 0, 100, 225, 255)
-    lineMinArea = 500.0
+    lineMinArea = (processingWidth * processingHeight) / 50.0
+    lineMaxArea = (processingWidth * processingHeight) / 10.0
+
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    # fourcc = cv2.VideoWriter_fourcc('M','J','P','G')
+    fourcc = cv2.VideoWriter_fourcc(*'MP4V')
+    out = cv2.VideoWriter(dir_path + '/videos/{}.avi'.format(datetime.now().strftime('%Y%m%d_%H%M%S')), fourcc, 30, (width,height))
+    start = time.process_time()
+    # print("dir_path: {}".format(dir_path))
 
     while True:
         time2, frame = cvSink.grabFrame(img)
 
-        frame = cv2.resize(frame, (processingWidth, processingHeight))
+        if not recordVideo:
 
-        CircleDetection(cvSink, cs, frame, ntinst.getTable('CargoDetection'), cargoOutputStream, cargoHSV, cargoParams, kernel)
+            frame = cv2.resize(frame, (processingWidth, processingHeight))
 
-        CircleDetection(cvSink, cs, frame.copy(), ntinst.getTable('HatchDetection'), hatchOutputStream, hatchHSV, hatchParams, kernel)
+            CircleDetection(cvSink, cs, frame, ntinst.getTable('CargoDetection'), cargoOutputStream, cargoHSV, cargoParams, kernel, "cargo", cargoRadius)
+
+            CircleDetection(cvSink, cs, frame.copy(), ntinst.getTable('HatchDetection'), hatchOutputStream, hatchHSV, hatchParams, kernel, "hatch", hatchRadius)
         
-        LineDetection(cvSink, cs, frame.copy(), ntinst.getTable('LineDetection'), lineOutputStream, lineHLS, lineMinArea)
+            LineDetection(cvSink, cs, frame.copy(), ntinst.getTable('LineDetection'), lineOutputStream, lineHLS, lineMinArea, lineMaxArea)
+        
+        else:
+            
+            out.write(frame)
+
+            end = time.process_time()
+
+            if end - start >= saveVideoDuration:
+                try:
+                    print("Saving video")
+                    out.release()                    
+                    out = cv2.VideoWriter(dir_path + '/videos/{}.avi'.format(datetime.now().strftime('%Y%m%d_%H%M%S')), fourcc, 30, (width,height))
+                except:
+                    print("Error saving file. Check write-only mode.")
+                    recordVideo = False
+                
+                start = time.process_time()
