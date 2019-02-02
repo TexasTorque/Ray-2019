@@ -28,7 +28,7 @@ public class DriveBase extends Subsystem {
     private static boolean clockwise = true;
 
     private DriveBase() {
-        leftFore = new TorqueMotor(new VictorSP(Ports.DB_LEFT_FORE_MOTOR), clockwise);
+        leftFore = new TorqueMotor(new VictorSP(Ports.DB_LEFT_FORE_MOTOR), !clockwise);
 		leftRear = new TorqueMotor(new VictorSP(Ports.DB_LEFT_REAR_MOTOR), !clockwise);
 		rightFore = new TorqueMotor(new VictorSP(Ports.DB_RIGHT_FORE_MOTOR), clockwise);
         rightRear = new TorqueMotor(new VictorSP(Ports.DB_RIGHT_REAR_MOTOR), clockwise);

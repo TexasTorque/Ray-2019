@@ -1,0 +1,15 @@
+#!/bin/sh
+### TYPE: upload-java
+/bin/mount -o remount,rw / && /bin/mount -o remount,rw /boot
+echo "Waiting 1 seconds..."
+sleep 1
+#exec env LD_LIBRARY_PATH=/usr/local/frc/lib java -jar uploaded.jar
+
+### kill python processes
+for pid in $(ps -ef | grep "python3" | awk '{print $2}'); do kill -9 $pid; done
+sleep 1
+exec ./multiCameraServer.py
+
+### kill java processes
+#for pid in $(ps -ef | grep "java" | awk '{print $2}'); do kill -9 $pid; done
+#exec env LD_LIBRARY_PATH=/usr/local/frc/lib java -jar java-multiCameraServer-all.jar

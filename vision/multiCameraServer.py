@@ -107,7 +107,7 @@ fps = 30
 processingScale = 2
 processingWidth = int(width/processingScale)
 processingHeight = int(height/processingScale)
-xOffset = 200
+xOffset = int(width / 2)
 yOffset = 240
 showAllReturnedObjects = False
 
@@ -467,9 +467,10 @@ if __name__ == "__main__":
 
     # Cargo params
     cargoOutputStream = cs.putVideo("Cargo Detection", processingWidth, processingHeight)  
-    cargoHSV = HSV(0, 7, 120, 255, 160, 255,)
+    cargoHSV = HSV(0, 7, 120, 255, 160, 255)
     cargoRadius = 25
-    cargoParams = HoughCircleParams(1.4, 50, 120, 30, 5, 0)
+    # cargoParams = HoughCircleParams(1.4, 50, 120, 30, 5, 0)
+    cargoParams = HoughCircleParams(1.4, 50, 120, 30, 30, 200)
     
     # Hatch params
     hatchOutputStream = cs.putVideo("Hatch Detection", processingWidth, processingHeight)  
@@ -484,8 +485,8 @@ if __name__ == "__main__":
     lineMaxArea = (processingWidth * processingHeight) / 10.0
 
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    # fourcc = cv2.VideoWriter_fourcc('M','J','P','G')
-    fourcc = cv2.VideoWriter_fourcc(*'MP4V')
+    fourcc = cv2.VideoWriter_fourcc('M','J','P','G')
+    # fourcc = cv2.VideoWriter_fourcc(*'MP4V')
     out = cv2.VideoWriter(dir_path + '/videos/{}.avi'.format(datetime.now().strftime('%Y%m%d_%H%M%S')), fourcc, 30, (width,height))
     start = time.process_time()
     # print("dir_path: {}".format(dir_path))
