@@ -4,6 +4,7 @@ import org.texastorque.inputs.State.RobotState;
 import org.texastorque.constants.Ports;
 import org.texastorque.torquelib.component.TorqueMotor;
 import edu.wpi.first.wpilibj.smartdashboard.*;
+import edu.wpi.first.wpilibj.networktables.*;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
@@ -13,7 +14,6 @@ public class DriveBase extends Subsystem {
     /**
 	 *
 	 */
-	
 	private static volatile DriveBase instance;
     private RobotState currentState;
     private SmartDashboard dashboard;
@@ -28,7 +28,7 @@ public class DriveBase extends Subsystem {
     private boolean highGear = false;
     
     private static boolean clockwise = true;
-    private boolean angle = true;
+    private boolean angle;
     private int fakeBinary = 0;
 
     private DriveBase() {
@@ -81,10 +81,10 @@ public class DriveBase extends Subsystem {
         }
         else if (currentState == RobotState.LINE) {
             // Read feedback for NetworkTables input, calculate output
-            //angle = feedback.getAngle();
-            
-                rightSpeed = input.getDBRightSpeed();
-                leftSpeed = input.getDBLeftSpeed();
+            angle = feedback.getAngle();
+                
+            leftSpeed = 0;
+            rightSpeed = 0;
 
                 if (feedback.lineLeftTrue())
                     fakeBinary+= 100;
@@ -94,17 +94,43 @@ public class DriveBase extends Subsystem {
                     fakeBinary+= 1;
                 if (angle)
                     fakeBinary+= 1000;
-                switch (fakeBinary) {
-                    case 1100: rightSpeed = leftSpeed * 3.5;
-                        break;
-                    case 1001: rightSpeed = leftSpeed * 1.65;
-                        break;
-                    case 0001: leftSpeed = rightSpeed * 3.5;
-                        break;
-                    case 0100: leftSpeed = rightSpeed * 1.65;
-                        break;      
-                }//switch cases
-                
+                // if(leftSpeed < .75){
+                //     switch (fakeBinary) {
+                //         case 1100: rightSpeed = leftSpeed * 3.5;
+                //             break;
+                //         case 1001: rightSpeed = leftSpeed * 2.5;
+                //             break;
+                //         case 0001: leftSpeed = rightSpeed * 3.5;
+                //             break;
+                //         case 0100: leftSpeed = rightSpeed * 2.5;
+                //             break;
+                //     }//switch cases
+                // }//if left speed <.75
+                // else{
+                //     switch(fakeBinary){
+                //         case 1100: leftSpeed = rightSpeed *.286;
+                //             break;
+                //         case 1001: leftSpeed = rightSpeed*.4;
+                //             break;
+                //         case 0001: rightSpeed = leftSpeed*.286;
+                //             break;
+                //         case 0100: rightSpeed = leftSpeed*.4;
+                //             break;
+                // }//switch
+                // }//else
+                    switch(fakeBinary) {
+                        case 1100: rightSpeed += 0.5;
+                            break;
+                        case 1001: rightSpeed += 0.2;
+                            break;
+                        case 0001: leftSpeed += 0.5;
+                            break;
+                        case 0100: leftSpeed += 0.2;
+                            break;
+                        default: rightSpeed += 0.2;
+                            leftSpeed += 0.2;
+                            break;
+                    }//switch
                 output();
                 fakeBinary = 0;
             
@@ -125,11 +151,20 @@ public class DriveBase extends Subsystem {
         // else
         //     gearShift.set(Value.kReverse);
         
-        leftFore.set(leftSpeed);
-		leftRear.set(leftSpeed);
-		rightFore.set(rightSpeed);
-        rightRear.set(rightSpeed);
+        if (!feedback.closeToWallTrue()){
+            leftFore.set(leftSpeed);
+            leftRear.set(leftSpeed);
+            rightFore.set(rightSpeed);
+            rightRear.set(rightSpeed);
+        }
+        else{
+            leftFore.set(-0.1);
+            leftRear.set(-0.1);
+            rightFore.set(-0.1);
+            rightRear.set(-0.1);
+        }
         smartDashboard();
+        
     }
 
     public boolean highGear() {
@@ -152,6 +187,7 @@ public class DriveBase extends Subsystem {
         dashboard.putNumber("RightSpeed", rightSpeed);
         dashboard.putBoolean("Tele", (currentState == RobotState.TELEOP));
         dashboard.putBoolean("Line", (currentState == RobotState.LINE));
+        dashboard.putBoolean("Closeness", feedback.closeToWallTrue());
     }
 
   
