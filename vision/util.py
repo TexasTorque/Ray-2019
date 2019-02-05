@@ -11,7 +11,7 @@ def adjustGamma(image, gamma=1.0):
 	# apply gamma correction using the lookup table
 	return cv.LUT(image, table)
 
-def limitValue(dict, minVal, maxVal):
+def clamp(dict, minVal, maxVal):
     return {i: value for i, value in dict.items() if value >= minVal and value <= maxVal}
 
 def outliers(dict, minVal=100, s=2):
