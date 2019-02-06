@@ -7,33 +7,31 @@ import org.texastorque.torquelib.controlLoop.ScheduledPID;
 
 import edu.wpi.first.wpilibj.VictorSP;
 
-public class Lift extends Subsystem {
+public class Rotary extends Subsystem {
 
-    private static volatile Lift instance;
+    private static volatile Rotary instance;
     private RobotState currentState;
+    
+    private TorqueMotor rotary;
 
-    private TorqueMotor pulleyA;
-    private TorqueMotor pulleyB;
-
-    private final ScheduledPID liftPID;
+    private final ScheduledPID rotaryPID;
     private double speed;
     private double currentPos;
     private double setpoint;
     private double prevSetpoint;
     private boolean clockwise = true;
 
-    private Lift() {
-        pulleyA = new TorqueMotor(new VictorSP(Ports.LF_MOTOR_A), clockwise);
-        pulleyB = new TorqueMotor(new VictorSP(Ports.LF_MOTOR_B), clockwise);
+    private Rotary() {
+        rotary = new TorqueMotor(new VictorSP(Ports.RT_MOTOR), clockwise);
 
-        this.liftPID = new ScheduledPID.Builder(0, 0.5)
+        this.rotaryPID = new ScheduledPID.Builder(0, 0.5)
                 .setPGains(0.01)
                 .setIGains(0.01)
                 .setDGains(0.01)
                 .build();
 
         speed = 0;
-        setpoint = input.getLFSetpoint(0);
+        setpoint = input.getRTSetpoint(0);
     }
 
     @Override
@@ -64,56 +62,55 @@ public class Lift extends Subsystem {
         currentState = state.getRobotState();
 
         if (currentState == RobotState.TELEOP) {
-            runLiftPID();
+            runRotaryPID();
         }
         else if (currentState == RobotState.VISION) {
-            runLiftBottom();
+            runRotaryBottom();
         }
         else if (currentState == RobotState.LINE) {
-            runLiftPID();
+            runRotaryPID();
         }
         
         output();
     }
 
-    private void runLiftPID() {
-        setpoint = input.getLFSetpoint();
-        currentPos = feedback.getLFPosition();
+    private void runRotaryPID() {
+        setpoint = input.getRTSetpoint();
+        currentPos = feedback.getRTPosition();
         if (setpoint != prevSetpoint) {
-            liftPID.changeSetpoint(setpoint);
+            rotaryPID.changeSetpoint(setpoint);
             prevSetpoint = setpoint;
         }
 
-        speed = liftPID.calculate(currentPos);
+        speed = rotaryPID.calculate(currentPos);
         output();
     }
 
-    private void runLiftBottom() {
-        setpoint = input.getLFSetpoint(0);
-        currentPos = feedback.getLFPosition();
+    private void runRotaryBottom() {
+        setpoint = input.getRTSetpoint(0);
+        currentPos = feedback.getRTPosition();
         if (setpoint != prevSetpoint) {
-            liftPID.changeSetpoint(setpoint);
+            rotaryPID.changeSetpoint(setpoint);
             prevSetpoint = setpoint;
         }
 
-        speed = liftPID.calculate(currentPos);
+        speed = rotaryPID.calculate(currentPos);
         output();
-    }
-
-    @Override
-    protected void output() {
-        pulleyA.set(speed);
-        pulleyB.set(speed);
     }
 
     @Override
     public void smartDashboard() {}
 
-    public static Lift getInstance() {
+    @Override
+    public void output() {
+
+    }
+
+    public static Rotary getInstance() {
         if (instance == null) {
-            synchronized (Lift.class) {
+            synchronized (Rotary.class) {
                 if (instance == null)
-                    instance = new Lift();
+                    instance = new Rotary();
             }
         }
         return instance;

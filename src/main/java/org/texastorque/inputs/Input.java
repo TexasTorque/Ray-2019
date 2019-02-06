@@ -7,7 +7,7 @@ public class Input {
 
     private static volatile Input instance;
 
-    private State state;
+    private volatile State state;
 	private GenericController driver;
     private  GenericController operator;
     
@@ -35,9 +35,9 @@ public class Input {
     }
     
     // ========== DriveBase ==========
-    private double DB_leftSpeed = 0;
-    private double DB_rightSpeed = 0;
-    private boolean DB_highGear = false;
+    private volatile double DB_leftSpeed = 0;
+    private volatile double DB_rightSpeed = 0;
+    private volatile boolean DB_highGear = false;
 
     public void updateDrive() {
 		DB_leftSpeed = -driver.getLeftYAxis() + driver.getRightXAxis();
@@ -78,14 +78,37 @@ public class Input {
         return LF_setpoints[i];
     }
 
-    //  ========== Pivot ==========
-    private final double[] PT_setpoints = {0, 10, 20};
-    private volatile int PT_setpoint;
+    // ========== Rotary ==========
+    private final double[] RT_setpoints = {0, 10};
+    private volatile int RT_setpoint;
 
-    public void updatePivot() {}
+    public void updateRotary() {}
 
-    public double getPTSetpoint() {
-        return PT_setpoints[PT_setpoint];
+    public double getRTSetpoint() {
+        return RT_setpoints[RT_setpoint];
+    }
+
+    public double getRTSetpoint(int i) {
+        return RT_setpoints[i];
+    }
+
+    // ========== Intake ==========
+    private volatile boolean IN_wheelsOn;
+    private volatile boolean IN_wristExtended;
+    private volatile boolean IN_hatchEngaged;
+
+    public void updateIntake() {}
+
+    public boolean getINWheelsOn() {
+        return IN_wheelsOn;
+    }
+
+    public boolean getINWristExtended() {
+        return IN_wristExtended;
+    }
+
+    public boolean getINHatchEngaged() {
+        return IN_hatchEngaged;
     }
     
     public static Input getInstance() {

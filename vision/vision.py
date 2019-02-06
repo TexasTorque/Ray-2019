@@ -60,7 +60,7 @@ showAllReturnedObjects = False
 config = {"properties":[
     {"name":"connect_verbose","value":1},
     {"name":"raw_brightness","value":100},
-    {"name":"brightness","value":randint(20, 40)}, 
+    {"name":"brightness","value":randint(20, 30)}, 
     {"name":"raw_contrast","value":0},
     {"name":"contrast","value":50},
     {"name":"raw_saturation","value":0},
@@ -80,7 +80,8 @@ config = {"properties":[
 
 # Report parse error
 def parseError(str):
-    print("Config error in '" + configFile + "': " + str, file=sys.stderr)
+    print("Config error in '" + configFile + "': " + str)
+    # print("Config error in '" + configFile + "': " + str, file=sys.stderr)
 
 # Read configuration file
 def readConfig():
@@ -91,7 +92,8 @@ def readConfig():
         with open(configFile, "rt") as f:
             parsed = json.load(f)
     except OSError as err:
-        print("could not open '{}': {}".format(configFile, err), file=sys.stderr)
+        print("could not open '{}': {}".format(configFile, err))
+        # print("could not open '{}': {}".format(configFile, err), file=sys.stderr)
         return False
 
     # Top level must be an object
@@ -158,7 +160,7 @@ def findTargetTop(frame, minHSV, maxHSV, kernel, tables, outputStream):
     mask = cv.morphologyEx(mask, cv.MORPH_CLOSE, kernel)
 
     # Draw contours
-    contours, hierarchy = cv.findContours(mask, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+    _, contours, hierarchy = cv.findContours(mask, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
 
     if contours:
         # Construct dictionary that maps indices to contour areas, then discard areas that are too small or too big.
@@ -285,6 +287,6 @@ if __name__ == "__main__":
     while 1:
         time2, frame = cvSink.grabFrame(img)
         frame = cv.resize(frame, (processWidth, processHeight))
-        frame = cv.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        frame = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
 
         findTargetTop(frame, minTargetHSV, maxTargetHSV, kernel, ntinst.getTable("TargetDetection"), targetOutputStream)
