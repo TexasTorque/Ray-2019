@@ -212,7 +212,7 @@ def findTargetTop(frame, minHSV, maxHSV, kernel, tables, outputStream):
         # Find pairs of left and right targets that pair to form a valid vision target
         for i, left in leftTargets:
             for j, right in rightTargets:
-                if left[1][0] < right[1][0] and util.approx(util.distance(left[1], right[1]), approxWidth*4, error=0.2) and inRange(abs(left[1][1]-right[1][1]), 0, 5):
+                if left[1][0] < right[1][0] and util.approx(util.distance(left[1], right[1]), approxWidth*4, error=0.2) and util.inRange(abs(left[1][1]-right[1][1]), 0, 5):
                     targetPairs.append((left, right))
 
         # Calculate center of vision target by drawing diagonals
@@ -223,6 +223,7 @@ def findTargetTop(frame, minHSV, maxHSV, kernel, tables, outputStream):
                 cv.putText(frame, "X", (c[0]+3, c[1]+3), cv.FONT_HERSHEY_PLAIN, 1, (0, 255, 0))
 
             outputStream.putFrame(frame)
+            print(centers)
             return centers
 
     outputStream.putFrame(frame)
