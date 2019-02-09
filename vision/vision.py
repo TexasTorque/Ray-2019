@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import json
 import time
 import sys
@@ -50,17 +52,18 @@ cameraConfigs = []
 width = 320
 height = 240
 fps = 30
-processingScale = 2
-processWidth = int(width / processingScale)
-processHeight = int(height / processingScale)
-xOffset = int(width / 2)
+processingScale = 1.5
+frameWidth = width // processingScale
+frameHeight = height // processingScale
+frameCenter = (frameWidth//2, frameHeight//2)
+xOffset = width // 2
 yOffset = 240
 showAllReturnedObjects = False
 
 config = {"properties":[
     {"name":"connect_verbose","value":1},
     {"name":"raw_brightness","value":100},
-    {"name":"brightness","value":randint(20, 30)}, 
+    {"name":"brightness","value":20}, 
     {"name":"raw_contrast","value":0},
     {"name":"contrast","value":50},
     {"name":"raw_saturation","value":0},
@@ -155,18 +158,23 @@ def startCamera(config):
 
 ########## VISION LOGIC ##########
 
-def findTargetTop(frame, minHSV, maxHSV, kernel, tables, outputStream):
-    mask = cv.inRange(frame, minHSV, maxHSV)
+def findTargetTop(hsv, minHSV, maxHSV, kernel, tables, outputStream):
+    mask = cv.inRange(hsv, minHSV, maxHSV)
     mask = cv.morphologyEx(mask, cv.MORPH_CLOSE, kernel)
 
     # Draw contours
     _, contours, hierarchy = cv.findContours(mask, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+
+    frame = cv.cvtColor(hsv, cv.COLOR_HSV2BGR)
+    cv.line(frame, (frameCenter[0], frameCenter[1]-5), (frameCenter[0], frameCenter[1]+5), (0,255,0), 1)
+    cv.line(frame, (frameCenter[0]-5, frameCenter[1]), (frameCenter[0]+5, frameCenter[1]), (0,255,0), 1)
 
     if contours:
         # Construct dictionary that maps indices to contour areas, then discard areas that are too small or too big.
         areas = {i: cv.contourArea(cnt) for i, cnt in enumerate(contours)}
         areas = util.clamp(areas, 100, 16000)
         if not areas:
+            tables.putNumber("target_error", 0)
             outputStream.putFrame(frame)
             return 0
 
@@ -200,6 +208,7 @@ def findTargetTop(frame, minHSV, maxHSV, kernel, tables, outputStream):
             else:
                 continue
         if not targets:
+            tables.putNumber("target_error", 0)
             outputStream.putFrame(frame)
             return 0
 
@@ -212,20 +221,22 @@ def findTargetTop(frame, minHSV, maxHSV, kernel, tables, outputStream):
         # Find pairs of left and right targets that pair to form a valid vision target
         for i, left in leftTargets:
             for j, right in rightTargets:
-                if left[1][0] < right[1][0] and util.approx(util.distance(left[1], right[1]), approxWidth*4, error=0.2) and util.inRange(abs(left[1][1]-right[1][1]), 0, 5):
+                if left[1][0] < right[1][0] and util.approx(util.distance(left[1], right[1]), approxWidth*4, error=0.2) and util.inRange(abs(left[1][1]-right[1][1]), 0, 10):
                     targetPairs.append((left, right))
 
         # Calculate center of vision target by drawing diagonals
         centers = list(filter(lambda c : c != 0, [util.midpoint(left[1], right[1]) for left, right in targetPairs]))
         if centers:
-            for c in centers:
-                cv.circle(frame, c, 2, (0, 255, 0), -1)
-                cv.putText(frame, "X", (c[0]+3, c[1]+3), cv.FONT_HERSHEY_PLAIN, 1, (0, 255, 0))
+            target = min(centers, key=lambda m : util.distance(m, frameCenter))
+            cv.circle(frame, target, 2, (0, 255, 0), -1)
+            cv.putText(frame, "X", (target[0]+3, target[1]+3), cv.FONT_HERSHEY_PLAIN, 1, (0, 255, 0))
 
+            # (+) if target is to the right, (-) if target is to the left
+            tables.putNumber("target_error", target[0]-frameCenter[0])
             outputStream.putFrame(frame)
-            print(centers)
-            return centers
+            return target
 
+    tables.putNumber("target_error", 0)
     outputStream.putFrame(frame)
     return 0
 
@@ -272,22 +283,25 @@ if __name__ == "__main__":
     time.sleep(2.0)
 
     # Preallocate a numpy empty array
-    img = np.zeros(shape=(processHeight, processWidth, 3), dtype=np.uint8)
+    img = np.zeros(shape=(frameHeight, frameWidth, 3), dtype=np.uint8)
 
     # (Optional) setup a CvSource. This will send images back to the Dashboard
     # Useful to see output from any image processing
-    # outputStream = cs.putVideo("NameOfStream", processWidth, processHeight) 
+    # outputStream = cs.putVideo("NameOfStream", frameWidth, frameHeight) 
 
     kernel = np.ones((5,5),np.uint8)
 
     # Target params
-    targetOutputStream = cs.putVideo("TargetDetection", processWidth, processHeight)
-    minTargetHSV = np.array([70, 170, 100])
+    targetTable = ntinst.getTable("TargetDetection")
+    targetTable.putNumber("frame_width", frameWidth)
+    targetTable.putNumber("frame_height", frameHeight)
+    targetOutputStream = cs.putVideo("TargetDetection", frameWidth, frameHeight)
+    minTargetHSV = np.array([70, 130, 100])
     maxTargetHSV = np.array([75, 255, 255])
 
     while 1:
         time2, frame = cvSink.grabFrame(img)
-        frame = cv.resize(frame, (processWidth, processHeight))
-        frame = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
+        frame = cv.resize(frame, (frameWidth, frameHeight))
+        hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
 
-        findTargetTop(frame, minTargetHSV, maxTargetHSV, kernel, ntinst.getTable("TargetDetection"), targetOutputStream)
+        findTargetTop(hsv, minTargetHSV, maxTargetHSV, kernel, targetTable, targetOutputStream)
