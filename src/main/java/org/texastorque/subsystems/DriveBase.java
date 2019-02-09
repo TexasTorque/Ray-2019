@@ -3,29 +3,33 @@ package org.texastorque.subsystems;
 import org.texastorque.inputs.State.RobotState;
 import org.texastorque.constants.Ports;
 import org.texastorque.torquelib.component.TorqueMotor;
-
+import edu.wpi.first.wpilibj.smartdashboard.*;
+import edu.wpi.first.wpilibj.networktables.*;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.VictorSP;
-// import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
-// import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 public class DriveBase extends Subsystem {
 
-    private static volatile DriveBase instance;
+    /**
+	 *
+	 */
+	private static volatile DriveBase instance;
     private RobotState currentState;
-
     private TorqueMotor leftFore;
 	private TorqueMotor leftRear;
 	private TorqueMotor rightFore;
     private TorqueMotor rightRear;
- //   private DoubleSolenoid leftGearShift;
- //   private DoubleSolenoid rightGearShift;
-    
+    private DoubleSolenoid gearShift;
+    private SmartDashboard dashboard;
+
     private double leftSpeed = 0.0;
     private double rightSpeed = 0.0;
-    private boolean leftHighGear = false;
-    private boolean rightHighGear = false;
+    private boolean highGear = false;
     
     private static boolean clockwise = true;
+    private boolean angle;
+    private int fakeBinary = 0;
 
     private DriveBase() {
         leftFore = new TorqueMotor(new VictorSP(Ports.DB_LEFT_FORE_MOTOR), !clockwise);
@@ -33,8 +37,8 @@ public class DriveBase extends Subsystem {
 		rightFore = new TorqueMotor(new VictorSP(Ports.DB_RIGHT_FORE_MOTOR), clockwise);
         rightRear = new TorqueMotor(new VictorSP(Ports.DB_RIGHT_REAR_MOTOR), clockwise);
         
-        // leftGearShift = new DoubleSolenoid(2, Ports.DB_LEFT_SOLE_A, Ports.DB_LEFT_SOLE_B);
-		// rightGearShift = new DoubleSolenoid(2, Ports.DB_RIGHT_SOLE_A, Ports.IN_RIGHT_SOLE_B);
+        gearShift = new DoubleSolenoid(2, Ports.DB_LEFT_SOLE_A, Ports.DB_LEFT_SOLE_B);
+
     }
 
     @Override
@@ -69,6 +73,7 @@ public class DriveBase extends Subsystem {
     @Override
     public void teleopContinuous() {
         currentState = state.getRobotState();
+        feedback.gyroReset();
 
         if (currentState == RobotState.TELEOP) {
             leftSpeed = input.getDBLeftSpeed();
@@ -77,8 +82,35 @@ public class DriveBase extends Subsystem {
         }
         else if (currentState == RobotState.LINE) {
             // Read feedback for NetworkTables input, calculate output
-            feedback.lineLeftTrue();
-            output();
+            angle = feedback.getAngle();
+                
+            leftSpeed = 0;
+            rightSpeed = 0;
+
+                if (feedback.lineLeftTrue())
+                    fakeBinary+= 100;
+                // if (feedback.lineMidTrue())
+                //     fakeBinary+= 10;
+                if (feedback.lineRightTrue())
+                    fakeBinary+= 1;
+                if (angle)
+                    fakeBinary+= 1000;
+                    switch(fakeBinary) {
+                        case 1100: rightSpeed += 0.5;
+                            break;
+                        case 1001: rightSpeed += 0.2;
+                            break;
+                        case 0001: leftSpeed += 0.5;
+                            break;
+                        case 0100: leftSpeed += 0.2;
+                            break;
+                        default: rightSpeed += 0.2;
+                            leftSpeed += 0.2;
+                            break;
+                    }//switch
+                output();
+                fakeBinary = 0;
+            
         }
         else if (currentState == RobotState.VISION) {
             // Read feedback for NetworkTables input, calculate output
@@ -89,42 +121,51 @@ public class DriveBase extends Subsystem {
 
     @Override
     public void output() {
-        setGears();
-        /*
-        if (leftHighGear)
-            leftGearShift.set(Value.kForward);
-        else
-            leftGearShift.set(Value.kReverse);
+        // setGears();
         
-        if (rightHighGear)
-            rightGearShift.set(Value.kForward);
-        else
-            rightGearShift.set(Value.kReverse);
-        */
-        leftFore.set(leftSpeed);
-		leftRear.set(leftSpeed);
-		rightFore.set(rightSpeed);
-        rightRear.set(rightSpeed);
+        // if (highGear)
+        //     gearShift.set(Value.kForward);
+        // else
+        //     gearShift.set(Value.kReverse);
+        
+        if (!feedback.closeToWallTrue()){
+            leftFore.set(leftSpeed);
+            leftRear.set(leftSpeed);
+            rightFore.set(rightSpeed);
+            rightRear.set(rightSpeed);
+        }
+        else{
+            leftFore.set(-0.2);
+            leftRear.set(-0.2);
+            rightFore.set(-0.2);
+            rightRear.set(-0.2);
+        }
+        smartDashboard();
+        
     }
 
-    public boolean getLeftHighGear() {
-        return leftHighGear;
-    }
-
-    public boolean getRightHighGear() {
-        return rightHighGear;
+    public boolean highGear() {
+        return highGear;
     }
 
     /**
      * Potential auto transmission
      */
     private void setGears() {
-        leftHighGear = (leftSpeed < 0.5) ? false : true;
-        rightHighGear = (rightSpeed < 0.5) ? false : true;
+        highGear = (leftSpeed > 0.5 && rightSpeed > 0.5) ? true : false;
     }
-
+    
     @Override
-    public void smartDashboard() {}
+    public void smartDashboard() {
+        dashboard.putBoolean("Left", feedback.lineLeftTrue());
+        dashboard.putBoolean("Right", feedback.lineRightTrue());
+        dashboard.putBoolean("Middle", feedback.lineMidTrue());
+        dashboard.putBoolean("Tele", (state.getRobotState() == RobotState.TELEOP));
+        dashboard.putBoolean("Line", (state.getRobotState() == RobotState.LINE));
+        dashboard.putBoolean("Closeness", feedback.closeToWallTrue());
+        dashboard.putNumber("Voltage", feedback.getVoltage());
+        dashboard.putNumber("Angle", feedback.getRawAngle());
+    }
 
     public static DriveBase getInstance() {
         if (instance == null) {

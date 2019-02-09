@@ -2,6 +2,7 @@ package org.texastorque.inputs;
 
 import org.texastorque.inputs.State.RobotState;
 import org.texastorque.torquelib.util.GenericController;
+import org.texastorque.torquelib.component.TorqueEncoder;
 
 public class Input {
 
@@ -10,17 +11,21 @@ public class Input {
     private State state;
 	private GenericController driver;
     private  GenericController operator;
+    private TorqueEncoder leftEncoder;
+    private TorqueEncoder rightEncoder;
     
     private Input() {
         state = State.getInstance();
 		driver = new GenericController(0, .1);
-		operator = new GenericController(1, .1);
+        operator = new GenericController(1, .1);
+        // leftEncoder = new TorqueEncoder();
+        // rightEncoder = new TorqueEncoder();
     }
     
     public void update() {
         updateState();
         updateDrive();
-    }
+    } 
 
     // =========== RobotState ==========
     public void updateState() {
@@ -41,6 +46,8 @@ public class Input {
     public void updateDrive() {
 		DB_leftSpeed = -driver.getLeftYAxis() + driver.getRightXAxis();
         DB_rightSpeed = -driver.getLeftYAxis() - driver.getRightXAxis();
+        //DB_leftSpeed = driver.getLeftYAxis();
+        //DB_rightSpeed = driver.getLeftYAxis();
     }
 
     public double getDBLeftSpeed() {
