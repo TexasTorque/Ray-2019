@@ -16,12 +16,12 @@ public class DriveBase extends Subsystem {
 	 */
 	private static volatile DriveBase instance;
     private RobotState currentState;
-    private SmartDashboard dashboard;
     private TorqueMotor leftFore;
 	private TorqueMotor leftRear;
 	private TorqueMotor rightFore;
     private TorqueMotor rightRear;
     private DoubleSolenoid gearShift;
+    private SmartDashboard dashboard;
 
     private double leftSpeed = 0.0;
     private double rightSpeed = 0.0;
@@ -73,6 +73,7 @@ public class DriveBase extends Subsystem {
     @Override
     public void teleopContinuous() {
         currentState = state.getRobotState();
+        feedback.gyroReset();
 
         if (currentState == RobotState.TELEOP) {
             leftSpeed = input.getDBLeftSpeed();
@@ -94,30 +95,6 @@ public class DriveBase extends Subsystem {
                     fakeBinary+= 1;
                 if (angle)
                     fakeBinary+= 1000;
-                // if(leftSpeed < .75){
-                //     switch (fakeBinary) {
-                //         case 1100: rightSpeed = leftSpeed * 3.5;
-                //             break;
-                //         case 1001: rightSpeed = leftSpeed * 2.5;
-                //             break;
-                //         case 0001: leftSpeed = rightSpeed * 3.5;
-                //             break;
-                //         case 0100: leftSpeed = rightSpeed * 2.5;
-                //             break;
-                //     }//switch cases
-                // }//if left speed <.75
-                // else{
-                //     switch(fakeBinary){
-                //         case 1100: leftSpeed = rightSpeed *.286;
-                //             break;
-                //         case 1001: leftSpeed = rightSpeed*.4;
-                //             break;
-                //         case 0001: rightSpeed = leftSpeed*.286;
-                //             break;
-                //         case 0100: rightSpeed = leftSpeed*.4;
-                //             break;
-                // }//switch
-                // }//else
                     switch(fakeBinary) {
                         case 1100: rightSpeed += 0.5;
                             break;
@@ -158,10 +135,10 @@ public class DriveBase extends Subsystem {
             rightRear.set(rightSpeed);
         }
         else{
-            leftFore.set(-0.1);
-            leftRear.set(-0.1);
-            rightFore.set(-0.1);
-            rightRear.set(-0.1);
+            leftFore.set(-0.2);
+            leftRear.set(-0.2);
+            rightFore.set(-0.2);
+            rightRear.set(-0.2);
         }
         smartDashboard();
         
@@ -177,20 +154,18 @@ public class DriveBase extends Subsystem {
     private void setGears() {
         highGear = (leftSpeed > 0.5 && rightSpeed > 0.5) ? true : false;
     }
-
+    
     @Override
     public void smartDashboard() {
         dashboard.putBoolean("Left", feedback.lineLeftTrue());
         dashboard.putBoolean("Right", feedback.lineRightTrue());
         dashboard.putBoolean("Middle", feedback.lineMidTrue());
-        dashboard.putNumber("LeftSpeed", leftSpeed);
-        dashboard.putNumber("RightSpeed", rightSpeed);
-        dashboard.putBoolean("Tele", (currentState == RobotState.TELEOP));
-        dashboard.putBoolean("Line", (currentState == RobotState.LINE));
+        dashboard.putBoolean("Tele", (state.getRobotState() == RobotState.TELEOP));
+        dashboard.putBoolean("Line", (state.getRobotState() == RobotState.LINE));
         dashboard.putBoolean("Closeness", feedback.closeToWallTrue());
+        dashboard.putNumber("Voltage", feedback.getVoltage());
+        dashboard.putNumber("Angle", feedback.getRawAngle());
     }
-
-  
 
     public static DriveBase getInstance() {
         if (instance == null) {
