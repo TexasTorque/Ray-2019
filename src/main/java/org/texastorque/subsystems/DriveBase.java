@@ -91,24 +91,22 @@ public class DriveBase extends Subsystem {
 
                 if (feedback.lineLeftTrue())
                     fakeBinary+= 100;
-                // if (feedback.lineMidTrue())
-                //     fakeBinary+= 10;
                 if (feedback.lineRightTrue())
                     fakeBinary+= 1;
                 if (angle)
                     fakeBinary+= 1000;
-                    switch(fakeBinary) {
-                        case 1100: rightSpeed += 0.5;
-                            break;
-                        case 1001: rightSpeed += 0.2;
-                            break;
-                        case 0001: leftSpeed += 0.5;
-                            break;
-                        case 0100: leftSpeed += 0.2;
-                            break;
-                        default: rightSpeed += 0.2;
-                            leftSpeed += 0.2;
-                            break;
+                switch(fakeBinary) {
+                    case 1100: rightSpeed = 0.5;
+                        break;
+                    case 1001: rightSpeed = 0.2;
+                        break;
+                    case 0001: leftSpeed = 0.5;
+                        break;
+                    case 0100: leftSpeed = 0.2;
+                        break;
+                    default: rightSpeed = 0.2;
+                        leftSpeed = 0.2;
+                        break;
                     }//switch
                 output();
                 fakeBinary = 0;
