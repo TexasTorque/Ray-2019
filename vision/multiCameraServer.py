@@ -6,53 +6,6 @@
 # the project.
 #----------------------------------------------------------------------------
 
-#----------------------------------------------------------------------------
-# 
-# This script is a modified version of the python example found on the FRCVision-rPi interface. 
-# Currently stripped to only retrieve camera on /dev/video0
-# 
-# FRCVision-rPi: http://wpilib.screenstepslive.com/s/currentCS/m/85074/l/1027798-the-raspberry-pi-frc-console
-# Examples on github: https://github.com/robotpy/examples
-#
-# sftp://pi:raspberry@10.14.77.19/home/pi/
-# 
-# If mDNS is working, ping frcvision.local -4 to get the IPv4 address
-# To browse the camera stream, go to http://frcvision.local or http://10.14.17.19
-# We will want to set a static ip once the rPi is on the rio. mDNS is slow and unreliable
-#
-# This image automatically kicks off /home/pi/runCamera upon startup. 
-# This can be modified to execute another script.
-# 
-# For developing, go to the web infterface and do the following:
-# # Vision Status -> Down to kill runCamera
-# # Click the "Writable" button at the top. By default, the rPi boots up in read-only mode
-#
-# Write: /bin/mount -o remount,rw / && /bin/mount -o remount,rw /boot
-# Read-Only: /bin/mount -o remount,ro / && /bin/mount -o remount,ro /boot
-#
-# To upload files to the rPi, use WinSCP and connect to frcvision.local or the IP.
-# If uploading a new script, make sure to chmod to 0755 (set properties on the doc).
-# 
-# Modify /home/pi/runInteractive and point it at your script.
-# Then in putty, ./runInteractive
-# 
-# For production, update ./runCamera to point at your script
-#
-# Network Tables
-# 
-# The RoboRio should always be the "server" and any app or device should be running in "client" mode.
-# Although the FRCVision-rPi can emulate server mode, an easier way is to load up 
-# Outline Viewer (part of the FRC 2019 suite) and run it as a server.
-# Then update the script to point at your IP address as the server.
-#
-# SmartDashboard
-#
-# Every cvSink that is setup can accessed via the browser or linked to directly as a mjpgstream in SmartDashboard
-# http://10.14.77.19:1181 will be the default stream, 1182, 1183, 1184, etc, for every additional cvSink
-# http://10.14.77.19:1181/stream.mjpg - added these streams to SmartDashboard
-#
-#----------------------------------------------------------------------------
-
 import json
 import time
 import sys
@@ -62,64 +15,52 @@ import numpy as np
 import os
 
 from cscore import CameraServer, VideoSource, VideoMode
-#from cscore import *
 from networktables import NetworkTablesInstance, NetworkTables
 from datetime import datetime
 from random import randint
-
-#   JSON format:
-#   {
-#       "team": <team number>,
-#       "ntmode": <"client" or "server", "client" if unspecified>
-#       "cameras": [
-#           {
-#               "name": <camera name>
-#               "path": <path, e.g. "/dev/video0">
-#               "pixel format": <"MJPEG", "YUYV", etc>   // optional
-#               "width": <video mode width>              // optional
-#               "height": <video mode height>            // optional
-#               "fps": <video mode fps>                  // optional
-#               "brightness": <percentage brightness>    // optional
-#               "white balance": <"auto", "hold", value> // optional
-#               "exposure": <"auto", "hold", value>      // optional
-#               "properties": [                          // optional
-#                   {
-#                       "name": <property name>
-#                       "value": <property value>
-#                   }
-#               ]
-#           }
-#       ]
-#   }
 
 configFile = "/boot/frc.json"
 
 class CameraConfig: pass
 
 team = 1477
-# ntServerIpAddress = "192.168.253.41"
 ntServerIpAddress = "10.14.77.2"
 server = False
 cameraConfigs = []
-width = 320
-height = 240
-fps = 30
-processingScale = 2
+# width, height = 640, 480
+width, height = 320, 240
+# width, height = 256, 144
+lifecamFps = 15
+fisheyeFps = 30
+processingScale = 1
 processingWidth = int(width/processingScale)
 processingHeight = int(height/processingScale)
-xOffset = int(width / 2)
-yOffset = 240
+xOffset = int(processingWidth / 2)
+yOffset = processingHeight
 showAllReturnedObjects = False
+lineSensitivity = 5.0
+
+blackoutRegions = True
+blackoutVerticalPercentage = 1 # percentage
+blackoutHorizontalPercentage = 25 # percentage
+rotateImage = False
+
+if rotateImage:
+    temp_width = processingWidth
+    processingWidth = processingHeight
+    processingHeight = temp_width
 
 # For saving test video to the rPi
 recordVideo = False
 saveVideoDuration = 30 # seconds
+if recordVideo:
+    fps = 30
 
 # Weird bug where brightness would not readjust in different lighting conditions, thus the randint()
-config = {"properties":[
+lifecamConfig = {"properties":[
     {"name":"connect_verbose","value":1},
     {"name":"raw_brightness","value":100},
-    {"name":"brightness","value":randint(20,40)}, 
+    {"name":"brightness","value":randint(30,40)}, 
     {"name":"raw_contrast","value":0},
     {"name":"contrast","value":50},
     {"name":"raw_saturation","value":0},
@@ -136,6 +77,30 @@ config = {"properties":[
     {"name":"pan_absolute","value":0},
     {"name":"tilt_absolute","value":0},
     {"name":"zoom_absolute","value":0}]}
+
+fisheyeConfig = {"properties": [
+    {"name": "connect_verbose","value": 1},
+    {"name": "raw_brightness","value": 0},
+    {"name": "brightness","value": 33},
+    {"name": "raw_contrast","value": 32},
+    {"name": "contrast","value": 25},
+    {"name": "raw_saturation","value": 61},
+    {"name": "saturation","value": 47},
+    {"name": "raw_hue","value": -1},
+    {"name": "hue","value": 48},
+    {"name": "white_balance_temperature_auto","value": False},
+    {"name": "gamma","value": 111},
+    {"name": "raw_gain","value": 0},
+    {"name": "gain","value": 0},
+    {"name": "power_line_frequency","value": 2},
+    {"name": "white_balance_temperature","value": 4500},
+    {"name": "raw_sharpness","value": 0},
+    {"name": "sharpness","value": 0},
+    {"name": "backlight_compensation","value": 1},
+    {"name": "exposure_auto","value": 1},
+    {"name": "raw_exposure_absolute","value": 850},
+    {"name": "exposure_absolute","value": 17},
+    {"name": "exposure_auto_priority","value": False}]}
 
 """Report parse error."""
 def parseError(str):
@@ -217,7 +182,7 @@ def startCamera(config):
         .startAutomaticCapture(name=config.name, path=config.path)
 
     camera.setConfigJson(json.dumps(config.config))
-    print(config.config)
+    print("camera config: ".format(config.config))
 
     return camera
 
@@ -269,7 +234,17 @@ class HoughCircleParams():
         self.min_radius = min_radius
         self.max_radius = max_radius
 
-def CircleDetection(cvSink, cs, frame, nt, outputStream, hsvParams, params, kernel, objectType, radius):
+def CircleDetection(cvSink, cs, frame, nt, outputStream, hsvParams, params, kernel, objectType, radius, blackout=False):
+    if blackout:
+        # blackout top region
+        cv2.rectangle(frame, (0,0), (processingWidth, int(processingHeight/(100/blackoutVerticalPercentage))), (0, 0, 0), thickness=-1)
+
+        # blackout left region
+        cv2.rectangle(frame, (0,0), (int(processingWidth/(100/blackoutHorizontalPercentage)), processingHeight), (0, 0, 0), thickness=-1)
+
+        # blackout right region
+        cv2.rectangle(frame, (processingWidth - int(processingWidth/(100/blackoutHorizontalPercentage)), 0), (processingWidth, processingHeight) , (0, 0, 0), thickness=-1)
+
     hsv = cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
     hue, sat, val = cv2.split(hsv)
     
@@ -320,7 +295,17 @@ def CircleDetection(cvSink, cs, frame, nt, outputStream, hsvParams, params, kern
 
     outputStream.putFrame(frame)
 
-def LineDetection(cvSink, cs, frame, nt, outputStream, hls, minArea, maxArea):
+def LineDetection(cvSink, cs, frame, nt, outputStream, hls, minArea, maxArea, sensitivity=10.0, blackout=False):
+    if blackout:
+        # blackout top region
+        cv2.rectangle(frame, (0,0), (processingWidth, int(processingHeight/(100/blackoutVerticalPercentage))), (0, 0, 0), thickness=-1)
+
+        # blackout left region
+        cv2.rectangle(frame, (0,0), (int(processingWidth/(100/blackoutHorizontalPercentage)), processingHeight), (0, 0, 0), thickness=-1)
+
+        # blackout right region
+        cv2.rectangle(frame, (processingWidth - int(processingWidth/(100/blackoutHorizontalPercentage)), 0), (processingWidth, processingHeight) , (0, 0, 0), thickness=-1)
+    
     hlsVals = cv2.cvtColor(frame,cv2.COLOR_BGR2HLS)
     hue, lig, sat = cv2.split(hlsVals)
     kernel = np.ones((5,5),np.uint8)
@@ -377,7 +362,7 @@ def LineDetection(cvSink, cs, frame, nt, outputStream, hls, minArea, maxArea):
                 max_side = max(rect[1][0], rect[1][1])
                 min_side = min(rect[1][0], rect[1][1])
 
-                if area > minArea and area < maxArea and abs(max_side/min_side) > 3.0:
+                if area > minArea and area < maxArea and abs(max_side/min_side) > 2.0:
                     # print('width: {}, height: {}, angle: {}, area: {}'.format(rect[1][0], rect[1][1], rect[2], area))
                     # sd.putString('center', str(rect[0][0]) + ',' + str(rect[0][1]))
                     nt.putNumber('width', rect[1][0])
@@ -388,7 +373,7 @@ def LineDetection(cvSink, cs, frame, nt, outputStream, hls, minArea, maxArea):
                     # https://namkeenman.wordpress.com/2015/12/18/open-cv-determine-angle-of-rotatedrect-minarearect/
                     # no real way of determining which way it is angled
                     # if width > height then tape is angled left (to the robot)
-                    if rect[2] >= -15.0 or rect[2] <= -75.0:
+                    if rect[2] >= -sensitivity or rect[2] <= -(90 - sensitivity):
                         nt.putString("tape_direction", "centered")
                     elif rect[1][1] > rect[1][0]:
                         nt.putString("tape_direction", "left")
@@ -431,31 +416,60 @@ if __name__ == "__main__":
         ntinst.initialize(server=ntServerIpAddress)
 
     # start cameras
-    # cameras = []
-    # for cameraConfig in cameraConfigs:
-    #     cameras.append(startCamera(cameraConfig))
+    cameras = []
+    for cameraConfig in cameraConfigs:
+        cam = startCamera(cameraConfig)
+        cameras.append(cam)
+        if cameraConfig.name == "lifecam":
+            print("lifecam found")
+            camera = cam
+        elif cameraConfig.name == "fisheye":
+            print("fisheye found")
+            fisheye = cam
+        
+
+    # print("cameras: {}".format(cameras))
+
+    for c in cameras:
+        print("camera: {}".format(c))
+        # c.setVideoMode(VideoMode.PixelFormat.kYUYV, width, height, fps)
+        # c.setConfigJson(json.dumps(config))
 
     # setup a cvSource
     cs = CameraServer.getInstance()
+    # cs = camera
+    # print("cs: {}".format(cs))
 
     # Returns a cscore.VideoSource, used to automatically start a mjpegstream on port 1181
-    camera = cs.startAutomaticCapture(name=cameraConfigs[0].name, path=cameraConfigs[0].path) 
-    #print("cameraConfig: .name: {}, cameraConfigs.path{}".format(cameraConfigs[0].name, cameraConfigs[0].path))
+    # camera = cs.startAutomaticCapture(name=cameraConfigs[0].name, path=cameraConfigs[0].path) 
+    # print("cameraConfig: .name: {}, cameraConfigs.path{}".format(cameraConfigs[0].name, cameraConfigs[0].path))
 
-    #VideoMode.PixelFormat.kMJPEG, kBGR, kGray, kRGB565, kUnknown, kYUYV
-    camera.setVideoMode(VideoMode.PixelFormat.kYUYV, width, height, fps)
+    # camera = cameras[0]
+
+    # VideoMode.PixelFormat.kMJPEG, kBGR, kGray, kRGB565, kUnknown, kYUYV
+    camera.setVideoMode(VideoMode.PixelFormat.kYUYV, width, height, lifecamFps)
+    fisheye.setVideoMode(VideoMode.PixelFormat.kYUYV, width, height, fisheyeFps)
     # camera.setResolution(width, height)
     # camera.setFPS(10)
 
     # Load camera properties config
-    camera.setConfigJson(json.dumps(config))
+    camera.setConfigJson(json.dumps(lifecamConfig))
+    fisheye.setConfigJson(json.dumps(fisheyeConfig))
+
+    print("Camera config loaded")
 
     # Get a CvSink. This will capture images from the camera
-    cvSink = cs.getVideo()
+    print("Grabbing cvSink")
+    try:
+        # cvSink = cs.getVideo()
+        cvLifecamSink = cs.getVideo(name="lifecam")
+    except:
+        print("Error with getVideo()")   
 
     # Let the camera initialize/warm up
     time.sleep(2.0)
 
+    print("Allocating empty array")
     # Preallocate a numpy empty array
     img = np.zeros(shape=(processingHeight, processingWidth, 3), dtype=np.uint8)
 
@@ -465,58 +479,75 @@ if __name__ == "__main__":
 
     kernel = np.ones((5,5),np.uint8)
 
+    print("Initializing params")
+
     # Cargo params
     cargoOutputStream = cs.putVideo("Cargo Detection", processingWidth, processingHeight)  
-    cargoHSV = HSV(0, 7, 120, 255, 160, 255)
-    cargoRadius = 25
-    # cargoParams = HoughCircleParams(1.4, 50, 120, 30, 5, 0)
-    cargoParams = HoughCircleParams(1.4, 50, 120, 30, 30, 200)
+    cargoMinRadius = 25
+
+    # cargoHSV = HSV(0, 7, 120, 255, 160, 255)
+    # cargoHSV = HSV(0, 7, 120, 255, 220, 255)
+    cargoHSV = HSV(5, 16, 120, 255, 220, 255)
     
+    # cargoParams = HoughCircleParams(1.4, 50, 120, 30, 5, 0)
+    # cargoParams = HoughCircleParams(1.4, 50, 120, 30, cargoMinRadius, 200)
+    cargoParams = HoughCircleParams(1.2, 10, 100, 20, cargoMinRadius, 0) # better for 320x240?
+
     # Hatch params
     hatchOutputStream = cs.putVideo("Hatch Detection", processingWidth, processingHeight)  
-    hatchHSV = HSV(20, 40, 60, 100, 186, 255)
-    hatchRadius = 25
+    hatchMinRadius = 25
+    # hatchHSV = HSV(20, 40, 60, 100, 186, 255)
+    # hatchHSV = HSV(0, 70, 0, 100, 160, 255)
+    hatchHSV = HSV(18, 36, 0, 100, 200, 255)
+
+    # hatchParams = HoughCircleParams(1.4, 50, 120, 30, hatchMinRadius, 50)
     hatchParams = HoughCircleParams(1.4, 50, 120, 30, 10, 50)
 
     # Line params
     lineOutputStream = cs.putVideo("Line Detection", processingWidth, processingHeight)   
-    lineHLS = HLS(0, 40, 0, 100, 225, 255)
-    lineMinArea = (processingWidth * processingHeight) / 50.0
+    # lineHLS = HLS(0, 40, 0, 100, 225, 255)
+    lineHLS = HLS(0, 40, 0, 100, 220, 255)
+    lineMinArea = 1 # (processingWidth * processingHeight) / 1000.0
     lineMaxArea = (processingWidth * processingHeight) / 10.0
 
     dir_path = os.path.dirname(os.path.realpath(__file__))
     fourcc = cv2.VideoWriter_fourcc('M','J','P','G')
-    # fourcc = cv2.VideoWriter_fourcc(*'MP4V')
+    # fourcc = cv2.VideoWriter_fourcc(*'MP4V') # needs codec installed?
     out = cv2.VideoWriter(dir_path + '/videos/{}.avi'.format(datetime.now().strftime('%Y%m%d_%H%M%S')), fourcc, 30, (width,height))
     start = time.process_time()
-    # print("dir_path: {}".format(dir_path))
 
+    print("Starting...")
     while True:
-        time2, frame = cvSink.grabFrame(img)
+        time2, frame = cvLifecamSink.grabFrame(img)
 
         if not recordVideo:
+            
+            if rotateImage:
+                frame = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
 
             frame = cv2.resize(frame, (processingWidth, processingHeight))
 
-            CircleDetection(cvSink, cs, frame, ntinst.getTable('CargoDetection'), cargoOutputStream, cargoHSV, cargoParams, kernel, "cargo", cargoRadius)
+            CircleDetection(cvLifecamSink, cs, frame.copy(), ntinst.getTable('CargoDetection'), cargoOutputStream, cargoHSV, cargoParams, kernel, "cargo", cargoMinRadius, blackout=False)
 
-            CircleDetection(cvSink, cs, frame.copy(), ntinst.getTable('HatchDetection'), hatchOutputStream, hatchHSV, hatchParams, kernel, "hatch", hatchRadius)
+            CircleDetection(cvLifecamSink, cs, frame.copy(), ntinst.getTable('HatchDetection'), hatchOutputStream, hatchHSV, hatchParams, kernel, "hatch", hatchMinRadius, blackout=True)
         
-            LineDetection(cvSink, cs, frame.copy(), ntinst.getTable('LineDetection'), lineOutputStream, lineHLS, lineMinArea, lineMaxArea)
+            LineDetection(cvLifecamSink, cs, frame.copy(), ntinst.getTable('LineDetection'), lineOutputStream, lineHLS, lineMinArea, lineMaxArea, lineSensitivity, blackout=True)
         
         else:
-            
-            out.write(frame)
+            try:
+                out.write(frame)
 
-            end = time.process_time()
+                end = time.process_time()
 
-            if end - start >= saveVideoDuration:
-                try:
-                    print("Saving video")
-                    out.release()                    
-                    out = cv2.VideoWriter(dir_path + '/videos/{}.avi'.format(datetime.now().strftime('%Y%m%d_%H%M%S')), fourcc, 30, (width,height))
-                except:
-                    print("Error saving file. Check write-only mode.")
-                    recordVideo = False
-                
-                start = time.process_time()
+                if end - start >= saveVideoDuration:
+                    try:
+                        print("Saving video")
+                        out.release()                    
+                        out = cv2.VideoWriter(dir_path + '/videos/{}.avi'.format(datetime.now().strftime('%Y%m%d_%H%M%S')), fourcc, 30, (width,height))
+                    except:
+                        print("Error saving file. Check write-only mode.")
+                        recordVideo = False
+                    
+                    start = time.process_time()
+            except:
+                print("error saving video")
