@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.networktables.*;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import static org.texastorque.torquelib.util.TorqueMathUtil.near;
 
 public class DriveBase extends Subsystem {
 
@@ -51,6 +52,7 @@ public class DriveBase extends Subsystem {
     public void teleopInit() {
         leftSpeed = 0.0;
         rightSpeed = 0.0;
+        feedback.gyroReset();
     }
 
     @Override
@@ -73,7 +75,6 @@ public class DriveBase extends Subsystem {
     @Override
     public void teleopContinuous() {
         currentState = state.getRobotState();
-        feedback.gyroReset();
 
         if (currentState == RobotState.TELEOP) {
             leftSpeed = input.getDBLeftSpeed();
@@ -82,6 +83,7 @@ public class DriveBase extends Subsystem {
         }
         else if (currentState == RobotState.LINE) {
             // Read feedback for NetworkTables input, calculate output
+            
             angle = feedback.getAngle();
                 
             leftSpeed = 0;
@@ -121,6 +123,10 @@ public class DriveBase extends Subsystem {
 
     @Override
     public void output() {
+
+        if (near(feedback.getRawAngle(), 360.0, 0.3) || near(feedback.getRawAngle(), -360.0, 0.5))
+            feedback.gyroReset();
+
         // setGears();
         
         // if (highGear)
@@ -163,8 +169,9 @@ public class DriveBase extends Subsystem {
         dashboard.putBoolean("Tele", (state.getRobotState() == RobotState.TELEOP));
         dashboard.putBoolean("Line", (state.getRobotState() == RobotState.LINE));
         dashboard.putBoolean("Closeness", feedback.closeToWallTrue());
-        dashboard.putNumber("Voltage", feedback.getVoltage());
+        dashboard.putNumber("Voltage", feedback.getDistance());
         dashboard.putNumber("Angle", feedback.getRawAngle());
+        dashboard.putNumber("Pitch", feedback.getVertAngle());
     }
 
     public static DriveBase getInstance() {

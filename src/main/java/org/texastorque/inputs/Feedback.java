@@ -17,6 +17,7 @@ public class Feedback {
     private final DigitalInput lineLeft;
     private final DigitalInput lineMid;
     private final DigitalInput lineRight;
+
     private AnalogInput ultra;
     private AHRS gyro;
 
@@ -53,8 +54,8 @@ public class Feedback {
         return false;
     }
 
-    public double getVoltage() {
-        return ultra.getAverageVoltage();
+    public double getDistance() {
+        return ultra.getAverageVoltage() / 2;
     }
 
     // public boolean inScoringRangeTrue() {
@@ -63,6 +64,10 @@ public class Feedback {
 
     public double getRawAngle() {
         return gyro.getAngle();
+    }
+
+    public double getVertAngle() {
+        return gyro.getPitch();
     }
 
     public void gyroReset() {
