@@ -10,5 +10,5 @@ public abstract class Subsystem implements TorqueSubsystem {
     protected Input input = Input.getInstance();
 	protected Feedback feedback = Feedback.getInstance();
 
-	public abstract void output();
+	protected abstract void output();
 }

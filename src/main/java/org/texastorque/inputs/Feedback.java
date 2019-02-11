@@ -1,97 +1,201 @@
 package org.texastorque.inputs;
 
 import org.texastorque.constants.Ports;
+import org.texastorque.torquelib.component.TorqueEncoder;
+
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.AnalogInput;
-import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.wpilibj.CounterBase.EncodingType;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.networktables.*;
+import com.kauailabs.navx.frc.AHRS;
 
 public class Feedback {
 
     private static volatile Feedback instance;
-    private NetworkTable table;
-    private NetworkTableInstance inst;
-    private NetworkTableEntry direction;
+
+    // Constants
+    public static final double PULSES_PER_ROTATION = 1000;
+    public static final double WHEEL_DIAMETER_FEET = 0.5;
+
+    public static final double DISTANCE_PER_PULSE = Math.PI * WHEEL_DIAMETER_FEET / PULSES_PER_ROTATION;
+    public static final double ANGLE_PER_PULSE = 360 / PULSES_PER_ROTATION;
+    public static final double LF_FEET_CONVERSION = Math.PI * (1.0/20) / PULSES_PER_ROTATION; // Approx shaft diameter
+
+    public static boolean clockwise = true;
 
     // Sensors
-    private final DigitalInput lineLeft;
-    private final DigitalInput lineMid;
-    private final DigitalInput lineRight;
+    private final TorqueEncoder DB_leftEncoder;
+    private final TorqueEncoder DB_rightEncoder;
+    private final TorqueEncoder LF_encoder;
+    private final TorqueEncoder RT_encoder;
 
-    private AnalogInput ultra;
-    private AHRS gyro;
+    private AHRS NX_gyro;
 
-    private Feedback() { 
-        lineLeft = new DigitalInput(Ports.FB_LINE_LEFT);
-        lineMid = new DigitalInput(Ports.FB_LINE_MID);
-        lineRight = new DigitalInput(Ports.FB_LINE_RIGHT);
-        ultra = new AnalogInput(Ports.FB_ULTRASONIC);
-        gyro = new AHRS(SPI.Port.kMXP);
-        ultra.setAverageBits(0);
-        ultra.setOversampleBits(10);
-        ultra.setGlobalSampleRate(50 * (1 << (10)));
+    // private final DigitalInput LN_leftSensor;
+    // private final DigitalInput LN_midSensor;
+    // private final DigitalInput LN_rightSensor;
 
-        inst = NetworkTableInstance.getDefault();
+    // NetworkTables
+    private NetworkTableInstance NT_instance;
+    private NetworkTable NT_target;
+    
+
+    private Feedback() {
+        DB_leftEncoder = new TorqueEncoder(Ports.DB_LEFT_ENCODER_A, Ports.DB_LEFT_ENCODER_B, clockwise, EncodingType.k4X);
+        DB_rightEncoder = new TorqueEncoder(Ports.DB_RIGHT_ENCODER_A, Ports.DB_RIGHT_ENCODER_B, clockwise, EncodingType.k4X);
+        LF_encoder = new TorqueEncoder(Ports.LF_ENCODER_A, Ports.LF_ENCODER_B, clockwise, EncodingType.k4X);
+        RT_encoder = new TorqueEncoder(Ports.RT_ENCODER_A, Ports.RT_ENCODER_B, clockwise, EncodingType.k4X);
+
+        NX_gyro = new AHRS(SPI.Port.kMXP);
+
+        // LN_leftSensor = new DigitalInput(Ports.LN_LEFT);
+        // LN_midSensor = new DigitalInput(Ports.LN_MID);
+        // LN_rightSensor = new DigitalInput(Ports.LN_RIGHT);
+        
+        NT_instance = NetworkTableInstance.getDefault();
+        NT_target = NT_instance.getTable("TargetDetection");
     }
 
-    // Read encoders
-
-    // Read RPi feedback from NetworkTables
-
-    public boolean getAngle(){
-        table = inst.getTable("LineDetection");
-        direction = table.getEntry("tape_direction");
-        // if (direction.getString("N/A").equals("N/A")){
-        //     direction  = table.getEntry("tape_direction");
-        // }
-        if (direction.getString("N/A").equals("left"))
-            return true;
-        else if (direction.getString("N/A").equals("right"))
-            return false;
-        return false;
+    public void update() {
+        updateEncoders();
+        updateNavX();
+        updateLineSensors();
+        updateNetworkTables();
     }
 
-    // Read sensors
-    public boolean closeToWallTrue() {
-        // return ((ultra.getVoltage() / 2 <= 21.59) ? true : false);
-        return false;
+
+    // ========== Encoders ==========
+
+    private double DB_leftSpeed;
+    private double DB_rightSpeed;
+    private double DB_leftDistance;
+    private double DB_rightDistance;
+
+    private double LF_position;
+    private double RT_angle;
+
+    public void resetEncoders() {
+		DB_leftEncoder.reset();
+        DB_rightEncoder.reset();
+        LF_encoder.reset();
+        RT_encoder.reset();
     }
 
-    public double getDistance() {
-        return ultra.getAverageVoltage() / 2;
+    public void updateEncoders() {
+        DB_leftEncoder.calc();
+        DB_rightEncoder.calc();
+        LF_encoder.calc();
+        RT_encoder.calc();
+
+        DB_leftSpeed = DB_leftEncoder.getRate() * DISTANCE_PER_PULSE;
+		DB_rightSpeed = DB_rightEncoder.getRate() * DISTANCE_PER_PULSE;
+        DB_leftDistance = DB_leftEncoder.get() * DISTANCE_PER_PULSE;
+        DB_rightDistance = DB_rightEncoder.get() * DISTANCE_PER_PULSE;
+
+        LF_position = LF_encoder.get() * LF_FEET_CONVERSION;
+        RT_angle = RT_encoder.get() * ANGLE_PER_PULSE;
     }
 
-    // public boolean inScoringRangeTrue() {
-
-    // }
-
-    public double getRawAngle() {
-        return gyro.getAngle();
+    public double getDBLeftSpeed() {
+        return DB_leftSpeed;
     }
 
-    public double getVertAngle() {
-        return gyro.getPitch();
+    public double getDBRightSpeed() {
+        return DB_rightSpeed;
     }
 
-    public void gyroReset() {
-        gyro.reset();
+    public double getDBLeftDistance() {
+        return DB_leftDistance;
+    }
+
+    public double getDBRightDistance() {
+        return DB_rightDistance;
+    }
+
+    public double getLFPosition() {
+        return LF_position;
+    }
+    
+    public double getRTPosition() {
+        return RT_angle;
+    }
+
+
+    // ========== Gyro ==========
+
+    private double NX_pitch;
+    private double NX_yaw;
+
+    public void updateNavX() {
+        NX_pitch = NX_gyro.getPitch();
+        NX_yaw = NX_gyro.getAngle();
+    }
+    public void gyroReset(){
+        NX_gyro.reset();
+    }
+
+    public double getPitch() {
+        return NX_pitch;
+    }
+
+    public double getYaw() {
+        return NX_yaw;
+    }
+
+
+    // ========== Line sensors ==========
+
+    private boolean LN_left;
+    private boolean LN_mid;
+    private boolean LN_right;
+
+    public void updateLineSensors() {
+        // LN_left = LN_leftSensor.get();
+        // LN_mid = LN_midSensor.get();
+        // LN_right = LN_rightSensor.get();
     }
 
     public boolean lineLeftTrue() {
-        return lineLeft.get();
+        return LN_left;
     }
 
     public boolean lineMidTrue() {
-        return lineMid.get();
+        return LN_mid;
     }
 
     public boolean lineRightTrue() {
-        return lineRight.get();
+        return LN_right;
     }
 
+
+    // ===== RPi feedback from NetworkTables =====
+    private double DB_targetOffset;
+    private double[] pastTargetErrors = new double[50];
+
+    public void updateNetworkTables() {
+        DB_targetOffset = NT_target.getEntry("target_offset").getDouble(0);
+    }
+
+    public double getTargetOffset() {
+        return DB_targetOffset;
+    }
+
+    public void smartDashboard() {
+        SmartDashboard.putString("State", State.getInstance().getRobotState().toString());
+        SmartDashboard.putNumber("DB_leftDistance", DB_leftDistance);
+        SmartDashboard.putNumber("DB_rightDistance", DB_rightDistance);
+        SmartDashboard.putNumber("DB_leftSpeed", DB_leftSpeed);
+        SmartDashboard.putNumber("DB_rightSpeed", DB_rightSpeed);
+        SmartDashboard.putNumber("LF_position", LF_position);
+        SmartDashboard.putNumber("RT_angle", RT_angle);
+        SmartDashboard.putNumber("NX_pitch", NX_pitch);
+        SmartDashboard.putNumber("NX_yaw", NX_yaw);
+
+        SmartDashboard.putBoolean("L", LN_left);
+        SmartDashboard.putBoolean("M", LN_mid);
+        SmartDashboard.putBoolean("R", LN_right);
+    }
 
     public static Feedback getInstance() {
         if (instance == null) {
@@ -102,6 +206,5 @@ public class Feedback {
         }
         return instance;
     }
-
 
 }

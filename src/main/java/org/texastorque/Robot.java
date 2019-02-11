@@ -11,6 +11,7 @@ public class Robot extends TorqueIterative {
 
     private ArrayList<Subsystem> subsystems;
 	private Subsystem driveBase = DriveBase.getInstance();
+	private Subsystem lift = Lift.getInstance();
 
 	private Input input = Input.getInstance();
 
@@ -25,6 +26,7 @@ public class Robot extends TorqueIterative {
 	private void initSubsystems() {
 		subsystems = new ArrayList<>();
 		subsystems.add(driveBase);
+		subsystems.add(lift);
 	}
 
 

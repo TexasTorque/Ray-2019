@@ -5,7 +5,6 @@ import org.texastorque.constants.Ports;
 import org.texastorque.torquelib.component.TorqueMotor;
 import org.texastorque.torquelib.component.TorqueEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.*;
-import edu.wpi.first.wpilibj.networktables.*;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
@@ -20,13 +19,13 @@ public class DriveBase extends Subsystem {
 	private static volatile DriveBase instance;
     private RobotState currentState;
     private TorqueMotor leftFore;
+    private TorqueMotor leftMid;
 	private TorqueMotor leftRear;
-	private TorqueMotor rightFore;
+    private TorqueMotor rightFore;
+    private TorqueMotor rightMid;
     private TorqueMotor rightRear;
     private DoubleSolenoid gearShift;
     private SmartDashboard dashboard;
-    private TorqueEncoder leftEncode;
-    private TorqueEncoder rightEncode;
 
     private double leftSpeed = 0.0;
     private double rightSpeed = 0.0;
@@ -38,13 +37,14 @@ public class DriveBase extends Subsystem {
 
     private DriveBase() {
         leftFore = new TorqueMotor(new VictorSP(Ports.DB_LEFT_FORE_MOTOR), !clockwise);
+        leftMid = new TorqueMotor(new VictorSP(Ports.DB_LEFT_MID_MOTOR), !clockwise);
 		leftRear = new TorqueMotor(new VictorSP(Ports.DB_LEFT_REAR_MOTOR), !clockwise);
-		rightFore = new TorqueMotor(new VictorSP(Ports.DB_RIGHT_FORE_MOTOR), clockwise);
+        rightFore = new TorqueMotor(new VictorSP(Ports.DB_RIGHT_FORE_MOTOR), clockwise);
+        rightMid = new TorqueMotor(new VictorSP(Ports.DB_RIGHT_MID_MOTOR), clockwise);
         rightRear = new TorqueMotor(new VictorSP(Ports.DB_RIGHT_REAR_MOTOR), clockwise);
         
-        gearShift = new DoubleSolenoid(2, Ports.DB_LEFT_SOLE_A, Ports.DB_LEFT_SOLE_B);
-        leftEncode = new TorqueEncoder(Ports.DB_LEFT_ENCODER_A, Ports.DB_LEFT_ENCODER_B, true, EncodingType.k4X);
-        rightEncode = new TorqueEncoder(Ports.DB_RIGHT_ENCODER_A, Ports.DB_RIGHT_ENCODER_B, false, EncodingType.k4X);
+        gearShift = new DoubleSolenoid(2, Ports.DB_GEAR_SOLE_A, Ports.DB_GEAR_SOLE_B);
+       
     }
 
     @Override
@@ -88,33 +88,7 @@ public class DriveBase extends Subsystem {
         }
         else if (currentState == RobotState.LINE) {
             // Read feedback for NetworkTables input, calculate output
-            
-            angle = feedback.getAngle();
-                
-            leftSpeed = 0;
-            rightSpeed = 0;
-
-                if (feedback.lineLeftTrue())
-                    fakeBinary+= 100;
-                if (feedback.lineRightTrue())
-                    fakeBinary+= 1;
-                if (angle)
-                    fakeBinary+= 1000;
-                switch(fakeBinary) {
-                    case 1100: rightSpeed = 0.5;
-                        break;
-                    case 1001: rightSpeed = 0.2;
-                        break;
-                    case 0001: leftSpeed = 0.5;
-                        break;
-                    case 0100: leftSpeed = 0.2;
-                        break;
-                    default: rightSpeed = 0.2;
-                        leftSpeed = 0.2;
-                        break;
-                    }//switch
-                output();
-                fakeBinary = 0;
+            output();
             
         }
         else if (currentState == RobotState.VISION) {
@@ -125,10 +99,10 @@ public class DriveBase extends Subsystem {
     }
 
     @Override
-    public void output() {
+    protected void output() {
 
-        if (near(feedback.getRawAngle(), 360.0, 0.3) || near(feedback.getRawAngle(), -360.0, 0.5))
-            feedback.gyroReset();
+        // if (near(feedback.getRawAngle(), 360.0, 0.3) || near(feedback.getRawAngle(), -360.0, 0.5))
+        //     feedback.gyroReset();
 
         // setGears();
         
@@ -136,19 +110,14 @@ public class DriveBase extends Subsystem {
         //     gearShift.set(Value.kForward);
         // else
         //     gearShift.set(Value.kReverse);
-        
-        if (!feedback.closeToWallTrue()){
             leftFore.set(leftSpeed);
+            leftMid.set(leftSpeed);
             leftRear.set(leftSpeed);
             rightFore.set(rightSpeed);
+            rightMid.set(rightSpeed);
             rightRear.set(rightSpeed);
-        }
-        else{
-            leftFore.set(-0.2);
-            leftRear.set(-0.2);
-            rightFore.set(-0.2);
-            rightRear.set(-0.2);
-        }
+        
+
         smartDashboard();
         
     }
@@ -160,26 +129,21 @@ public class DriveBase extends Subsystem {
     /**
      * auto transmission
      */
-    private void setGears() {
-        //OLD CODE: highGear = (leftSpeed > 0.5 && rightSpeed > 0.5) ? true : false;
-        // instead of controller input use encoder
-        if (!highGear && ((leftEncode.getAverageRate()+rightEncode.getAverageRate())/2) > 10)
-            highGear = true;
-        if (highGear && ((leftEncode.getAverageRate()+rightEncode.getAverageRate())/2) > 10)
-            highGear = false;
-    }
+    // private void setGears() {
+    //     //OLD CODE: highGear = (leftSpeed > 0.5 && rightSpeed > 0.5) ? true : false;
+    //     // instead of controller input use encoder
+    //     if (!highGear && ((leftEncode.getAverageRate()+rightEncode.getAverageRate())/2) > 10)
+    //         highGear = true;
+    //     if (highGear && ((leftEncode.getAverageRate()+rightEncode.getAverageRate())/2) > 10)
+    //         highGear = false;
+    // }
     
     @Override
     public void smartDashboard() {
-        dashboard.putBoolean("Left", feedback.lineLeftTrue());
-        dashboard.putBoolean("Right", feedback.lineRightTrue());
-        dashboard.putBoolean("Middle", feedback.lineMidTrue());
         dashboard.putBoolean("Tele", (state.getRobotState() == RobotState.TELEOP));
         dashboard.putBoolean("Line", (state.getRobotState() == RobotState.LINE));
-        dashboard.putBoolean("Closeness", feedback.closeToWallTrue());
-        dashboard.putNumber("Voltage", feedback.getDistance());
-        dashboard.putNumber("Angle", feedback.getRawAngle());
-        dashboard.putNumber("Pitch", feedback.getVertAngle());
+        dashboard.putNumber("LeftSpeed", leftSpeed);
+        dashboard.putNumber("RightSpeed", rightSpeed);
     }
 
     public static DriveBase getInstance() {
