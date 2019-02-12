@@ -29,7 +29,11 @@ public class DriveBase extends Subsystem {
     
     private static boolean clockwise = true;
     private boolean angle;
+    private double lastAngle = 0.0;
+    private String tapeDirection;
     private int fakeBinary = 0;
+    private NetworkTable ntLineDetection = NetworkTable.getTable("LineDetection");
+    private boolean line = false;
 
     private DriveBase() {
         leftFore = new TorqueMotor(new VictorSP(Ports.DB_LEFT_FORE_MOTOR), !clockwise);
@@ -76,40 +80,70 @@ public class DriveBase extends Subsystem {
         feedback.gyroReset();
 
         if (currentState == RobotState.TELEOP) {
+            line = false;
             leftSpeed = input.getDBLeftSpeed();
             rightSpeed = input.getDBRightSpeed();
             output();
         }
         else if (currentState == RobotState.LINE) {
+            
             // Read feedback for NetworkTables input, calculate output
-            angle = feedback.getAngle();
-                
+            // angle = feedback.getAngle();
+            if(!line)
+                tapeDirection = feedback.getTapeDirection();
+                line = true;
+            
             leftSpeed = 0;
             rightSpeed = 0;
 
-                if (feedback.lineLeftTrue())
-                    fakeBinary+= 100;
-                // if (feedback.lineMidTrue())
-                //     fakeBinary+= 10;
-                if (feedback.lineRightTrue())
-                    fakeBinary+= 1;
-                if (angle)
-                    fakeBinary+= 1000;
-                    switch(fakeBinary) {
-                        case 1100: rightSpeed += 0.5;
-                            break;
-                        case 1001: rightSpeed += 0.2;
-                            break;
-                        case 0001: leftSpeed += 0.5;
-                            break;
-                        case 0100: leftSpeed += 0.2;
-                            break;
-                        default: rightSpeed += 0.2;
-                            leftSpeed += 0.2;
-                            break;
-                    }//switch
-                output();
-                fakeBinary = 0;
+            if (feedback.lineLeftTrue())
+                fakeBinary+= 100;
+
+            // if (feedback.lineMidTrue())
+            //     fakeBinary+= 10;
+
+            if (feedback.lineRightTrue())
+                fakeBinary+= 1;
+                
+            if (tapeDirection.equals("left"))
+                fakeBinary+= 1000;
+                
+            double angle = Math.abs(ntLineDetection.getDouble("angle", lastAngle));
+            lastAngle = angle;
+            
+            // adjust speed based on initial angle
+            double adjustedSpeed = (0.8 * Math.sin(Math.PI * ((90 - angle) / 90))) + 0.2;
+
+            switch(fakeBinary) {
+                case 1100: 
+                    // rightSpeed += 0.5;
+                    rightSpeed = adjustedSpeed;
+                    break;
+                case 1001: 
+                    // rightSpeed += 0.2;
+                    rightSpeed = adjustedSpeed;
+                    break;
+                case 0001: 
+                    // leftSpeed += 0.5;
+                    leftSpeed = adjustedSpeed;
+                    break;
+                case 0100: 
+                    // leftSpeed += 0.2;
+                    leftSpeed = adjustedSpeed;
+                    break;
+                default: 
+                    rightSpeed += 0.2;
+                    leftSpeed += 0.2;
+                    break;
+            }//switch
+
+            // System.out.println(String.valueOf(fakeBinary) + " - L: "  + String.valueOf(leftSpeed) + ", R: " + String.valueOf(rightSpeed));
+            // ntLineDetection.putString("rightSpeed", String.valueOf(rightSpeed));
+            // ntLineDetection.putString("leftSpeed", String.valueOf(leftSpeed));
+            // ntLineDetection.putValue("adjustedSpeed", adjustedSpeed);
+
+            output();
+            fakeBinary = 0;
             
         }
         else if (currentState == RobotState.VISION) {

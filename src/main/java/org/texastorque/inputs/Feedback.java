@@ -11,7 +11,7 @@ public class Feedback {
 
     private static volatile Feedback instance;
     private String direction;
-    private NetworkTable table;
+    private NetworkTable lineNT;
 
     // Sensors
     private final DigitalInput lineLeft;
@@ -29,14 +29,16 @@ public class Feedback {
         ultra.setAverageBits(0);
         ultra.setOversampleBits(10);
         ultra.setGlobalSampleRate(50 * (1 << (10)));
+        lineNT = NetworkTable.getTable("LineDetection");
     }
 
     // Read encoders
 
     // Read RPi feedback from NetworkTables
 
-    public boolean getAngle(){
-        table = NetworkTable.getTable("LineDetection");
+    public String getTapeDirection(){        
+        // String direction = table.getString("tape_direction", "N/A");
+        
         // while (direction.equals("N/A")){
         //     direction  = table.getString("tape_direction", "N/A");
         // }//while loop
@@ -44,7 +46,8 @@ public class Feedback {
         //     return false;
         // if (direction.equals("right"))
         //     return false;
-        return false;
+        // return false;
+        return lineNT.getString("tape_direction", "N/A");
     }
 
     // Read sensors

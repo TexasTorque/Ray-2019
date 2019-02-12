@@ -27,20 +27,19 @@ team = 1477
 ntServerIpAddress = "10.14.77.2"
 server = False
 cameraConfigs = []
-# width, height = 640, 480
 width, height = 320, 240
-# width, height = 256, 144
 lifecamFps = 15
 fisheyeFps = 30
-processingScale = 1
+processingScale = 2
 processingWidth = int(width/processingScale)
 processingHeight = int(height/processingScale)
 xOffset = int(processingWidth / 2)
 yOffset = processingHeight
 showAllReturnedObjects = False
-lineSensitivity = 5.0
+lineSensitivity = 1.0
+lineDirection = []
 
-blackoutRegions = True
+blackoutRegions = False
 blackoutVerticalPercentage = 1 # percentage
 blackoutHorizontalPercentage = 25 # percentage
 rotateImage = False
@@ -234,6 +233,20 @@ class HoughCircleParams():
         self.min_radius = min_radius
         self.max_radius = max_radius
 
+class LineDetectionResult:
+    width = -1
+    height = -1
+    angle = -1
+    line_found = False
+    tape_direction = "N/A"
+
+    def __init__(self, width, height, angle, line_found, tape_direction):
+        self.width = width
+        self.height = height
+        self.angle = angle
+        self.line_found = line_found
+        self.tape_direction = tape_direction
+
 def CircleDetection(cvSink, cs, frame, nt, outputStream, hsvParams, params, kernel, objectType, radius, blackout=False):
     if blackout:
         # blackout top region
@@ -326,73 +339,122 @@ def LineDetection(cvSink, cs, frame, nt, outputStream, hls, minArea, maxArea, se
 
     _, contours, hierarchy = cv2.findContours(threshold, 1, 2)
 
-    for contour in contours:
-        # https://www.pyimagesearch.com/2016/02/08/opencv-shape-detection/
-        
-        approx = cv2.approxPolyDP(contour, 0.02 * cv2.arcLength(contour,True), cv2.CHAIN_APPROX_NONE)
+    if len(contours) >= 1:
+        for contour in contours:
+            # https://www.pyimagesearch.com/2016/02/08/opencv-shape-detection/
+            
+            approx = cv2.approxPolyDP(contour, 0.02 * cv2.arcLength(contour,True), cv2.CHAIN_APPROX_NONE)
 
-        if len(approx) == 4:
-            if showAllReturnedObjects:
-                (x, y, w, h) = cv2.boundingRect(approx)
-                aspect_ratio = w / float(h)
+            if len(approx) == 4:
+                if showAllReturnedObjects:
+                    (x, y, w, h) = cv2.boundingRect(approx)
+                    aspect_ratio = w / float(h)
 
-                if aspect_ratio < 0.95 or aspect_ratio > 1.05:
+                    if aspect_ratio < 0.95 or aspect_ratio > 1.05:
 
-                    rect = cv2.minAreaRect(contour)
+                        rect = cv2.minAreaRect(contour)
+                        box = cv2.boxPoints(rect)
+                        box = np.int0(box)
+                        # cv2.drawContours(threshold, [box], 0, (0,255,0), 3)      
+                        area = cv2.contourArea(contour)
+
+                        if area > minArea:
+                            # print("area: {}", area)
+                            cv2.drawContours(frame, [box], 0, (0,255,0), 3)
+                            
+                            # if rect[1][0] < rect[1][1]:
+                            #     print("top left point: {}, width, height: {}, angle of rotation: {}, area: {}".format(rect[0], rect[1], rect[2]-90.0, area))
+                            # else:
+                            #     print("top left point: {}, width, height: {}, angle of rotation: {}, area: {}".format(rect[0], rect[1], rect[2], area))
+                else:
+                    c = max(contours, key = cv2.contourArea)
+                    area = cv2.contourArea(c)
+                    rect = cv2.minAreaRect(c)
                     box = cv2.boxPoints(rect)
                     box = np.int0(box)
-                    # cv2.drawContours(threshold, [box], 0, (0,255,0), 3)      
-                    area = cv2.contourArea(contour)
-
-                    if area > minArea:
-                        # print("area: {}", area)
-                        cv2.drawContours(frame, [box], 0, (0,255,0), 3)
-                        
-                        # if rect[1][0] < rect[1][1]:
-                        #     print("top left point: {}, width, height: {}, angle of rotation: {}, area: {}".format(rect[0], rect[1], rect[2]-90.0, area))
-                        # else:
-                        #     print("top left point: {}, width, height: {}, angle of rotation: {}, area: {}".format(rect[0], rect[1], rect[2], area))
-            else:
-                c = max(contours, key = cv2.contourArea)
-                area = cv2.contourArea(c)
-                rect = cv2.minAreaRect(c)
-                box = cv2.boxPoints(rect)
-                box = np.int0(box)
-                
-                max_side = max(rect[1][0], rect[1][1])
-                min_side = min(rect[1][0], rect[1][1])
-
-                if area > minArea and area < maxArea and abs(max_side/min_side) > 2.0:
-                    # print('width: {}, height: {}, angle: {}, area: {}'.format(rect[1][0], rect[1][1], rect[2], area))
-                    # sd.putString('center', str(rect[0][0]) + ',' + str(rect[0][1]))
-                    nt.putNumber('width', rect[1][0])
-                    nt.putNumber('height', rect[1][1])
-                    nt.putNumber('angle', rect[2])
-                    nt.putBoolean('line_found', True)
-
-                    # https://namkeenman.wordpress.com/2015/12/18/open-cv-determine-angle-of-rotatedrect-minarearect/
-                    # no real way of determining which way it is angled
-                    # if width > height then tape is angled left (to the robot)
-                    if rect[2] >= -sensitivity or rect[2] <= -(90 - sensitivity):
-                        nt.putString("tape_direction", "centered")
-                    elif rect[1][1] > rect[1][0]:
-                        nt.putString("tape_direction", "left")
-                    else:
-                        nt.putString("tape_direction", "right")
                     
-                    cv2.drawContours(frame, [box], 0, (255,0,255), 3)
-                else:
-                    nt.putNumber('width', -1)
-                    nt.putNumber('height', -1)
-                    nt.putNumber('angle', -1)
-                    nt.putString('tape_direction', 'N/A')
-                    nt.putBoolean('line_found', False)
-        else:
-            nt.putNumber('width', -1)
-            nt.putNumber('height', -1)
-            nt.putNumber('angle', -1)
-            nt.putString('tape_direction', 'N/A')
-            nt.putBoolean('line_found', False)
+                    max_side = max(rect[1][0], rect[1][1])
+                    min_side = min(rect[1][0], rect[1][1])
+
+                    if area > minArea and area < maxArea and abs(max_side/min_side) > 2.0:
+                        # print('width: {}, height: {}, angle: {}, area: {}'.format(rect[1][0], rect[1][1], rect[2], area))
+                        # sd.putString('center', str(rect[0][0]) + ',' + str(rect[0][1]))
+                        
+                        
+                        # nt.putNumber('width', rect[1][0])
+                        # nt.putNumber('height', rect[1][1])
+                        # nt.putNumber('angle', rect[2])
+                        # nt.putBoolean('line_found', True)
+                        width = rect[1][0]
+                        height = rect[1][1]
+                        angle = rect[2]
+                        line_found = True
+
+                        # https://namkeenman.wordpress.com/2015/12/18/open-cv-determine-angle-of-rotatedrect-minarearect/
+                        # no real way of determining which way it is angled
+                        # if width > height then tape is angled left (to the robot)
+                        if rect[2] >= -sensitivity or rect[2] <= -(90 - sensitivity):
+                            # nt.putString("tape_direction", "centered")
+                            direction = "centered"
+                        elif rect[1][1] > rect[1][0]:
+                            # nt.putString("tape_direction", "left")
+                            direction = "left"
+                        else:
+                            # nt.putString("tape_direction", "right")
+                            direction = "right"
+                        
+
+                        
+                        cv2.drawContours(frame, [box], 0, (255,0,255), 3)
+                        lineDirection.append(LineDetectionResult(width, height, angle, line_found, direction))
+                    else:
+                        # nt.putNumber('width', -1)
+                        # nt.putNumber('height', -1)
+                        # nt.putNumber('angle', -1)
+                        # nt.putString('tape_direction', 'N/A')
+                        # nt.putBoolean('line_found', False)
+                        width = -1
+                        height = -1
+                        angle = -1
+                        line_found = False
+                        direction = "N/A"
+
+            
+
+    else:
+        # nt.putNumber('width', -1)
+        # nt.putNumber('height', -1)
+        # nt.putNumber('angle', -1)
+        # nt.putString('tape_direction', 'N/A')
+        # nt.putBoolean('line_found', False)
+        
+        width = -1
+        height = -1
+        angle = -1
+        line_found = False
+        direction = "N/A"
+        
+        lineDirection.append(LineDetectionResult(width, height, angle, line_found, direction))
+
+    while len(lineDirection) > (lifecamFps/3):
+        lineDirection.pop(0)
+
+    cnt = sum(y.line_found == True for y in lineDirection)
+
+    if cnt >= int(lifecamFps/3):
+        x = list(filter(lambda x: x.line_found == True, lineDirection))[0]
+        # print("{}".format(x[0].line_found))
+        nt.putNumber('width', x.width)
+        nt.putNumber('height', x.height)
+        nt.putNumber('angle', abs(x.angle/2.0))
+        nt.putString('tape_direction', x.tape_direction)
+        nt.putBoolean('line_found', x.line_found)
+    else:
+        nt.putNumber('width', -1)
+        nt.putNumber('height', -1)
+        nt.putNumber('angle', -1)
+        nt.putString('tape_direction', "N/A")
+        nt.putBoolean('line_found', False)
                     
     outputStream.putFrame(frame)
 
@@ -447,7 +509,8 @@ if __name__ == "__main__":
     # camera = cameras[0]
 
     # VideoMode.PixelFormat.kMJPEG, kBGR, kGray, kRGB565, kUnknown, kYUYV
-    camera.setVideoMode(VideoMode.PixelFormat.kYUYV, width, height, lifecamFps)
+    # camera.setVideoMode(VideoMode.PixelFormat.kYUYV, width, height, lifecamFps)
+    camera.setVideoMode(VideoMode.PixelFormat.kMJPEG, width, height, lifecamFps)
     fisheye.setVideoMode(VideoMode.PixelFormat.kYUYV, width, height, fisheyeFps)
     # camera.setResolution(width, height)
     # camera.setFPS(10)
@@ -479,7 +542,7 @@ if __name__ == "__main__":
 
     kernel = np.ones((5,5),np.uint8)
 
-    print("Initializing params")
+    print("Initializing detection params")
 
     # Cargo params
     cargoOutputStream = cs.putVideo("Cargo Detection", processingWidth, processingHeight)  
@@ -506,17 +569,20 @@ if __name__ == "__main__":
     # Line params
     lineOutputStream = cs.putVideo("Line Detection", processingWidth, processingHeight)   
     # lineHLS = HLS(0, 40, 0, 100, 225, 255)
-    lineHLS = HLS(0, 40, 0, 100, 220, 255)
+    # lineHLS = HLS(0, 40, 0, 100, 220, 255)
+    lineHLS = HLS(0, 40, 0, 100, 230, 255)
     lineMinArea = 1 # (processingWidth * processingHeight) / 1000.0
-    lineMaxArea = (processingWidth * processingHeight) / 10.0
+    lineMaxArea = (processingWidth * processingHeight) #/ 10.0
 
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    fourcc = cv2.VideoWriter_fourcc('M','J','P','G')
-    # fourcc = cv2.VideoWriter_fourcc(*'MP4V') # needs codec installed?
-    out = cv2.VideoWriter(dir_path + '/videos/{}.avi'.format(datetime.now().strftime('%Y%m%d_%H%M%S')), fourcc, 30, (width,height))
+    if recordVideo:
+        fourcc = cv2.VideoWriter_fourcc('M','J','P','G')
+        # fourcc = cv2.VideoWriter_fourcc(*'MP4V') # needs codec installed?
+        out = cv2.VideoWriter(dir_path + '/videos/{}.avi'.format(datetime.now().strftime('%Y%m%d_%H%M%S')), fourcc, 30, (width,height))
+    
     start = time.process_time()
-
     print("Starting...")
+
     while True:
         time2, frame = cvLifecamSink.grabFrame(img)
 
@@ -527,11 +593,11 @@ if __name__ == "__main__":
 
             frame = cv2.resize(frame, (processingWidth, processingHeight))
 
-            CircleDetection(cvLifecamSink, cs, frame.copy(), ntinst.getTable('CargoDetection'), cargoOutputStream, cargoHSV, cargoParams, kernel, "cargo", cargoMinRadius, blackout=False)
+            # CircleDetection(cvLifecamSink, cs, frame.copy(), ntinst.getTable('CargoDetection'), cargoOutputStream, cargoHSV, cargoParams, kernel, "cargo", cargoMinRadius, blackout=False)
 
-            CircleDetection(cvLifecamSink, cs, frame.copy(), ntinst.getTable('HatchDetection'), hatchOutputStream, hatchHSV, hatchParams, kernel, "hatch", hatchMinRadius, blackout=True)
+            # CircleDetection(cvLifecamSink, cs, frame.copy(), ntinst.getTable('HatchDetection'), hatchOutputStream, hatchHSV, hatchParams, kernel, "hatch", hatchMinRadius, blackout=True)
         
-            LineDetection(cvLifecamSink, cs, frame.copy(), ntinst.getTable('LineDetection'), lineOutputStream, lineHLS, lineMinArea, lineMaxArea, lineSensitivity, blackout=True)
+            LineDetection(cvLifecamSink, cs, frame.copy(), ntinst.getTable('LineDetection'), lineOutputStream, lineHLS, lineMinArea, lineMaxArea, lineSensitivity, blackoutRegions)
         
         else:
             try:
