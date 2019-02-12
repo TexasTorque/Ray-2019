@@ -83,7 +83,6 @@ public class Rotary extends Subsystem {
         }
 
         speed = rotaryPID.calculate(currentPos);
-        output();
     }
 
     private void runRotaryBottom() {
@@ -95,7 +94,6 @@ public class Rotary extends Subsystem {
         }
 
         speed = rotaryPID.calculate(currentPos);
-        output();
     }
 
     @Override

@@ -6,29 +6,34 @@ import org.texastorque.torquelib.component.TorqueEncoder;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.networktables.*;
 
 public class Feedback {
 
     private static volatile Feedback instance;
 
-    // ========== Constants ==========
+    // Constants
     public static final double DISTANCE_CONVERSION = 1.0;
     public static final double ANGLE_CONVERSION = 1.0;
 
-    // ========== Sensors ===========
-    private final TorqueEncoder DB_leftEncoder;
-    private final TorqueEncoder DB_rightEncoder;
+    // Sensors
+    // private final TorqueEncoder DB_leftEncoder;
+    // private final TorqueEncoder DB_rightEncoder;
     // private final TorqueEncoder LF_encoder;
     // private final TorqueEncoder RT_encoder;
 
     private final DigitalInput LN_leftSensor;
     private final DigitalInput LN_midSensor;
     private final DigitalInput LN_rightSensor;
+
+    // NetworkTables
+    private NetworkTableInstance NT_instance;
+    private NetworkTable NT_target;
     
 
     private Feedback() {
-        DB_leftEncoder = new TorqueEncoder(Ports.DB_LEFT_ENCODER_A, Ports.DB_LEFT_ENCODER_B, false, EncodingType.k4X);
-        DB_rightEncoder = new TorqueEncoder(Ports.DB_LEFT_ENCODER_A, Ports.DB_LEFT_ENCODER_B, false, EncodingType.k4X);
+        // DB_leftEncoder = new TorqueEncoder(Ports.DB_LEFT_ENCODER_A, Ports.DB_LEFT_ENCODER_B, false, EncodingType.k4X);
+        // DB_rightEncoder = new TorqueEncoder(Ports.DB_LEFT_ENCODER_A, Ports.DB_LEFT_ENCODER_B, false, EncodingType.k4X);
         // LF_encoder = new TorqueEncoder(Ports.DB_LEFT_ENCODER_A, Ports.DB_LEFT_ENCODER_B, false, EncodingType.k4X);
         // RT_encoder = new TorqueEncoder(Ports.DB_LEFT_ENCODER_A, Ports.DB_LEFT_ENCODER_B, false, EncodingType.k4X);
 
@@ -36,11 +41,14 @@ public class Feedback {
         LN_midSensor = new DigitalInput(Ports.LN_MID);
         LN_rightSensor = new DigitalInput(Ports.LN_RIGHT);
         
+        NT_instance = NetworkTableInstance.getDefault();
+        NT_target = NT_instance.getTable("TargetDetection");
     }
 
     public void update() {
         // updateEncoders();
         updateLineSensors();
+        updateNetworkTables();
     }
 
 
@@ -55,22 +63,22 @@ public class Feedback {
     private double RT_angle;
 
     public void resetEncoders() {
-		DB_leftEncoder.reset();
-        DB_rightEncoder.reset();
+		// DB_leftEncoder.reset();
+        // DB_rightEncoder.reset();
         // LF_encoder.reset();
         // RT_encoder.reset();
     }
 
     public void updateEncoders() {
-        DB_leftEncoder.calc();
-        DB_rightEncoder.calc();
+        // DB_leftEncoder.calc();
+        // DB_rightEncoder.calc();
         // LF_encoder.calc();
         // RT_encoder.calc();
 
-        DB_leftSpeed = DB_leftEncoder.getRate() * DISTANCE_CONVERSION;
-		DB_rightSpeed = DB_rightEncoder.getRate() * DISTANCE_CONVERSION;
-        DB_leftDistance = DB_leftEncoder.getDistance() * DISTANCE_CONVERSION;
-        DB_rightDistance = DB_rightEncoder.getDistance() * DISTANCE_CONVERSION;
+        // DB_leftSpeed = DB_leftEncoder.getRate() * DISTANCE_CONVERSION;
+		// DB_rightSpeed = DB_rightEncoder.getRate() * DISTANCE_CONVERSION;
+        // DB_leftDistance = DB_leftEncoder.getDistance() * DISTANCE_CONVERSION;
+        // DB_rightDistance = DB_rightEncoder.getDistance() * DISTANCE_CONVERSION;
 
         // LF_position = LF_encoder.getDistance();
         // RT_angle = RT_encoder.getDistance() * ANGLE_CONVERSION;
@@ -127,6 +135,31 @@ public class Feedback {
 
 
     // ===== RPi feedback from NetworkTables =====
+    private double DB_targetError;
+    private double[] pastTargetErrors = new double[50];
+
+    public void updateNetworkTables() {
+        // double temp = NT_target.getEntry("target_error").getDouble(0);
+        // for (int i = 1; i < pastTargetErrors.length; i++)
+        //     pastTargetErrors[i] = pastTargetErrors[i-1];
+        // pastTargetErrors[0] = temp;
+        // if (temp != 0)
+        //     DB_targetError = temp;
+        // else {
+        //     boolean allZeros = true;
+        //     for (int i = 0; i < pastTargetErrors.length; i++)
+        //         if (pastTargetErrors[i] == 0)
+        //             allZeros = false;
+        //     if (allZeros)
+        //         DB_targetError = 0;
+        // }
+        // DB_targetError = 2 * DB_targetError / NT_target.getEntry("frame_width").getDouble(210);
+        DB_targetError = 2 * NT_target.getEntry("target_error").getDouble(0) / NT_target.getEntry("frame_width").getDouble(210);
+    }
+
+    public double getTargetError() {
+        return DB_targetError;
+    }
 
 
     public void smartDashboard() {

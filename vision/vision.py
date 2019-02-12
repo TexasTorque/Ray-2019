@@ -52,11 +52,11 @@ cameraConfigs = []
 width = 320
 height = 240
 fps = 30
-processingScale = 1.5
-frameWidth = width // processingScale
-frameHeight = height // processingScale
-frameCenter = (frameWidth//2, frameHeight//2)
-xOffset = width // 2
+processingScale = 1
+frameWidth = int(width / processingScale)
+frameHeight = int(height / processingScale)
+frameCenter = (int(frameWidth/2), int(frameHeight/2))
+xOffset = int(width / 2)
 yOffset = 240
 showAllReturnedObjects = False
 
@@ -181,7 +181,7 @@ def findTargetTop(hsv, minHSV, maxHSV, kernel, tables, outputStream):
         # Construct rectangular boxes around each contour and store their coordinates in a dictionary.
         boxes = {}
         for i, area in areas.items():
-            epsilon = 0.02 * cv.arcLength(contours[i], True)
+            epsilon = 0.03 * cv.arcLength(contours[i], True)
             box = [(point[0][0], point[0][1]) for point in cv.approxPolyDP(contours[i], epsilon, True)]
             boxes[i] = list(box)
 
@@ -239,7 +239,7 @@ def findTargetTop(hsv, minHSV, maxHSV, kernel, tables, outputStream):
     tables.putNumber("target_error", 0)
     outputStream.putFrame(frame)
     return 0
-
+    
 
 ########## MAIN ##########
 
@@ -296,8 +296,8 @@ if __name__ == "__main__":
     targetTable.putNumber("frame_width", frameWidth)
     targetTable.putNumber("frame_height", frameHeight)
     targetOutputStream = cs.putVideo("TargetDetection", frameWidth, frameHeight)
-    minTargetHSV = np.array([70, 130, 100])
-    maxTargetHSV = np.array([75, 255, 255])
+    minTargetHSV = np.array([70, 110, 70])
+    maxTargetHSV = np.array([80, 255, 255])
 
     while 1:
         time2, frame = cvSink.grabFrame(img)

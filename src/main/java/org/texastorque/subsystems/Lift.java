@@ -26,7 +26,7 @@ public class Lift extends Subsystem {
         pulleyA = new TorqueMotor(new VictorSP(Ports.LF_MOTOR_A), clockwise);
         pulleyB = new TorqueMotor(new VictorSP(Ports.LF_MOTOR_B), clockwise);
 
-        this.liftPID = new ScheduledPID.Builder(0, 0.5)
+        liftPID = new ScheduledPID.Builder(0, 0.5)
                 .setPGains(0.01)
                 .setIGains(0.01)
                 .setDGains(0.01)
@@ -85,7 +85,6 @@ public class Lift extends Subsystem {
         }
 
         speed = liftPID.calculate(currentPos);
-        output();
     }
 
     private void runLiftBottom() {
@@ -97,7 +96,6 @@ public class Lift extends Subsystem {
         }
 
         speed = liftPID.calculate(currentPos);
-        output();
     }
 
     @Override

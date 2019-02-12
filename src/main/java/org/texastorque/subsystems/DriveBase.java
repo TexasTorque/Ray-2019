@@ -3,6 +3,7 @@ package org.texastorque.subsystems;
 import org.texastorque.inputs.State.RobotState;
 import org.texastorque.constants.Ports;
 import org.texastorque.torquelib.component.TorqueMotor;
+import org.texastorque.torquelib.controlLoop.ScheduledPID;
 
 import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
@@ -21,6 +22,7 @@ public class DriveBase extends Subsystem {
     private TorqueMotor rightRear;
     private DoubleSolenoid gearShift;
     
+    private final ScheduledPID visionPID;
     private double leftSpeed = 0.0;
     private double rightSpeed = 0.0;
     private boolean highGear = false;
@@ -37,6 +39,8 @@ public class DriveBase extends Subsystem {
         rightRear = new TorqueMotor(new VictorSP(Ports.DB_RIGHT_REAR_MOTOR), clockwise);
         
         gearShift = new DoubleSolenoid(2, Ports.DB_SOLE_A, Ports.DB_SOLE_B);
+
+        visionPID = new ScheduledPID.Builder(0, -0.1, 0.9, 1).setPGains(1).setIGains(0).setDGains(0).build();
     }
 
     @Override
@@ -77,7 +81,9 @@ public class DriveBase extends Subsystem {
             rightSpeed = input.getDBRightSpeed();
         }
         else if (currentState == RobotState.VISION) {
-            // Read feedback for NetworkTables input, calculate output
+            double currentError = feedback.getTargetError();
+            leftSpeed = 0.1 + visionPID.calculate(currentError);
+            rightSpeed = 0.1 - visionPID.calculate(currentError);
         }
         else if (currentState == RobotState.LINE) {
             // Read feedback for NetworkTables input, calculate output
