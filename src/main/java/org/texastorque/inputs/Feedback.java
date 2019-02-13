@@ -154,7 +154,8 @@ public class Feedback {
         //         DB_targetError = 0;
         // }
         // DB_targetError = 2 * DB_targetError / NT_target.getEntry("frame_width").getDouble(210);
-        DB_targetError = 2 * NT_target.getEntry("target_error").getDouble(0) / NT_target.getEntry("frame_width").getDouble(210);
+        
+        DB_targetError = NT_target.getEntry("target_error").getDouble(0);
     }
 
     public double getTargetError() {

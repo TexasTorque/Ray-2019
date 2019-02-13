@@ -158,7 +158,7 @@ def startCamera(config):
 
 ########## VISION LOGIC ##########
 
-def findTargetTop(hsv, minHSV, maxHSV, kernel, tables, outputStream):
+def findTargetTop(hsv, minHSV, maxHSV, kernel):
     mask = cv.inRange(hsv, minHSV, maxHSV)
     mask = cv.morphologyEx(mask, cv.MORPH_CLOSE, kernel)
 
@@ -174,9 +174,9 @@ def findTargetTop(hsv, minHSV, maxHSV, kernel, tables, outputStream):
         areas = {i: cv.contourArea(cnt) for i, cnt in enumerate(contours)}
         areas = util.clamp(areas, 100, 16000)
         if not areas:
-            tables.putNumber("target_error", 0)
-            outputStream.putFrame(frame)
-            return 0
+            # tables.putNumber("target_error", 0)
+            # outputStream.putFrame(frame)
+            return (0, frame)
 
         # Construct rectangular boxes around each contour and store their coordinates in a dictionary.
         boxes = {}
@@ -208,9 +208,9 @@ def findTargetTop(hsv, minHSV, maxHSV, kernel, tables, outputStream):
             else:
                 continue
         if not targets:
-            tables.putNumber("target_error", 0)
-            outputStream.putFrame(frame)
-            return 0
+            # tables.putNumber("target_error", 0)
+            # outputStream.putFrame(frame)
+            return (0, frame)
 
         # Calculate average width of targets. Separate list of targets by left or right targets.
         approxWidth /= len(boxes)
@@ -232,13 +232,14 @@ def findTargetTop(hsv, minHSV, maxHSV, kernel, tables, outputStream):
             cv.putText(frame, "X", (target[0]+3, target[1]+3), cv.FONT_HERSHEY_PLAIN, 1, (0, 255, 0))
 
             # (+) if target is to the right, (-) if target is to the left
-            tables.putNumber("target_error", target[0]-frameCenter[0])
-            outputStream.putFrame(frame)
-            return target
+            # tables.putNumber("target_error", target[0]-frameCenter[0])
+            error = 2*(target[0]-frameCenter[0]) / frameWidth
+            # outputStream.putFrame(frame)
+            return (error, frame)
 
-    tables.putNumber("target_error", 0)
-    outputStream.putFrame(frame)
-    return 0
+    # tables.putNumber("target_error", 0)
+    # outputStream.putFrame(frame)
+    return (0, frame)
     
 
 ########## MAIN ##########
@@ -304,4 +305,6 @@ if __name__ == "__main__":
         frame = cv.resize(frame, (frameWidth, frameHeight))
         hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
 
-        findTargetTop(hsv, minTargetHSV, maxTargetHSV, kernel, targetTable, targetOutputStream)
+        targetError, targetFrame = findTargetTop(hsv, minTargetHSV, maxTargetHSV, kernel)
+        targetOutputStream.putFrame(targetFrame)
+        targetTable.putNumber("target_error", util.bufferOutput(targetError))

@@ -20,6 +20,10 @@ public class Input {
     public void update() {
         updateState();
         updateDrive();
+        updateLift();
+        updateRotary();
+        updateIntake();
+        updateClimber();
     }
 
     // =========== RobotState ==========
@@ -109,6 +113,20 @@ public class Input {
 
     public boolean getINHatchEngaged() {
         return IN_hatchEngaged;
+    }
+
+
+    //Climber
+    private volatile boolean CM_enabled;
+    
+    public void updateClimber() {
+        if (driver.getAButtonPressed()) {
+            CM_enabled = !CM_enabled;
+        }
+    }
+
+    public boolean getCMEnabled() {
+        return CM_enabled;
     }
     
     public static Input getInstance() {

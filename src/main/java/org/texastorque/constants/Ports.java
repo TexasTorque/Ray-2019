@@ -28,6 +28,12 @@ public class Ports {
     public static final int IN_WALL_SOLE_A = 4;
     public static final int IN_WALL_SOLE_B = 5;
 
+    //Climber
+    public static final int CM_LEFT_TOM_MOTOR = 4;
+    public static final int CM_RIGHT_TOM_MOTOR = 5;
+    public static final int CM_REAR_A_MOTOR = 6;
+    public static final int CM_REAR_B_MOTOR = 7;
+
     // Sensors
     public static final int DB_LEFT_ENCODER_A = 0;
     public static final int DB_LEFT_ENCODER_B = 1;

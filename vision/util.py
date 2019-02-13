@@ -52,7 +52,7 @@ def approx(num1, num2, error=0.05):
 def inRange(num, lower, upper):
     return num >= lower and num <= upper
 
-pastOutputs = [0] * 5
+pastOutputs = [0] * 10
 lastNonzero = 0
 def bufferOutput(newOutput):
     global pastOutputs, lastNonzero
