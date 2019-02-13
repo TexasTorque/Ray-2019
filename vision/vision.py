@@ -307,4 +307,4 @@ if __name__ == "__main__":
 
         targetError, targetFrame = findTargetTop(hsv, minTargetHSV, maxTargetHSV, kernel)
         targetOutputStream.putFrame(targetFrame)
-        targetTable.putNumber("target_error", util.bufferOutput(targetError))
+        targetTable.putNumber("target_error", util.bufferOutput(targetError, 1))

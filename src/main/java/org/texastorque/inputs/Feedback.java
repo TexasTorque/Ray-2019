@@ -19,7 +19,7 @@ public class Feedback {
     // Sensors
     // private final TorqueEncoder DB_leftEncoder;
     // private final TorqueEncoder DB_rightEncoder;
-    // private final TorqueEncoder LF_encoder;
+    private final TorqueEncoder LF_encoder;
     // private final TorqueEncoder RT_encoder;
 
     private final DigitalInput LN_leftSensor;
@@ -34,7 +34,7 @@ public class Feedback {
     private Feedback() {
         // DB_leftEncoder = new TorqueEncoder(Ports.DB_LEFT_ENCODER_A, Ports.DB_LEFT_ENCODER_B, false, EncodingType.k4X);
         // DB_rightEncoder = new TorqueEncoder(Ports.DB_LEFT_ENCODER_A, Ports.DB_LEFT_ENCODER_B, false, EncodingType.k4X);
-        // LF_encoder = new TorqueEncoder(Ports.DB_LEFT_ENCODER_A, Ports.DB_LEFT_ENCODER_B, false, EncodingType.k4X);
+        LF_encoder = new TorqueEncoder(Ports.DB_LEFT_ENCODER_A, Ports.DB_LEFT_ENCODER_B, false, EncodingType.k4X);
         // RT_encoder = new TorqueEncoder(Ports.DB_LEFT_ENCODER_A, Ports.DB_LEFT_ENCODER_B, false, EncodingType.k4X);
 
         LN_leftSensor = new DigitalInput(Ports.LN_LEFT);
@@ -46,7 +46,7 @@ public class Feedback {
     }
 
     public void update() {
-        // updateEncoders();
+        updateEncoders();
         updateLineSensors();
         updateNetworkTables();
     }
@@ -65,7 +65,7 @@ public class Feedback {
     public void resetEncoders() {
 		// DB_leftEncoder.reset();
         // DB_rightEncoder.reset();
-        // LF_encoder.reset();
+        LF_encoder.reset();
         // RT_encoder.reset();
     }
 
@@ -80,7 +80,7 @@ public class Feedback {
         // DB_leftDistance = DB_leftEncoder.getDistance() * DISTANCE_CONVERSION;
         // DB_rightDistance = DB_rightEncoder.getDistance() * DISTANCE_CONVERSION;
 
-        // LF_position = LF_encoder.getDistance();
+        LF_position = LF_encoder.getDistance();
         // RT_angle = RT_encoder.getDistance() * ANGLE_CONVERSION;
     }
 
@@ -139,22 +139,6 @@ public class Feedback {
     private double[] pastTargetErrors = new double[50];
 
     public void updateNetworkTables() {
-        // double temp = NT_target.getEntry("target_error").getDouble(0);
-        // for (int i = 1; i < pastTargetErrors.length; i++)
-        //     pastTargetErrors[i] = pastTargetErrors[i-1];
-        // pastTargetErrors[0] = temp;
-        // if (temp != 0)
-        //     DB_targetError = temp;
-        // else {
-        //     boolean allZeros = true;
-        //     for (int i = 0; i < pastTargetErrors.length; i++)
-        //         if (pastTargetErrors[i] == 0)
-        //             allZeros = false;
-        //     if (allZeros)
-        //         DB_targetError = 0;
-        // }
-        // DB_targetError = 2 * DB_targetError / NT_target.getEntry("frame_width").getDouble(210);
-        
         DB_targetError = NT_target.getEntry("target_error").getDouble(0);
     }
 
@@ -162,9 +146,8 @@ public class Feedback {
         return DB_targetError;
     }
 
-
     public void smartDashboard() {
-
+        SmartDashboard.putNumber("LF_position", LF_position);
     }
 
     public static Feedback getInstance() {

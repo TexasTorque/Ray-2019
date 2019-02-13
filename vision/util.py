@@ -1,5 +1,6 @@
 import cv2 as cv
 import numpy as np
+import time
 
 def adjustGamma(image, gamma=1.0):
 	# build a lookup table mapping the pixel values [0, 255] to
@@ -52,6 +53,7 @@ def approx(num1, num2, error=0.05):
 def inRange(num, lower, upper):
     return num >= lower and num <= upper
 
+'''
 pastOutputs = [0] * 10
 lastNonzero = 0
 def bufferOutput(newOutput):
@@ -66,3 +68,16 @@ def bufferOutput(newOutput):
         return 0
     else:
         return lastNonzero
+'''
+
+lastValue = 0
+updateTime = 0
+def bufferOutput(newOutput, bufferTime):
+    global lastValue, updateTime
+    if newOutput != 0:
+        lastValue = newOutput
+        updateTime = time.perf_counter()
+    if time.perf_counter() - updateTime < bufferTime:
+        return lastValue
+    else:
+        return 0
