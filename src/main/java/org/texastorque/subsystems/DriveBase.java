@@ -3,11 +3,13 @@ package org.texastorque.subsystems;
 import org.texastorque.inputs.State.RobotState;
 import org.texastorque.constants.Ports;
 import org.texastorque.torquelib.component.TorqueMotor;
+import org.texastorque.torquelib.component.TorqueEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.*;
 import edu.wpi.first.wpilibj.networktables.*;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.CounterBase.EncodingType;
 import static org.texastorque.torquelib.util.TorqueMathUtil.near;
 
 public class DriveBase extends Subsystem {
@@ -23,6 +25,8 @@ public class DriveBase extends Subsystem {
     private TorqueMotor rightRear;
     private DoubleSolenoid gearShift;
     private SmartDashboard dashboard;
+    private TorqueEncoder leftEncode;
+    private TorqueEncoder rightEncode;
 
     private double leftSpeed = 0.0;
     private double rightSpeed = 0.0;
@@ -39,7 +43,8 @@ public class DriveBase extends Subsystem {
         rightRear = new TorqueMotor(new VictorSP(Ports.DB_RIGHT_REAR_MOTOR), clockwise);
         
         gearShift = new DoubleSolenoid(2, Ports.DB_LEFT_SOLE_A, Ports.DB_LEFT_SOLE_B);
-
+        leftEncode = new TorqueEncoder(Ports.DB_LEFT_ENCODER_A, Ports.DB_LEFT_ENCODER_B, true, EncodingType.k4X);
+        rightEncode = new TorqueEncoder(Ports.DB_RIGHT_ENCODER_A, Ports.DB_RIGHT_ENCODER_B, false, EncodingType.k4X);
     }
 
     @Override
@@ -153,10 +158,15 @@ public class DriveBase extends Subsystem {
     }
 
     /**
-     * Potential auto transmission
+     * auto transmission
      */
     private void setGears() {
-        highGear = (leftSpeed > 0.5 && rightSpeed > 0.5) ? true : false;
+        //OLD CODE: highGear = (leftSpeed > 0.5 && rightSpeed > 0.5) ? true : false;
+        // instead of controller input use encoder
+        if (!highGear && ((leftEncode.getAverageRate()+rightEncode.getAverageRate())/2) > 10)
+            highGear = true;
+        if (highGear && ((leftEncode.getAverageRate()+rightEncode.getAverageRate())/2) > 10)
+            highGear = false;
     }
     
     @Override

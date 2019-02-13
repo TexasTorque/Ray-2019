@@ -13,6 +13,12 @@ public class Ports {
     // public static final int DB_RIGHT_SOLE_A = 2;
     // public static final int IN_RIGHT_SOLE_B = 3;
 
+    //These are all temporary port positions, CHANGE LATER
+    public static final int DB_RIGHT_ENCODER_A = 0;
+    public static final int DB_RIGHT_ENCODER_B = 0;
+    public static final int DB_LEFT_ENCODER_A = 0;
+    public static final int DB_LEFT_ENCODER_B = 0;
+
     // Other subsystems
     public static final int FB_ULTRASONIC = 1;
     // LineFollower
