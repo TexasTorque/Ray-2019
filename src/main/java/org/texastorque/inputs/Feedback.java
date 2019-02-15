@@ -135,15 +135,15 @@ public class Feedback {
 
 
     // ===== RPi feedback from NetworkTables =====
-    private double DB_targetError;
+    private double DB_targetOffset;
     private double[] pastTargetErrors = new double[50];
 
     public void updateNetworkTables() {
-        DB_targetError = NT_target.getEntry("target_error").getDouble(0);
+        DB_targetOffset = NT_target.getEntry("target_offset").getDouble(0);
     }
 
-    public double getTargetError() {
-        return DB_targetError;
+    public double getTargetOffset() {
+        return DB_targetOffset;
     }
 
     public void smartDashboard() {
