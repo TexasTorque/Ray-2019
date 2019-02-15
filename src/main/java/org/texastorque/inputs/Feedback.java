@@ -147,6 +147,7 @@ public class Feedback {
     }
 
     public void smartDashboard() {
+        SmartDashboard.putString("State", State.getInstance().getRobotState().toString());
         SmartDashboard.putNumber("LF_position", LF_position);
     }
 

@@ -23,10 +23,10 @@ public class Climber extends Subsystem {
     private boolean clockwise = true;
 
     private Climber() {
-        leftTom = new TorqueMotor(new VictorSP(Ports.CM_LEFT_TOM_MOTOR), !clockwise);
-        rightTom = new TorqueMotor(new VictorSP(Ports.CM_RIGHT_TOM_MOTOR), clockwise);
-        rearA = new TorqueMotor(new VictorSP(Ports.CM_REAR_A_MOTOR), clockwise);
-        rearB = new TorqueMotor(new VictorSP(Ports.CM_REAR_B_MOTOR), clockwise);
+        // leftTom = new TorqueMotor(new VictorSP(Ports.CM_LEFT_TOM_MOTOR), !clockwise);
+        // rightTom = new TorqueMotor(new VictorSP(Ports.CM_RIGHT_TOM_MOTOR), clockwise);
+        // rearA = new TorqueMotor(new VictorSP(Ports.CM_REAR_A_MOTOR), clockwise);
+        // rearB = new TorqueMotor(new VictorSP(Ports.CM_REAR_B_MOTOR), clockwise);
 
         rearPID = new ScheduledPID.Builder(0, -0.1, 0.9, 1).setPGains(1).setIGains(0).setDGains(0).build();
     }
@@ -80,10 +80,10 @@ public class Climber extends Subsystem {
 
     @Override
     public void output() {
-        leftTom.set(tomSpeed);
-        rightTom.set(tomSpeed);
-        rearA.set(rearSpeed);
-        rearB.set(rearSpeed);
+        // leftTom.set(tomSpeed);
+        // rightTom.set(tomSpeed);
+        // rearA.set(rearSpeed);
+        // rearB.set(rearSpeed);
     }
 
     public static Climber getInstance() {

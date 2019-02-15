@@ -40,7 +40,12 @@ public class DriveBase extends Subsystem {
         
         gearShift = new DoubleSolenoid(2, Ports.DB_SOLE_A, Ports.DB_SOLE_B);
 
-        visionPID = new ScheduledPID.Builder(0, -0.1, 0.9, 1).setPGains(1).setIGains(0).setDGains(0).build();
+        visionPID = new ScheduledPID.Builder(0, -0.5, 0.5, 3)
+                .setRegions(-0.2, 0.2)
+                .setPGains(0.3, 0.3, 0.3)
+                .setIGains(0.1, 0.02, 0.1)
+                .setDGains(0.02, 0.1, 0.02)
+                .build();
     }
 
     @Override
@@ -82,8 +87,9 @@ public class DriveBase extends Subsystem {
         }
         else if (currentState == RobotState.VISION) {
             double currentError = feedback.getTargetError();
-            leftSpeed = 0.1 + visionPID.calculate(currentError);
-            rightSpeed = 0.1 - visionPID.calculate(currentError);
+            // System.out.println(visionPID.calculate(currentError));
+            leftSpeed = input.getDBLeftSpeed() * (0.5 - visionPID.calculate(currentError));
+            rightSpeed = input.getDBRightSpeed() * (visionPID.calculate(currentError) + 0.5);
         }
         else if (currentState == RobotState.LINE) {
             // Read feedback for NetworkTables input, calculate output
