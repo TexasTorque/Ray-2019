@@ -2,6 +2,11 @@ package org.texastorque.inputs;
 
 import org.texastorque.inputs.State.RobotState;
 import org.texastorque.torquelib.util.GenericController;
+<<<<<<< HEAD
+=======
+import org.texastorque.torquelib.component.TorqueEncoder;
+import org.texastorque.inputs.Feedback.*;
+>>>>>>> Network Tables
 
 public class Input {
 

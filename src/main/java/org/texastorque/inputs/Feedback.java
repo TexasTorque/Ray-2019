@@ -1,10 +1,15 @@
 package org.texastorque.inputs;
-
 import org.texastorque.constants.Ports;
 import org.texastorque.torquelib.component.TorqueEncoder;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+<<<<<<< HEAD
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
+=======
+import edu.wpi.first.wpilibj.networktables.*;
+import edu.wpi.first.wpilibj.AnalogInput;
+import com.kauailabs.navx.frc.AHRS;
+>>>>>>> Network Tables
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.networktables.*;
@@ -13,6 +18,7 @@ import com.kauailabs.navx.frc.AHRS;
 public class Feedback {
 
     private static volatile Feedback instance;
+<<<<<<< HEAD
 
     // Constants
     public static final double PULSES_PER_ROTATION = 1000;
@@ -23,6 +29,8 @@ public class Feedback {
     public static final double LF_FEET_CONVERSION = Math.PI * (1.0/20) / PULSES_PER_ROTATION; // Approx shaft diameter
 
     public static boolean clockwise = true;
+=======
+>>>>>>> Network Tables
 
     // Sensors
     private final TorqueEncoder DB_leftEncoder;
@@ -72,8 +80,14 @@ public class Feedback {
     private double DB_leftDistance;
     private double DB_rightDistance;
 
+<<<<<<< HEAD
     private double LF_position;
     private double RT_angle;
+=======
+    private AHRS gyro;
+    private NetworkTable lnNetworkTable;
+    private double lastAngle = 0.0;
+>>>>>>> Network Tables
 
     public void resetEncoders() {
 		DB_leftEncoder.reset();
@@ -112,6 +126,7 @@ public class Feedback {
     public double getDBRightDistance() {
         return DB_rightDistance;
     }
+    // Read sensors
 
     public double getLFPosition() {
         return LF_position;
@@ -160,6 +175,10 @@ public class Feedback {
         return LN_left;
     }
 
+    public double getYaw(){
+        return gyro.getYaw();
+    }
+
     public boolean lineMidTrue() {
         return LN_mid;
     }
@@ -169,6 +188,7 @@ public class Feedback {
     }
 
 
+<<<<<<< HEAD
     // ===== RPi feedback from NetworkTables =====
     private double DB_targetOffset;
     private double[] pastTargetErrors = new double[50];
@@ -196,6 +216,8 @@ public class Feedback {
         SmartDashboard.putBoolean("M", LN_mid);
         SmartDashboard.putBoolean("R", LN_right);
     }
+=======
+>>>>>>> Network Tables
 
     public static Feedback getInstance() {
         if (instance == null) {
@@ -207,4 +229,9 @@ public class Feedback {
         return instance;
     }
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> Network Tables
 }

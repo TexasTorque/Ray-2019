@@ -9,6 +9,10 @@ import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
+import edu.wpi.first.wpilibj.networktables.*;
+
+import org.texastorque.torquelib.controlLoop.ScheduledPID;
+import org.texastorque.torquelib.controlLoop.ScheduledPID.*;
 import static org.texastorque.torquelib.util.TorqueMathUtil.near;
 
 public class DriveBase extends Subsystem {
@@ -32,8 +36,11 @@ public class DriveBase extends Subsystem {
     private boolean highGear = false;
     
     private static boolean clockwise = true;
-    private boolean angle;
-    private int fakeBinary = 0;
+
+    private ScheduledPID linePID;
+    private boolean reset;
+    private double angleDegree = 45;
+    private String lineDirection;
 
     private DriveBase() {
         leftFore = new TorqueMotor(new VictorSP(Ports.DB_LEFT_FORE_MOTOR), !clockwise);
@@ -82,6 +89,7 @@ public class DriveBase extends Subsystem {
         currentState = state.getRobotState();
 
         if (currentState == RobotState.TELEOP) {
+            reset = true;
             leftSpeed = input.getDBLeftSpeed();
             rightSpeed = input.getDBRightSpeed();
             output();
@@ -155,4 +163,6 @@ public class DriveBase extends Subsystem {
         }
         return instance;
     }
+
+
 }
