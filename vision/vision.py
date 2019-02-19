@@ -179,8 +179,9 @@ def findTargetTop(hsv, minHSV, maxHSV, kernel):
         # Construct rectangular boxes around each contour and store their coordinates in a dictionary.
         boxes = {}
         for i, area in areas.items():
-            epsilon = 0.03 * cv.arcLength(contours[i], True)
-            box = [(point[0][0], point[0][1]) for point in cv.approxPolyDP(contours[i], epsilon, True)]
+            # epsilon = 0.03 * cv.arcLength(contours[i], True)
+            # box = [(point[0][0], point[0][1]) for point in cv.approxPolyDP(contours[i], epsilon, True)]
+            box = np.int0(cv.boxPoints(cv.minAreaRect(contours[i])))
             boxes[i] = list(box)
 
         # For each box, find top two and bottom coordinates. If ratio of side edge to top edge is about right, then confirm box is a target and analyze if it is a left or right target. Add all targets into a dictionary.
@@ -289,7 +290,7 @@ if __name__ == "__main__":
     targetTable.putNumber("frame_width", frameWidth)
     targetTable.putNumber("frame_height", frameHeight)
     targetOutputStream = cs.putVideo("TargetDetection", frameWidth, frameHeight)
-    minTargetHSV = np.array([70, 110, 70])
+    minTargetHSV = np.array([70, 70, 50])
     maxTargetHSV = np.array([80, 255, 255])
 
     while 1:

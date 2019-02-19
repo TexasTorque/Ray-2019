@@ -148,7 +148,15 @@ public class Feedback {
 
     public void smartDashboard() {
         SmartDashboard.putString("State", State.getInstance().getRobotState().toString());
+        SmartDashboard.putNumber("DB_leftSpeed", DB_leftSpeed);
+        SmartDashboard.putNumber("DB_rightSpeed", DB_rightSpeed);
         SmartDashboard.putNumber("LF_position", LF_position);
+
+        // boolean[] lineSensors = {LN_left, LN_mid, LN_right};
+        // SmartDashboard.putBooleanArray("lineSensors", lineSensors);
+        SmartDashboard.putBoolean("L", LN_left);
+        SmartDashboard.putBoolean("M", LN_mid);
+        SmartDashboard.putBoolean("R", LN_right);
     }
 
     public static Feedback getInstance() {

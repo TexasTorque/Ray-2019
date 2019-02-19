@@ -41,14 +41,15 @@ public class DriveBase extends Subsystem {
         gearShift = new DoubleSolenoid(2, Ports.DB_SOLE_A, Ports.DB_SOLE_B);
 
         visionPID = new ScheduledPID.Builder(0, -0.5, 0.5, 3)
-                .setRegions(-0.1, 0.1)
-                .setPGains(0.3, 0.3, 0.3)
-                .setIGains(0.1, 0.02, 0.1)
-                .setDGains(0.02, 0.1, 0.02)
+                .setRegions(-0.2, 0.2)
+                .setPGains(0.3, 0.8, 0.3)
+                //.setIGains(0.1, 0, 0.1)
+                //.setDGains(0, 0.5, 0)
                 .build();
     }
 
     @Override
+    
     public void autoInit() {
         leftSpeed = 0.0;
         rightSpeed = 0.0;
