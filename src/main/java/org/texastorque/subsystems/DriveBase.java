@@ -49,7 +49,7 @@ public class DriveBase extends Subsystem {
     }
 
     @Override
-    
+
     public void autoInit() {
         leftSpeed = 0.0;
         rightSpeed = 0.0;
@@ -88,8 +88,14 @@ public class DriveBase extends Subsystem {
         }
         else if (currentState == RobotState.VISION) {
             double currentOffset = feedback.getTargetOffset();
-            leftSpeed = input.getDBLeftSpeed() * (0.5 - visionPID.calculate(currentOffset));
-            rightSpeed = input.getDBRightSpeed() * (visionPID.calculate(currentOffset) + 0.5);
+            double adjustment = visionPID.calculate(currentOffset);
+            System.out.println("Offset: " + currentOffset + " || Adjustment: " + adjustment);
+
+            leftSpeed = 0.5 * input.getDBLeftSpeed() - adjustment;
+            rightSpeed = 0.5 * input.getDBRightSpeed() + adjustment; 
+
+            // leftSpeed = input.getDBLeftSpeed() * (0.5 - adjustment);
+            // rightSpeed = input.getDBRightSpeed() * (adjustment + 0.5);
         }
         else if (currentState == RobotState.LINE) {
             // Read feedback for NetworkTables input, calculate output

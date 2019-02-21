@@ -27,9 +27,9 @@ public class Lift extends Subsystem {
         pulleyB = new TorqueMotor(new VictorSP(Ports.LF_MOTOR_B), clockwise);
 
         liftPID = new ScheduledPID.Builder(0, 0.5)
-                .setPGains(0.01)
-                .setIGains(0.01)
-                .setDGains(0.01)
+                .setPGains(0.001)
+                .setIGains(0)
+                .setDGains(0)
                 .build();
 
         speed = 0;

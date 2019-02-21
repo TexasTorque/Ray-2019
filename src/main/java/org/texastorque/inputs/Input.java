@@ -69,10 +69,20 @@ public class Input {
 
 
     // ========== Lift ==========
-    private final double[] LF_setpoints = {0, 10, 20};
+    private final double[] LF_setpoints = {0, 100, 200};
     private volatile int LF_setpoint;
 
-    public void updateLift() {}
+    public void updateLift() {
+        if (operator.getAButtonPressed()) {
+            LF_setpoint = 0;
+        }
+        else if (operator.getBButtonPressed()) {
+            LF_setpoint = 1;
+        }
+        else if (operator.getYButtonPressed()) {
+            LF_setpoint = 2;
+        }
+    }
 
     public double getLFSetpoint() {
         return LF_setpoints[LF_setpoint];
@@ -86,7 +96,14 @@ public class Input {
     private final double[] RT_setpoints = {0, 10};
     private volatile int RT_setpoint;
 
-    public void updateRotary() {}
+    public void updateRotary() {
+        if (operator.getLeftBumper()) {
+            RT_setpoint = 1;
+        }
+        else if (operator.getLeftTrigger()) {
+            RT_setpoint = 0;
+        }
+    }
 
     public double getRTSetpoint() {
         return RT_setpoints[RT_setpoint];
