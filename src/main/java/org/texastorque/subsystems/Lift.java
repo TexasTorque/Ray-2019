@@ -10,13 +10,13 @@ import edu.wpi.first.wpilibj.VictorSP;
 public class Lift extends Subsystem {
 
     private static volatile Lift instance;
-    private RobotState currentState;
 
     private TorqueMotor pulleyA;
     private TorqueMotor pulleyB;
 
     private final ScheduledPID liftPID;
     private double speed;
+    private double baseOutput = 0.07;
     private double currentPos;
     private double setpoint;
     private double prevSetpoint;
@@ -26,10 +26,10 @@ public class Lift extends Subsystem {
         pulleyA = new TorqueMotor(new VictorSP(Ports.LF_MOTOR_A), !clockwise);
         pulleyB = new TorqueMotor(new VictorSP(Ports.LF_MOTOR_B), !clockwise);
 
-        liftPID = new ScheduledPID.Builder(0, 0.5)
-                .setPGains(0.5)
-                .setIGains(0.01)
-                .setDGains(0)
+        liftPID = new ScheduledPID.Builder(0, -0.7, 0.7, 1)
+                .setPGains(0.3)
+                .setIGains(0.1)
+                //.setDGains(0.01)
                 .build();
 
         speed = 0;
@@ -52,27 +52,27 @@ public class Lift extends Subsystem {
     }
 
     @Override
-    public void disabledContinuous() {}
-
-    @Override
-    public void autoContinuous() {
-
-    }
-
-    @Override
-    public void teleopContinuous() {
-        currentState = state.getRobotState();
-
-        if (currentState == RobotState.TELEOP) {
+    public void run(RobotState state) {
+        if (state == RobotState.AUTO) {
             runLiftPID();
         }
-        else if (currentState == RobotState.VISION) {
+
+        else if (state == RobotState.TELEOP) {
+            runLiftPID();
+        }
+
+        else if (state == RobotState.VISION) {
             runLiftBottom();
         }
-        else if (currentState == RobotState.LINE) {
+
+        else if (state == RobotState.LINE) {
             runLiftPID();
         }
         
+        double backup = input.getLFBackup();
+        if (backup != 0) {
+            speed = backup;
+        }
         output();
     }
 
@@ -100,9 +100,19 @@ public class Lift extends Subsystem {
 
     @Override
     protected void output() {
+        speed += baseOutput;
         pulleyA.set(speed);
         pulleyB.set(speed);
     }
+
+    @Override
+    public void disabledContinuous() {}
+
+    @Override
+    public void autoContinuous() {}
+
+    @Override
+    public void teleopContinuous() {}
 
     @Override
     public void smartDashboard() {}

@@ -20,7 +20,7 @@ public class Feedback {
 
     public static final double DISTANCE_PER_PULSE = Math.PI * WHEEL_DIAMETER_FEET / PULSES_PER_ROTATION;
     public static final double ANGLE_PER_PULSE = 360 / PULSES_PER_ROTATION;
-    public static final double LF_FEET_CONVERSION = Math.PI * (1.0/20) / PULSES_PER_ROTATION; // Approx shaft diameter
+    public static final double LF_FEET_CONVERSION = Math.PI * (1.0/20) / PULSES_PER_ROTATION; // Using approximate shaft diameter
 
     public static boolean clockwise = true;
 

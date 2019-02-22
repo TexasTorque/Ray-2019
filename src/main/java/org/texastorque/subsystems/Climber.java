@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.VictorSP;
 public class Climber extends Subsystem {
 
     private static volatile Climber instance;
-    private RobotState currentState;
 
     private TorqueMotor leftTom;
     private TorqueMotor rightTom;
@@ -23,12 +22,16 @@ public class Climber extends Subsystem {
     private boolean clockwise = true;
 
     private Climber() {
-        // leftTom = new TorqueMotor(new VictorSP(Ports.CM_LEFT_TOM_MOTOR), !clockwise);
-        // rightTom = new TorqueMotor(new VictorSP(Ports.CM_RIGHT_TOM_MOTOR), clockwise);
-        // rearA = new TorqueMotor(new VictorSP(Ports.CM_REAR_A_MOTOR), clockwise);
-        // rearB = new TorqueMotor(new VictorSP(Ports.CM_REAR_B_MOTOR), clockwise);
+        leftTom = new TorqueMotor(new VictorSP(Ports.CM_LEFT_TOM_MOTOR), clockwise);
+        rightTom = new TorqueMotor(new VictorSP(Ports.CM_RIGHT_TOM_MOTOR), clockwise);
+        rearA = new TorqueMotor(new VictorSP(Ports.CM_REAR_A_MOTOR), clockwise);
+        rearB = new TorqueMotor(new VictorSP(Ports.CM_REAR_B_MOTOR), clockwise);
 
-        rearPID = new ScheduledPID.Builder(0, -0.1, 0.9, 1).setPGains(1).setIGains(0).setDGains(0).build();
+        rearPID = new ScheduledPID.Builder(0, 0, 0.7, 1)
+            .setPGains(0.1)
+            .setIGains(0)
+            .setDGains(0)
+            .build();
     }
 
     @Override
@@ -50,21 +53,17 @@ public class Climber extends Subsystem {
     }
 
     @Override
-    public void disabledContinuous() {}
+    public void run(RobotState state) {
+        if (state == RobotState.AUTO) {
+        }
 
-    @Override
-    public void autoContinuous() {
-
-    }
-
-    @Override
-    public void teleopContinuous() {
-        currentState = state.getRobotState();
-
-        if (currentState == RobotState.TELEOP) {
+        else if (state == RobotState.TELEOP) {
             if (input.getCMEnabled()) {
-                tomSpeed = 0.01;
-                rearSpeed = 0.01;
+                tomSpeed = 0.1;
+                // rearSpeed = 0.1;
+
+                double currentPitch = feedback.getPitch();
+                rearSpeed = rearPID.calculate(currentPitch);
             }
             else {
                 tomSpeed = 0;
@@ -72,11 +71,12 @@ public class Climber extends Subsystem {
             }
         }
 
+        else if (state == RobotState.VISION) {}
+
+        else if (state == RobotState.LINE) {}
+        
         output();
     }
-
-    @Override
-    public void smartDashboard() {}
 
     @Override
     public void output() {
@@ -85,6 +85,18 @@ public class Climber extends Subsystem {
         // rearA.set(rearSpeed);
         // rearB.set(rearSpeed);
     }
+
+    @Override
+    public void disabledContinuous() {}
+
+    @Override
+    public void autoContinuous() {}
+
+    @Override
+    public void teleopContinuous() {}
+
+    @Override
+    public void smartDashboard() {}
 
     public static Climber getInstance() {
         if (instance == null) {

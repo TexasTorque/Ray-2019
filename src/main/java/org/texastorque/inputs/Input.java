@@ -37,6 +37,7 @@ public class Input {
             }
         }
     }
+
     
     // ========== DriveBase ==========
     private volatile double DB_leftSpeed = 0;
@@ -71,8 +72,11 @@ public class Input {
     // ========== Lift ==========
     private final double[] LF_setpoints = {0.0, 2.64, 5.17};
     private volatile int LF_setpoint;
+    private volatile double LF_backup = 0.0;
 
     public void updateLift() {
+        LF_backup = 0.0;
+
         if (operator.getAButtonPressed()) {
             LF_setpoint = 0;
         }
@@ -82,6 +86,12 @@ public class Input {
         else if (operator.getYButtonPressed()) {
             LF_setpoint = 2;
         }
+        else if (operator.getDPADUp()) {
+            LF_backup = 0.3;
+        }
+        else if (operator.getDPADDown()) {
+            LF_backup = -0.3;
+        }
     }
 
     public double getLFSetpoint() {
@@ -90,6 +100,10 @@ public class Input {
 
     public double getLFSetpoint(int i) {
         return LF_setpoints[i];
+    }
+
+    public double getLFBackup() {
+        return LF_backup;
     }
 
     // ========== Rotary ==========
@@ -133,7 +147,7 @@ public class Input {
     }
 
 
-    //Climber
+    //========== Climber ==========
     private volatile boolean CM_enabled;
     
     public void updateClimber() {

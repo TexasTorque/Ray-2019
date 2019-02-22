@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.VictorSP;
 public class Rotary extends Subsystem {
 
     private static volatile Rotary instance;
-    private RobotState currentState;
     
     private TorqueMotor rotary;
 
@@ -50,24 +49,19 @@ public class Rotary extends Subsystem {
     }
 
     @Override
-    public void disabledContinuous() {}
+    public void run(RobotState state) {
+        if (state == RobotState.AUTO) {
+        }
 
-    @Override
-    public void autoContinuous() {
-
-    }
-
-    @Override
-    public void teleopContinuous() {
-        currentState = state.getRobotState();
-
-        if (currentState == RobotState.TELEOP) {
+        else if (state == RobotState.TELEOP) {
             runRotaryPID();
         }
-        else if (currentState == RobotState.VISION) {
+
+        else if (state == RobotState.VISION) {
             runRotaryBottom();
         }
-        else if (currentState == RobotState.LINE) {
+
+        else if (state == RobotState.LINE) {
             runRotaryPID();
         }
         
@@ -97,12 +91,21 @@ public class Rotary extends Subsystem {
     }
 
     @Override
-    public void smartDashboard() {}
-
-    @Override
     public void output() {
 
     }
+
+    @Override
+    public void disabledContinuous() {}
+
+    @Override
+    public void autoContinuous() {}
+
+    @Override
+    public void teleopContinuous() {}
+
+    @Override
+    public void smartDashboard() {}
 
     public static Rotary getInstance() {
         if (instance == null) {

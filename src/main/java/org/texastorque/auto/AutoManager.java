@@ -8,7 +8,6 @@ public class AutoManager {
 
     private ArrayList<Sequence> sequences;
     //private ArrayList<Command> runningCommands;
-    private boolean blockDone = false;
 
     private AutoManager() {
         sequences = new ArrayList<>();

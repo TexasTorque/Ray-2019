@@ -7,13 +7,13 @@ public class State {
     public enum RobotState {
         AUTO, TELEOP, VISION, LINE;
     }
-    private RobotState robotState = RobotState.TELEOP;
+    private RobotState robotState = RobotState.AUTO;
 
     public RobotState getRobotState() {
         return robotState;
     }
 
-    protected void setRobotState(RobotState state) {
+    public void setRobotState(RobotState state) {
         synchronized (this) {
             this.robotState = state;
         }
