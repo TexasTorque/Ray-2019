@@ -12,8 +12,13 @@ public class Robot extends TorqueIterative {
     private ArrayList<Subsystem> subsystems;
 	private Subsystem driveBase = DriveBase.getInstance();
 	private Subsystem lift = Lift.getInstance();
-
+	private Subsystem rotary = Rotary.getInstance();
+	private Subsystem intake = Intake.getInstance();
+	private Subsystem climber = Climber.getInstance();
+	
+	private State state = State.getInstance();
 	private Input input = Input.getInstance();
+	private Feedback feedback = Feedback.getInstance();
 
 	public void robotInit() {
 		initSubsystems();
@@ -27,8 +32,10 @@ public class Robot extends TorqueIterative {
 		subsystems = new ArrayList<>();
 		subsystems.add(driveBase);
 		subsystems.add(lift);
+		subsystems.add(rotary);
+		subsystems.add(intake);
+		subsystems.add(climber);
 	}
-
 
 	public void disabledInit() {
 		for (Subsystem system : subsystems) {
@@ -44,20 +51,27 @@ public class Robot extends TorqueIterative {
 
 	@Override
 	public void autoContinuous() {
+		input.update();
+		feedback.update();
+		for (Subsystem system : subsystems) {
+			system.run(state.getRobotState());
+		}
 	}
 
 	@Override
 	public void teleopContinuous() {
 		input.update();
+		feedback.update();
 		for (Subsystem system : subsystems) {
-			system.teleopContinuous();
+			system.run(state.getRobotState());
 		}
 	}
 
 	@Override
 	public void alwaysContinuous() {
+		feedback.smartDashboard();
 		for (Subsystem system : subsystems) {
-			system.smartDashboard();
+			system.run(state.getRobotState());
 		}
 	}
 

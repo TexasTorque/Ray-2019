@@ -7,33 +7,30 @@ import org.texastorque.torquelib.controlLoop.ScheduledPID;
 
 import edu.wpi.first.wpilibj.VictorSP;
 
-public class Lift extends Subsystem {
+public class Rotary extends Subsystem {
 
-    private static volatile Lift instance;
+    private static volatile Rotary instance;
+    
+    private TorqueMotor rotary;
 
-    private TorqueMotor pulleyA;
-    private TorqueMotor pulleyB;
-
-    private final ScheduledPID liftPID;
+    private final ScheduledPID rotaryPID;
     private double speed;
-    private double baseOutput = 0.07;
     private double currentPos;
     private double setpoint;
     private double prevSetpoint;
     private boolean clockwise = true;
 
-    private Lift() {
-        pulleyA = new TorqueMotor(new VictorSP(Ports.LF_MOTOR_A), !clockwise);
-        pulleyB = new TorqueMotor(new VictorSP(Ports.LF_MOTOR_B), !clockwise);
+    private Rotary() {
+        rotary = new TorqueMotor(new VictorSP(Ports.RT_MOTOR), clockwise);
 
-        liftPID = new ScheduledPID.Builder(0, -0.7, 0.7, 1)
-                .setPGains(0.3)
-                .setIGains(0.1)
-                //.setDGains(0.01)
+        this.rotaryPID = new ScheduledPID.Builder(0, 0.5)
+                .setPGains(0.01)
+                .setIGains(0.01)
+                .setDGains(0.01)
                 .build();
 
         speed = 0;
-        setpoint = input.getLFSetpoint(0);
+        setpoint = input.getRTSetpoint(0);
     }
 
     @Override
@@ -54,55 +51,48 @@ public class Lift extends Subsystem {
     @Override
     public void run(RobotState state) {
         if (state == RobotState.AUTO) {
-            runLiftPID();
         }
 
         else if (state == RobotState.TELEOP) {
-            runLiftPID();
+            runRotaryPID();
         }
 
         else if (state == RobotState.VISION) {
-            runLiftBottom();
+            runRotaryBottom();
         }
 
         else if (state == RobotState.LINE) {
-            runLiftPID();
+            runRotaryPID();
         }
         
-        double backup = input.getLFBackup();
-        if (backup != 0) {
-            speed = backup;
-        }
         output();
     }
 
-    private void runLiftPID() {
-        setpoint = input.getLFSetpoint();
-        currentPos = feedback.getLFPosition();
+    private void runRotaryPID() {
+        setpoint = input.getRTSetpoint();
+        currentPos = feedback.getRTPosition();
         if (setpoint != prevSetpoint) {
-            liftPID.changeSetpoint(setpoint);
+            rotaryPID.changeSetpoint(setpoint);
             prevSetpoint = setpoint;
         }
 
-        speed = liftPID.calculate(currentPos);
+        speed = rotaryPID.calculate(currentPos);
     }
 
-    private void runLiftBottom() {
-        setpoint = input.getLFSetpoint(0);
-        currentPos = feedback.getLFPosition();
+    private void runRotaryBottom() {
+        setpoint = input.getRTSetpoint(0);
+        currentPos = feedback.getRTPosition();
         if (setpoint != prevSetpoint) {
-            liftPID.changeSetpoint(setpoint);
+            rotaryPID.changeSetpoint(setpoint);
             prevSetpoint = setpoint;
         }
 
-        speed = liftPID.calculate(currentPos);
+        speed = rotaryPID.calculate(currentPos);
     }
 
     @Override
-    protected void output() {
-        speed += baseOutput;
-        pulleyA.set(speed);
-        pulleyB.set(speed);
+    public void output() {
+
     }
 
     @Override
@@ -117,11 +107,11 @@ public class Lift extends Subsystem {
     @Override
     public void smartDashboard() {}
 
-    public static Lift getInstance() {
+    public static Rotary getInstance() {
         if (instance == null) {
-            synchronized (Lift.class) {
+            synchronized (Rotary.class) {
                 if (instance == null)
-                    instance = new Lift();
+                    instance = new Rotary();
             }
         }
         return instance;

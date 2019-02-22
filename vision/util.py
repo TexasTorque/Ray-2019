@@ -1,5 +1,6 @@
 import cv2 as cv
 import numpy as np
+import time
 
 def adjustGamma(image, gamma=1.0):
 	# build a lookup table mapping the pixel values [0, 255] to
@@ -11,7 +12,7 @@ def adjustGamma(image, gamma=1.0):
 	# apply gamma correction using the lookup table
 	return cv.LUT(image, table)
 
-def limitValue(dict, minVal, maxVal):
+def clamp(dict, minVal, maxVal):
     return {i: value for i, value in dict.items() if value >= minVal and value <= maxVal}
 
 def outliers(dict, minVal=100, s=2):
@@ -51,3 +52,32 @@ def approx(num1, num2, error=0.05):
 
 def inRange(num, lower, upper):
     return num >= lower and num <= upper
+
+'''
+pastOutputs = [0] * 10
+lastNonzero = 0
+def bufferOutput(newOutput):
+    global pastOutputs, lastNonzero
+
+    if newOutput != 0:
+        lastNonzero = newOutput
+    pastOutputs[1:-1] = pastOutputs[0:-2]
+    pastOutputs[0] = newOutput
+
+    if all([p == 0 for p in pastOutputs]):
+        return 0
+    else:
+        return lastNonzero
+'''
+
+lastValue = 0
+updateTime = 0
+def bufferOutput(newOutput, bufferTime):
+    global lastValue, updateTime
+    if newOutput != 0:
+        lastValue = newOutput
+        updateTime = time.perf_counter()
+    if time.perf_counter() - updateTime < bufferTime:
+        return lastValue
+    else:
+        return 0
