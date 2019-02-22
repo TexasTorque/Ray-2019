@@ -218,7 +218,7 @@ def findTargetTop(hsv, minHSV, maxHSV, kernel):
         # Find pairs of left and right targets that pair to form a valid vision target
         for i, left in leftTargets:
             for j, right in rightTargets:
-                if left[1][0] < right[1][0] and util.approx(util.distance(left[1], right[1]), approxWidth*4, error=0.2) and util.inRange(abs(left[1][1]-right[1][1]), 0, 10):
+                if left[1][0] < right[1][0] and util.approx(util.distance(left[1], right[1]), approxWidth*4, error=0.2) and util.inRange(abs(left[1][1]-right[1][1]), 0, 20):
                     targetPairs.append((left, right))
 
         # Calculate center of vision target by drawing diagonals
@@ -290,7 +290,7 @@ if __name__ == "__main__":
     targetTable.putNumber("frame_width", frameWidth)
     targetTable.putNumber("frame_height", frameHeight)
     targetOutputStream = cs.putVideo("TargetDetection", frameWidth, frameHeight)
-    minTargetHSV = np.array([70, 70, 50])
+    minTargetHSV = np.array([70, 70, 40])
     maxTargetHSV = np.array([80, 255, 255])
 
     while 1:

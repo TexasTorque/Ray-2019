@@ -15,11 +15,14 @@ public class Feedback {
     private static volatile Feedback instance;
 
     // Constants
-    public static final double PULSES_PER_ROTATION = 4600;
+    public static final double PULSES_PER_ROTATION = 1000;
     public static final double WHEEL_DIAMETER_FEET = 0.5;
 
     public static final double DISTANCE_PER_PULSE = Math.PI * WHEEL_DIAMETER_FEET / PULSES_PER_ROTATION;
     public static final double ANGLE_PER_PULSE = 360 / PULSES_PER_ROTATION;
+    public static final double LF_FEET_CONVERSION = Math.PI * (1.0/20) / PULSES_PER_ROTATION; // Approx shaft diameter
+
+    public static boolean clockwise = true;
 
     // Sensors
     private final TorqueEncoder DB_leftEncoder;
@@ -39,10 +42,10 @@ public class Feedback {
     
 
     private Feedback() {
-        DB_leftEncoder = new TorqueEncoder(Ports.DB_LEFT_ENCODER_A, Ports.DB_LEFT_ENCODER_B, false, EncodingType.k4X);
-        DB_rightEncoder = new TorqueEncoder(Ports.DB_RIGHT_ENCODER_A, Ports.DB_RIGHT_ENCODER_B, false, EncodingType.k4X);
-        LF_encoder = new TorqueEncoder(Ports.LF_ENCODER_A, Ports.LF_ENCODER_B, false, EncodingType.k4X);
-        RT_encoder = new TorqueEncoder(Ports.RT_ENCODER_A, Ports.RT_ENCODER_B, false, EncodingType.k4X);
+        DB_leftEncoder = new TorqueEncoder(Ports.DB_LEFT_ENCODER_A, Ports.DB_LEFT_ENCODER_B, clockwise, EncodingType.k4X);
+        DB_rightEncoder = new TorqueEncoder(Ports.DB_RIGHT_ENCODER_A, Ports.DB_RIGHT_ENCODER_B, clockwise, EncodingType.k4X);
+        LF_encoder = new TorqueEncoder(Ports.LF_ENCODER_A, Ports.LF_ENCODER_B, clockwise, EncodingType.k4X);
+        RT_encoder = new TorqueEncoder(Ports.RT_ENCODER_A, Ports.RT_ENCODER_B, clockwise, EncodingType.k4X);
 
         NX_gyro = new AHRS(SPI.Port.kMXP);
 
@@ -90,7 +93,7 @@ public class Feedback {
         DB_leftDistance = DB_leftEncoder.get() * DISTANCE_PER_PULSE;
         DB_rightDistance = DB_rightEncoder.get() * DISTANCE_PER_PULSE;
 
-        LF_position = LF_encoder.get();
+        LF_position = LF_encoder.get() * LF_FEET_CONVERSION;
         RT_angle = RT_encoder.get() * ANGLE_PER_PULSE;
     }
 

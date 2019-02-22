@@ -23,12 +23,12 @@ public class Lift extends Subsystem {
     private boolean clockwise = true;
 
     private Lift() {
-        pulleyA = new TorqueMotor(new VictorSP(Ports.LF_MOTOR_A), clockwise);
-        pulleyB = new TorqueMotor(new VictorSP(Ports.LF_MOTOR_B), clockwise);
+        pulleyA = new TorqueMotor(new VictorSP(Ports.LF_MOTOR_A), !clockwise);
+        pulleyB = new TorqueMotor(new VictorSP(Ports.LF_MOTOR_B), !clockwise);
 
         liftPID = new ScheduledPID.Builder(0, 0.5)
-                .setPGains(0.001)
-                .setIGains(0)
+                .setPGains(0.5)
+                .setIGains(0.01)
                 .setDGains(0)
                 .build();
 

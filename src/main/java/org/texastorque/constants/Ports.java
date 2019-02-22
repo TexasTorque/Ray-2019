@@ -2,14 +2,16 @@ package org.texastorque.constants;
 
 public class Ports {
 
-    // DriveBase
-    public static final int DB_LEFT_FORE_MOTOR = 0;
-    public static final int DB_LEFT_MID_MOTOR = 1;
-    public static final int DB_LEFT_REAR_MOTOR = 2;
+    private static boolean isDeepSpace = true;
 
-    public static final int DB_RIGHT_FORE_MOTOR = 3;
-    public static final int DB_RIGHT_MID_MOTOR = 4;
-    public static final int DB_RIGHT_REAR_MOTOR = 5;
+    // DriveBase
+    public static final int DB_LEFT_FORE_MOTOR = isDeepSpace ? 0 : 0;
+    public static final int DB_LEFT_MID_MOTOR = isDeepSpace ? 1 : 1;
+    public static final int DB_LEFT_REAR_MOTOR = isDeepSpace ? 2 : 4;
+
+    public static final int DB_RIGHT_FORE_MOTOR = isDeepSpace ? 3 : 3;
+    public static final int DB_RIGHT_MID_MOTOR = isDeepSpace ? 4 : 2;
+    public static final int DB_RIGHT_REAR_MOTOR = isDeepSpace ? 5: 5;
     
     public static final int DB_SOLE_A = 0;
     public static final int DB_SOLE_B = 1;

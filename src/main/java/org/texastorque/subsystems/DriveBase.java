@@ -40,11 +40,11 @@ public class DriveBase extends Subsystem {
         
         gearShift = new DoubleSolenoid(2, Ports.DB_SOLE_A, Ports.DB_SOLE_B);
 
-        visionPID = new ScheduledPID.Builder(0, -0.5, 0.5, 3)
-                .setRegions(-0.2, 0.2)
-                .setPGains(0.3, 0.8, 0.3)
+        visionPID = new ScheduledPID.Builder(0, -0.5, 0.5, 5)
+                .setRegions(-0.5, -0.25, 0.25, 0.5)
+                .setPGains(0.3, 0.5, 0.8, 0.5, 0.3)
                 //.setIGains(0.1, 0, 0.1)
-                //.setDGains(0, 0.5, 0)
+                //.setDGains(0, 0, 0.02, 0, 0)
                 .build();
     }
 
@@ -89,10 +89,12 @@ public class DriveBase extends Subsystem {
         else if (currentState == RobotState.VISION) {
             double currentOffset = feedback.getTargetOffset();
             double adjustment = visionPID.calculate(currentOffset);
+            // if (Math.abs(adjustment) < 0.1)
+            //     adjustment = 0;
             System.out.println("Offset: " + currentOffset + " || Adjustment: " + adjustment);
 
             leftSpeed = 0.5 * input.getDBLeftSpeed() - adjustment;
-            rightSpeed = 0.5 * input.getDBRightSpeed() + adjustment; 
+            rightSpeed = 0.5 * input.getDBRightSpeed() + adjustment;
 
             // leftSpeed = input.getDBLeftSpeed() * (0.5 - adjustment);
             // rightSpeed = input.getDBRightSpeed() * (adjustment + 0.5);
@@ -129,7 +131,10 @@ public class DriveBase extends Subsystem {
      * Potential auto transmission
      */
     private void setGears() {
-        highGear = input.getDBHighGear();
+        if (currentState == RobotState.TELEOP)
+            highGear = input.getDBHighGear();
+        else
+            highGear = false;
     }
 
     @Override
