@@ -1,7 +1,9 @@
 package org.texastorque;
 
 import org.texastorque.subsystems.*;
+import org.texastorque.auto.AutoManager;
 import org.texastorque.inputs.*;
+import org.texastorque.inputs.State.RobotState;
 
 import org.texastorque.torquelib.base.TorqueIterative;
 
@@ -19,6 +21,7 @@ public class Robot extends TorqueIterative {
 	private State state = State.getInstance();
 	private Input input = Input.getInstance();
 	private Feedback feedback = Feedback.getInstance();
+	private AutoManager autoManager = AutoManager.getInstance();
 
 	public void robotInit() {
 		initSubsystems();
@@ -51,8 +54,14 @@ public class Robot extends TorqueIterative {
 
 	@Override
 	public void autoContinuous() {
-		input.update();
+		if (state.getRobotState() == RobotState.AUTO) {
+			input.updateState();
+		}
+		else {
+			input.updateControllers();
+		}
 		feedback.update();
+
 		for (Subsystem system : subsystems) {
 			system.run(state.getRobotState());
 		}
@@ -60,7 +69,7 @@ public class Robot extends TorqueIterative {
 
 	@Override
 	public void teleopContinuous() {
-		input.update();
+		input.updateControllers();
 		feedback.update();
 		for (Subsystem system : subsystems) {
 			system.run(state.getRobotState());

@@ -10,6 +10,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.networktables.*;
 import com.kauailabs.navx.frc.AHRS;
 
+/**
+ * Retrieve values from all sensors and NetworkTables
+ */
 public class Feedback {
 
     private static volatile Feedback instance;

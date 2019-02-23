@@ -16,7 +16,6 @@ public class Lift extends Subsystem {
 
     private final ScheduledPID liftPID;
     private double speed;
-    private double baseOutput = 0.07;
     private double currentPos;
     private double setpoint;
     private double prevSetpoint;
@@ -26,9 +25,9 @@ public class Lift extends Subsystem {
         pulleyA = new TorqueMotor(new VictorSP(Ports.LF_MOTOR_A), !clockwise);
         pulleyB = new TorqueMotor(new VictorSP(Ports.LF_MOTOR_B), !clockwise);
 
-        liftPID = new ScheduledPID.Builder(0, -0.7, 0.7, 1)
-                .setPGains(0.3)
-                .setIGains(0.1)
+        liftPID = new ScheduledPID.Builder(0, -0.4, 0.4, 1)
+                .setPGains(0.7)
+                .setIGains(0.2)
                 //.setDGains(0.01)
                 .build();
 
@@ -69,10 +68,6 @@ public class Lift extends Subsystem {
             runLiftPID();
         }
         
-        double backup = input.getLFBackup();
-        if (backup != 0) {
-            speed = backup;
-        }
         output();
     }
 
@@ -98,9 +93,19 @@ public class Lift extends Subsystem {
         speed = liftPID.calculate(currentPos);
     }
 
+    private double addBaseOutput(double speed) {
+        if (feedback.getLFPosition() < input.getLFSetpoint(1)) {
+            return speed + 0.04;
+        }
+        else if (feedback.getLFPosition() < input.getLFSetpoint(2)) {
+            return speed + 0.08;
+        }
+        return speed;
+    }
+
     @Override
     protected void output() {
-        speed += baseOutput;
+        //speed = addBaseOutput(speed);
         pulleyA.set(speed);
         pulleyB.set(speed);
     }

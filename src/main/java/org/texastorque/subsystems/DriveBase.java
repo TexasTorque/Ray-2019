@@ -68,6 +68,8 @@ public class DriveBase extends Subsystem {
     @Override
     public void run(RobotState state) {
         if (state == RobotState.AUTO) {
+            leftSpeed = input.getDBLeftSpeed();
+            rightSpeed = input.getDBRightSpeed();
         }
 
         else if (state == RobotState.TELEOP) {

@@ -3,6 +3,11 @@ package org.texastorque.inputs;
 import org.texastorque.inputs.State.RobotState;
 import org.texastorque.torquelib.util.GenericController;
 
+/**
+ * All forms of input, including driver/operator controllers and input from the code itself.
+ * 
+ * Setters should only be used by Commands. Subsystems should only use getters.
+ */
 public class Input {
 
     private static volatile Input instance;
@@ -17,7 +22,7 @@ public class Input {
 		operator = new GenericController(1, .1);
     }
     
-    public void update() {
+    public void updateControllers() {
         updateState();
         updateDrive();
         updateLift();
@@ -64,19 +69,25 @@ public class Input {
         return DB_rightSpeed;
     }
 
+    public void setDBLeftSpeed(double speed) {
+        this.DB_leftSpeed = speed;
+    }
+
+    public void setDBRightSpeed(double speed) {
+        this.DB_rightSpeed = speed;
+    }
+
     public boolean getDBHighGear() {
         return DB_highGear;
     }
 
 
     // ========== Lift ==========
-    private final double[] LF_setpoints = {0.0, 2.64, 5.17};
+    private final double[] LF_setpoints = {0.0, 2.6, 5.0};
+    private double LF_offset = 0;
     private volatile int LF_setpoint;
-    private volatile double LF_backup = 0.0;
 
     public void updateLift() {
-        LF_backup = 0.0;
-
         if (operator.getAButtonPressed()) {
             LF_setpoint = 0;
         }
@@ -86,24 +97,20 @@ public class Input {
         else if (operator.getYButtonPressed()) {
             LF_setpoint = 2;
         }
-        else if (operator.getDPADUp()) {
-            LF_backup = 0.3;
+        else if (operator.getRightYAxis() > 0.1) {
+            LF_offset -= 0.005;
         }
-        else if (operator.getDPADDown()) {
-            LF_backup = -0.3;
+        else if (operator.getRightYAxis() < -0.1) {
+            LF_offset += 0.005;
         }
     }
 
     public double getLFSetpoint() {
-        return LF_setpoints[LF_setpoint];
+        return LF_setpoints[LF_setpoint] + LF_offset;
     }
 
     public double getLFSetpoint(int i) {
-        return LF_setpoints[i];
-    }
-
-    public double getLFBackup() {
-        return LF_backup;
+        return LF_setpoints[i] + LF_offset;
     }
 
     // ========== Rotary ==========
