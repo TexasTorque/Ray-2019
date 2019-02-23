@@ -109,8 +109,12 @@ public class Input {
         return LF_setpoints[LF_setpoint] + LF_offset;
     }
 
-    public double getLFSetpoint(int i) {
-        return LF_setpoints[i] + LF_offset;
+    public double getLFSetpoint(int index) {
+        return LF_setpoints[index] + LF_offset;
+    }
+
+    public void setLFSetpoint(int index) {
+        this.LF_setpoint = index;
     }
 
     // ========== Rotary ==========

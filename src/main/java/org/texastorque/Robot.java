@@ -26,9 +26,7 @@ public class Robot extends TorqueIterative {
 	public void robotInit() {
 		initSubsystems();
 
-		for (Subsystem system : subsystems) {
-			system.autoInit();
-		}
+		autoManager.displayChoices();
 	}
 
 	private void initSubsystems() {
@@ -40,12 +38,16 @@ public class Robot extends TorqueIterative {
 		subsystems.add(climber);
 	}
 
-	public void disabledInit() {
+	@Override
+	public void autoInit() {
+		autoManager.chooseSequence();
+
 		for (Subsystem system : subsystems) {
-			system.disabledInit();
+			system.autoInit();
 		}
 	}
-
+	
+	@Override
 	public void teleopInit() {
 		for (Subsystem system : subsystems) {
 			system.teleopInit();
@@ -53,8 +55,16 @@ public class Robot extends TorqueIterative {
 	}
 
 	@Override
+	public void disabledInit() {
+		for (Subsystem system : subsystems) {
+			system.disabledInit();
+		}
+	}
+
+	@Override
 	public void autoContinuous() {
 		if (state.getRobotState() == RobotState.AUTO) {
+			autoManager.runSequence();
 			input.updateState();
 		}
 		else {

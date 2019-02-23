@@ -5,11 +5,10 @@ import edu.wpi.first.wpilibj.Timer;
 
 public class DriveTime extends Command {
 
-    private double startTime = 0;
+    private double startTime = -1;
     private double time = 0;
 
     public DriveTime(double time) {
-        this.startTime = Timer.getFPGATimestamp();
         this.time = time;
         this.done = false;
     }
@@ -20,6 +19,10 @@ public class DriveTime extends Command {
             return done;
         }
 
+        if (startTime == -1) {
+            startTime = Timer.getFPGATimestamp();
+        }
+
         input.setDBLeftSpeed(0.5);
         input.setDBRightSpeed(0.5);
 
@@ -28,10 +31,7 @@ public class DriveTime extends Command {
             input.setDBRightSpeed(0);
 
             done = true;
-            return done;
         }
-
         return false;
     }
-
 }

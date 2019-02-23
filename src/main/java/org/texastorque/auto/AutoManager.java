@@ -18,13 +18,16 @@ public class AutoManager {
 
     private AutoManager() {
         autoSequences = new ArrayList<>();
-        autoSequences.add(new DoNothing());
+        autoSequences.add(new BackupDrive());
 
         for (Sequence sequence : autoSequences) {
             sequence.init();
         }
 
-        autoSelector.setDefaultOption("DoNothing", "DoNothing");
+        autoSelector.setDefaultOption("BackupDrive", "BackupDrive");
+    }
+
+    public void displayChoices() {
         SmartDashboard.putData(autoSelector);
     }
 
@@ -32,12 +35,12 @@ public class AutoManager {
         String autoChoice = autoSelector.getSelected();
 
         switch(autoChoice) {
-            case "DoNothing":
+            case "BackupDrive":
                 currentSequence = autoSequences.get(0);
         }
     }
 
-    public void runCurrentSequence() {
+    public void runSequence() {
         currentSequence.run();
     }
 
