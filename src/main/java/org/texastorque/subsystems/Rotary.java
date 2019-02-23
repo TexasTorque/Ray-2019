@@ -1,5 +1,4 @@
 package org.texastorque.subsystems;
-
 import org.texastorque.inputs.State.RobotState;
 import org.texastorque.constants.Ports;
 import org.texastorque.torquelib.component.TorqueMotor;

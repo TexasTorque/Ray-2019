@@ -14,8 +14,9 @@ public class Intake extends Subsystem {
     private static volatile Intake instance;
     
     private TorqueMotor intakeWheels;
-    private DoubleSolenoid intakeWrist;
-    private DoubleSolenoid wallIntake;
+    private DoubleSolenoid intakeWristLeft;
+    private DoubleSolenoid intakeWristRight;
+    private double intakeSpeed;
 
     private boolean wheelsOn;
     private boolean wristExtended;
@@ -26,8 +27,8 @@ public class Intake extends Subsystem {
     private Intake() {
         intakeWheels = new TorqueMotor(new VictorSP(Ports.IN_MOTOR), clockwise);
         
-        intakeWrist = new DoubleSolenoid(2, Ports.IN_WRIST_SOLE_A, Ports.IN_WRIST_SOLE_B);
-        wallIntake = new DoubleSolenoid(2, Ports.IN_WALL_SOLE_A, Ports.IN_WALL_SOLE_B);
+        intakeWristLeft = new DoubleSolenoid(2, Ports.IN_HATCH_LEFT_SOLE_A, Ports.IN_HATCH_LEFT_SOLE_B);
+        intakeWristRight = new DoubleSolenoid(2, Ports.IN_HATCH_RIGHT_SOLE_A, Ports.IN_HATcH_RIGHT_SOLE_B);
     }
 
     @Override
@@ -56,6 +57,8 @@ public class Intake extends Subsystem {
             wheelsOn = input.getINWheelsOn();
             wristExtended = input.getINWristExtended();
             hatchEngaged = input.getINHatchEngaged();
+            if (wheelsOn)
+                intakeSpeed = .5;    
         }
 
         else if (state == RobotState.VISION) {
@@ -75,6 +78,14 @@ public class Intake extends Subsystem {
 
     @Override
     public void output() {
+        if (wristExtended){
+            intakeWristLeft.set(Value.kForward);
+            intakeWristRight.set(Value.kForward);
+        }
+        else {
+            intakeWristLeft.set(Value.kReverse);
+            intakeWristRight.set(Value.kReverse);
+        }
 
     }
 

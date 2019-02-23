@@ -61,7 +61,6 @@ public class Climber extends Subsystem {
             if (input.getCMEnabled()) {
                 tomSpeed = 0.1;
                 // rearSpeed = 0.1;
-
                 double currentPitch = feedback.getPitch();
                 rearSpeed = rearPID.calculate(currentPitch);
             }
