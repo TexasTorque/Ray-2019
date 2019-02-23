@@ -1,8 +1,12 @@
 package org.texastorque.auto;
 
+import org.texastorque.inputs.*;
+
 public abstract class Command {
 
-    public abstract void run();
+    protected Input input = Input.getInstance();
+    protected Feedback feedback = Feedback.getInstance();
+    protected boolean done = false;
 
-    public abstract void reset();
+    public abstract boolean run();
 }

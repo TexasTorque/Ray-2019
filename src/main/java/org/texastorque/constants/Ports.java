@@ -2,7 +2,7 @@ package org.texastorque.constants;
 
 public class Ports {
 
-    private static boolean isDeepSpace = true;
+    private static boolean isDeepSpace = false;
 
     // DriveBase
     public static final int DB_LEFT_FORE_MOTOR = isDeepSpace ? 0 : 0;

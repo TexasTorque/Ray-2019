@@ -1,7 +1,9 @@
 package org.texastorque;
 
 import org.texastorque.subsystems.*;
+import org.texastorque.auto.AutoManager;
 import org.texastorque.inputs.*;
+import org.texastorque.inputs.State.RobotState;
 
 import org.texastorque.torquelib.base.TorqueIterative;
 
@@ -19,13 +21,12 @@ public class Robot extends TorqueIterative {
 	private State state = State.getInstance();
 	private Input input = Input.getInstance();
 	private Feedback feedback = Feedback.getInstance();
+	private AutoManager autoManager = AutoManager.getInstance();
 
 	public void robotInit() {
 		initSubsystems();
 
-		for (Subsystem system : subsystems) {
-			system.autoInit();
-		}
+		autoManager.displayChoices();
 	}
 
 	private void initSubsystems() {
@@ -37,12 +38,16 @@ public class Robot extends TorqueIterative {
 		subsystems.add(climber);
 	}
 
-	public void disabledInit() {
+	@Override
+	public void autoInit() {
+		autoManager.chooseSequence();
+
 		for (Subsystem system : subsystems) {
-			system.disabledInit();
+			system.autoInit();
 		}
 	}
-
+	
+	@Override
 	public void teleopInit() {
 		for (Subsystem system : subsystems) {
 			system.teleopInit();
@@ -50,9 +55,23 @@ public class Robot extends TorqueIterative {
 	}
 
 	@Override
+	public void disabledInit() {
+		for (Subsystem system : subsystems) {
+			system.disabledInit();
+		}
+	}
+
+	@Override
 	public void autoContinuous() {
-		input.update();
+		if (state.getRobotState() == RobotState.AUTO) {
+			autoManager.runSequence();
+			input.updateState();
+		}
+		else {
+			input.updateControllers();
+		}
 		feedback.update();
+
 		for (Subsystem system : subsystems) {
 			system.run(state.getRobotState());
 		}
@@ -60,7 +79,7 @@ public class Robot extends TorqueIterative {
 
 	@Override
 	public void teleopContinuous() {
-		input.update();
+		input.updateControllers();
 		feedback.update();
 		for (Subsystem system : subsystems) {
 			system.run(state.getRobotState());
