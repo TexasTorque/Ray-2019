@@ -153,7 +153,7 @@ public class Input {
     private volatile boolean CM_enabled;
     
     public void updateClimber() {
-        if (driver.getAButtonPressed()) {
+        if (driver.getRightCenterButton()&& driver.getLeftCenterButton()) {
             CM_enabled = !CM_enabled;
         }
     }

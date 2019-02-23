@@ -26,12 +26,11 @@ public class Lift extends Subsystem {
         pulleyA = new TorqueMotor(new VictorSP(Ports.LF_MOTOR_A), !clockwise);
         pulleyB = new TorqueMotor(new VictorSP(Ports.LF_MOTOR_B), !clockwise);
 
-        liftPID = new ScheduledPID.Builder(0, -0.7, 0.7, 1)
-                .setPGains(0.3)
-                .setIGains(0.1)
+        liftPID = new ScheduledPID.Builder(0, -0.4, 0.4, 1)
+                .setPGains(0.7)
+                .setIGains(0.2)
                 //.setDGains(0.01)
                 .build();
-
         speed = 0;
         setpoint = input.getLFSetpoint(0);
     }
@@ -54,7 +53,7 @@ public class Lift extends Subsystem {
     @Override
     public void run(RobotState state) {
         if (state == RobotState.AUTO) {
-            runLiftPID();
+
         }
 
         else if (state == RobotState.TELEOP) {
@@ -84,7 +83,7 @@ public class Lift extends Subsystem {
             prevSetpoint = setpoint;
         }
 
-        speed = liftPID.calculate(currentPos);
+        speed = liftPID.calculate(currentPos) ;
     }
 
     private void runLiftBottom() {
