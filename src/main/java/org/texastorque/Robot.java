@@ -25,7 +25,6 @@ public class Robot extends TorqueIterative {
 
 	public void robotInit() {
 		initSubsystems();
-
 		autoManager.displayChoices();
 	}
 

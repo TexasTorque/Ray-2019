@@ -13,16 +13,18 @@ public class LiftSet extends Command {
     }
 
     @Override
-    public boolean run() {
-        if (done) {
-            return done;
-        }
-
+    protected void init() {
         input.setLFSetpoint(setpointIndex);
-
-        if (Math.abs(feedback.getLFPosition() - input.getLFSetpoint(setpointIndex)) < 0.2) {
-            done = true;
-        }
-        return false;
     }
+
+    @Override
+    protected void continuous() {}
+
+    @Override
+    protected boolean endCondition() {
+        return Math.abs(feedback.getLFPosition() - input.getLFSetpoint(setpointIndex)) < 0.2;
+    }
+
+    @Override
+    protected void end() {}
 }

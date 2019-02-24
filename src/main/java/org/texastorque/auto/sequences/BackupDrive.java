@@ -18,8 +18,7 @@ public class BackupDrive extends Sequence {
         block1.add(new DriveTime(0, 2, -0.5));
         block1.add(new LiftSet(1, 0));
 
-        sequence.add(block1);
-        sequence.add(block2);
+        addBlocks(block1, block2);
     }
 
 }

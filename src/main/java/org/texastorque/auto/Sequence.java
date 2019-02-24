@@ -2,17 +2,19 @@ package org.texastorque.auto;
 
 import edu.wpi.first.wpilibj.Timer;
 
+import java.util.Arrays;
 import java.util.ArrayList;
 
 public abstract class Sequence {
 
-    protected ArrayList<ArrayList<Command>> sequence = new ArrayList<>();
+    private ArrayList<ArrayList<Command>> sequence;
     private double startTime = -1;
 
-    /**
-     * Add command blocks
-     */
     public abstract void init();
+
+    protected void addBlocks(ArrayList<Command>... blocks) {
+        sequence.addAll(Arrays.asList(blocks));
+    }
 
     public void run() {
         if (startTime == -1) {
@@ -20,19 +22,19 @@ public abstract class Sequence {
         }
 
         if (sequence.size() > 0) {
-            boolean blockDone = true;
+            boolean blockEnded = true;
             for (Command command : sequence.get(0)) {
                 if (Timer.getFPGATimestamp() - startTime > command.getDelay()) {
                     if (!command.run()) {
-                        blockDone = false;
+                        blockEnded = false;
                     }
                 }
                 else {
-                    blockDone = false;
+                    blockEnded = false;
                 }
             }
 
-            if (blockDone) {
+            if (blockEnded) {
                 sequence.remove(0);
             }
         }

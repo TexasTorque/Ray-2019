@@ -6,12 +6,14 @@ public abstract class Command {
 
     protected Input input = Input.getInstance();
     protected Feedback feedback = Feedback.getInstance();
-    protected boolean done = false;
-    protected double delay = 0; // Seconds
+    private double delay; // Seconds
+    private boolean started;
+    private boolean ended;
 
     public Command(double delay) {
         this.delay = delay;
-        this.done = false;
+        this.started = false;
+        this.ended = false;
     }
 
     public double getDelay() {
@@ -24,17 +26,32 @@ public abstract class Command {
      * Returns whether or not Command is done.
      */
     public boolean run() {
-        if (done) {
-            return done;
+        if (ended) {
+            return ended;
+        }
+
+        // Operations on first loop
+        if (!started) {
+            init();
+            started = true;
         }
 
         // Single-loop operations for when Command is running
+        continuous();
 
-        boolean endCondition = false;
-        if (endCondition) {
-            // Operations for when Command is done
-            done = true;
+        // Operations for when Command is done
+        if (endCondition()) {
+            end();
+            ended = true;
         }
         return false;
     }
+
+    protected abstract void init();
+
+    protected abstract void continuous();
+
+    protected abstract boolean endCondition();
+
+    protected abstract void end();
 }

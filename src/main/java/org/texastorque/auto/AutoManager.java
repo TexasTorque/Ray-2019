@@ -19,12 +19,14 @@ public class AutoManager {
     private AutoManager() {
         autoSequences = new ArrayList<>();
         autoSequences.add(new BackupDrive());
+        autoSequences.add(new OneHatchRocket());
 
         for (Sequence sequence : autoSequences) {
             sequence.init();
         }
 
         autoSelector.setDefaultOption("BackupDrive", "BackupDrive");
+        autoSelector.addOption("OneHatchRocket", "OneHatchRocket");
     }
 
     public void displayChoices() {
@@ -37,6 +39,10 @@ public class AutoManager {
         switch(autoChoice) {
             case "BackupDrive":
                 currentSequence = autoSequences.get(0);
+                break;
+            case "OneHatchRocket":
+                currentSequence = autoSequences.get(1);
+                break;
         }
     }
 
