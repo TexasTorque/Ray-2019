@@ -6,6 +6,7 @@ import org.texastorque.torquelib.component.TorqueMotor;
 import org.texastorque.torquelib.controlLoop.ScheduledPID;
 
 import edu.wpi.first.wpilibj.VictorSP;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Lift extends Subsystem {
 
@@ -98,14 +99,14 @@ public class Lift extends Subsystem {
             return speed + 0.04;
         }
         else if (feedback.getLFPosition() < input.getLFSetpoint(2)) {
-            return speed + 0.08;
+            return speed + 0.07;
         }
         return speed;
     }
 
     @Override
     protected void output() {
-        //speed = addBaseOutput(speed);
+        speed = addBaseOutput(speed);
         pulleyA.set(speed);
         pulleyB.set(speed);
     }
@@ -120,7 +121,9 @@ public class Lift extends Subsystem {
     public void teleopContinuous() {}
 
     @Override
-    public void smartDashboard() {}
+    public void smartDashboard() {
+        SmartDashboard.putNumber("LF_output", speed);
+    }
 
     public static Lift getInstance() {
         if (instance == null) {

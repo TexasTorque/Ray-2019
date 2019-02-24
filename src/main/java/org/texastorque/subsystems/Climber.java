@@ -22,13 +22,13 @@ public class Climber extends Subsystem {
     private boolean clockwise = true;
 
     private Climber() {
-        leftTom = new TorqueMotor(new VictorSP(Ports.CM_LEFT_TOM_MOTOR), clockwise);
+        leftTom = new TorqueMotor(new VictorSP(Ports.CM_LEFT_TOM_MOTOR), !clockwise);
         rightTom = new TorqueMotor(new VictorSP(Ports.CM_RIGHT_TOM_MOTOR), clockwise);
         rearA = new TorqueMotor(new VictorSP(Ports.CM_REAR_A_MOTOR), clockwise);
         rearB = new TorqueMotor(new VictorSP(Ports.CM_REAR_B_MOTOR), clockwise);
 
-        rearPID = new ScheduledPID.Builder(0, 0, 0.7, 1)
-            .setPGains(0.1)
+        rearPID = new ScheduledPID.Builder(0, -0.2, 0.2, 1)
+            .setPGains(0.5)
             .setIGains(0)
             .setDGains(0)
             .build();
@@ -59,15 +59,18 @@ public class Climber extends Subsystem {
 
         else if (state == RobotState.TELEOP) {
             if (input.getCMEnabled()) {
-                tomSpeed = 0.1;
-                // rearSpeed = 0.1;
+                tomSpeed = 0.5;
 
                 double currentPitch = feedback.getPitch();
-                rearSpeed = rearPID.calculate(currentPitch);
+                rearSpeed = -rearPID.calculate(currentPitch) + 0.6;
             }
             else {
                 tomSpeed = 0;
                 rearSpeed = 0;
+
+                if (input.getCMRetract()) {
+                    rearSpeed = -0.4;
+                }
             }
         }
 
@@ -80,10 +83,10 @@ public class Climber extends Subsystem {
 
     @Override
     public void output() {
-        // leftTom.set(tomSpeed);
-        // rightTom.set(tomSpeed);
-        // rearA.set(rearSpeed);
-        // rearB.set(rearSpeed);
+        leftTom.set(tomSpeed);
+        rightTom.set(tomSpeed);
+        rearA.set(rearSpeed);
+        rearB.set(rearSpeed);
     }
 
     @Override

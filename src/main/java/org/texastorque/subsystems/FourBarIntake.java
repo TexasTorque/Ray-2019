@@ -9,31 +9,29 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 import edu.wpi.first.wpilibj.VictorSP;
 
-public class Intake extends Subsystem {
+public class FourBarIntake extends Subsystem {
 
-    private static volatile Intake instance;
+    private static volatile FourBarIntake instance;
     
     private TorqueMotor intakeWheels;
-    private DoubleSolenoid intakeWrist;
-    private DoubleSolenoid wallIntake;
+    private DoubleSolenoid hatchLeft;
+    private DoubleSolenoid hatchRight;
 
     private boolean wheelsOn;
-    private boolean wristExtended;
     private boolean hatchEngaged;
 
     private boolean clockwise = true;
 
-    private Intake() {
+    private FourBarIntake() {
         intakeWheels = new TorqueMotor(new VictorSP(Ports.IN_MOTOR), clockwise);
-        
-        intakeWrist = new DoubleSolenoid(2, Ports.IN_WRIST_SOLE_A, Ports.IN_WRIST_SOLE_B);
-        wallIntake = new DoubleSolenoid(2, Ports.IN_WALL_SOLE_A, Ports.IN_WALL_SOLE_B);
+
+        hatchLeft = new DoubleSolenoid(2, Ports.IN_HATCH_LEFT_SOLE_A, Ports.IN_HATCH_LEFT_SOLE_B);
+        hatchRight = new DoubleSolenoid(2, Ports.IN_HATCH_RIGHT_SOLE_A, Ports.IN_HATCH_RIGHT_SOLE_B);
     }
 
     @Override
     public void autoInit() {
         wheelsOn = false;
-        wristExtended = false;
         hatchEngaged = false;
     }
 
@@ -54,19 +52,16 @@ public class Intake extends Subsystem {
 
         else if (state == RobotState.TELEOP) {
             wheelsOn = input.getINWheelsOn();
-            wristExtended = input.getINWristExtended();
             hatchEngaged = input.getINHatchEngaged();
         }
 
         else if (state == RobotState.VISION) {
             wheelsOn = false;
-            wristExtended = false;
             hatchEngaged = input.getINHatchEngaged();
         }
 
         else if (state == RobotState.LINE) {
-            wheelsOn = input.getINWheelsOn();
-            wristExtended = input.getINWristExtended();
+            wheelsOn = false;
             hatchEngaged = input.getINHatchEngaged();
         }
         
@@ -75,7 +70,19 @@ public class Intake extends Subsystem {
 
     @Override
     public void output() {
+        if (wheelsOn) {
+            intakeWheels.set(0.5);
+        } else {
+            intakeWheels.set(0);
+        }
 
+        if (hatchEngaged) {
+            hatchLeft.set(Value.kForward);
+            hatchRight.set(Value.kForward);
+        } else {
+            hatchLeft.set(Value.kReverse);
+            hatchRight.set(Value.kReverse);
+        }
     }
 
     @Override
@@ -90,11 +97,11 @@ public class Intake extends Subsystem {
     @Override
     public void smartDashboard() {}
 
-    public static Intake getInstance() {
+    public static FourBarIntake getInstance() {
         if (instance == null) {
-            synchronized (Intake.class) {
+            synchronized (FourBarIntake.class) {
                 if (instance == null)
-                    instance = new Intake();
+                    instance = new FourBarIntake();
             }
         }
         return instance;

@@ -83,7 +83,7 @@ public class Input {
 
 
     // ========== Lift ==========
-    private final double[] LF_setpoints = {0.0, 2.6, 5.0};
+    private final double[] LF_setpoints = {0.0, 2.5, 5.0};
     private double LF_offset = 0;
     private volatile int LF_setpoint;
 
@@ -160,15 +160,25 @@ public class Input {
 
     //========== Climber ==========
     private volatile boolean CM_enabled;
+    private volatile boolean CM_retract;
     
     public void updateClimber() {
+        CM_retract = false;
+
         if (driver.getAButtonPressed()) {
             CM_enabled = !CM_enabled;
+        }
+        else if (driver.getBButton()) {
+            CM_retract = true;
         }
     }
 
     public boolean getCMEnabled() {
         return CM_enabled;
+    }
+
+    public boolean getCMRetract() {
+        return CM_retract;
     }
     
     public static Input getInstance() {

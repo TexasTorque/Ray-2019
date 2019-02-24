@@ -70,6 +70,8 @@ public class Feedback {
 
     // ========== Encoders ==========
 
+    private int DB_leftRaw;
+    private int DB_rightRaw;
     private double DB_leftSpeed;
     private double DB_rightSpeed;
     private double DB_leftDistance;
@@ -91,6 +93,8 @@ public class Feedback {
         LF_encoder.calc();
         RT_encoder.calc();
 
+        DB_leftRaw = DB_leftEncoder.get();
+        DB_rightRaw = DB_rightEncoder.get();
         DB_leftSpeed = DB_leftEncoder.getRate() * DISTANCE_PER_PULSE;
 		DB_rightSpeed = DB_rightEncoder.getRate() * DISTANCE_PER_PULSE;
         DB_leftDistance = DB_leftEncoder.get() * DISTANCE_PER_PULSE;
@@ -98,6 +102,14 @@ public class Feedback {
 
         LF_position = LF_encoder.get() * LF_FEET_CONVERSION;
         RT_angle = RT_encoder.get() * ANGLE_PER_PULSE;
+    }
+
+    public int getDBLeftRaw() {
+        return DB_leftRaw;
+    }
+
+    public int getDBRightRaw() {
+        return DB_rightRaw;
     }
 
     public double getDBLeftSpeed() {

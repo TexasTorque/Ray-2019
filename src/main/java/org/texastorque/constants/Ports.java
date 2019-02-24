@@ -2,7 +2,7 @@ package org.texastorque.constants;
 
 public class Ports {
 
-    private static boolean isDeepSpace = false;
+    private static boolean isDeepSpace = true;
 
     // DriveBase
     public static final int DB_LEFT_FORE_MOTOR = isDeepSpace ? 0 : 0;
@@ -25,10 +25,10 @@ public class Ports {
 
     // Intake
     public static final int IN_MOTOR = 13;
-    public static final int IN_WRIST_SOLE_A = 2;
-    public static final int IN_WRIST_SOLE_B = 3;
-    public static final int IN_WALL_SOLE_A = 4;
-    public static final int IN_WALL_SOLE_B = 5;
+    public static final int IN_HATCH_LEFT_SOLE_A = 2;
+    public static final int IN_HATCH_LEFT_SOLE_B = 3;
+    public static final int IN_HATCH_RIGHT_SOLE_A = 4;
+    public static final int IN_HATCH_RIGHT_SOLE_B = 5;
 
     //Climber
     public static final int CM_LEFT_TOM_MOTOR = 6;

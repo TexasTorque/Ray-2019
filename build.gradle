@@ -1,7 +1,6 @@
 plugins {
     id "java"
     id "edu.wpi.first.GradleRIO" version "2019.1.1"
-    // id "com.snobot.simulator.plugin.SnobotSimulatorPlugin" version "2019-0.2.0" apply false
 }
 
 def ROBOT_MAIN_CLASS = "org.texastorque.Main"
@@ -35,12 +34,6 @@ deploy {
     }
 }
 
-// Apply SnobotSim
-// apply plugin: com.snobot.simulator.plugin.SnobotSimulatorPlugin
-// configurations {
-//     snobotSimCompile
-// }
-
 // Set this to true to enable desktop support.
 def includeDesktopSupport = false
 
@@ -57,9 +50,6 @@ dependencies {
     nativeZip wpi.deps.vendor.jni(wpi.platforms.roborio)
     nativeDesktopZip wpi.deps.vendor.jni(wpi.platforms.desktop)
     testCompile 'junit:junit:4.12'
-
-    // SnobotSim
-    // snobotSimCompile snobotSimJava()
 }
 
 // Setting up my Jar File. In this case, adding all libraries into the main jar ('fat jar')

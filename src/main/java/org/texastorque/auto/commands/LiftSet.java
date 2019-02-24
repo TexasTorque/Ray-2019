@@ -7,9 +7,9 @@ public class LiftSet extends Command {
 
     private int setpointIndex = 0;
 
-    public LiftSet(int index) {
+    public LiftSet(double delay, int index) {
+        super(delay);
         this.setpointIndex = index;
-        this.done = false;
     }
 
     @Override

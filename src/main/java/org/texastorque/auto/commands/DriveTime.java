@@ -7,10 +7,12 @@ public class DriveTime extends Command {
 
     private double startTime = -1;
     private double time = 0;
-
-    public DriveTime(double time) {
+    private double speed = 0;
+    
+    public DriveTime(double delay, double time, double speed) {
+        super(delay);
         this.time = time;
-        this.done = false;
+        this.speed = speed;
     }
 
     @Override
@@ -23,8 +25,8 @@ public class DriveTime extends Command {
             startTime = Timer.getFPGATimestamp();
         }
 
-        input.setDBLeftSpeed(0.5);
-        input.setDBRightSpeed(0.5);
+        input.setDBLeftSpeed(speed);
+        input.setDBRightSpeed(speed);
 
         if (Timer.getFPGATimestamp() - startTime > time) {
             input.setDBLeftSpeed(0);
