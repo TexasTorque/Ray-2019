@@ -15,7 +15,6 @@ public class Intake extends Subsystem {
     private TorqueMotor intakeWheels;
     private DoubleSolenoid hatchWrist;
 
-
     private double wheelsSpeed;//+= forward - = backwards
     private boolean hatchEngaged;//true = parallel false = perpendicular
 

@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.CounterBase.EncodingType;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.networktables.*;
+import edu.wpi.first.wpilibj.AnalogInput;
 import com.kauailabs.navx.frc.AHRS;
 
 /**
@@ -25,6 +26,8 @@ public class Feedback {
     public static final double ANGLE_PER_PULSE = 360 / PULSES_PER_ROTATION;
     public static final double LF_FEET_CONVERSION = Math.PI * (1.0/20) / PULSES_PER_ROTATION; // Using approximate shaft diameter
 
+    public static final double ULTRASONIC_CONVERSION = 0.125;
+
     public static boolean clockwise = true;
 
     // Sensors
@@ -34,6 +37,9 @@ public class Feedback {
     private final TorqueEncoder RT_encoder;
 
     private AHRS NX_gyro;
+
+    //private final AnalogInput RT_ultrasonic;
+    //private final AnalogInput LF_ultrasonic;
 
     // private final DigitalInput LN_leftSensor;
     // private final DigitalInput LN_midSensor;
@@ -52,6 +58,9 @@ public class Feedback {
 
         NX_gyro = new AHRS(SPI.Port.kMXP);
 
+        //RT_ultrasonic = new AnalogInput(Ports.RT_ULTRASONIC);
+        //LF_ultrasonic = new AnalogInput(Ports.LF_ULTRASONIC);
+
         // LN_leftSensor = new DigitalInput(Ports.LN_LEFT);
         // LN_midSensor = new DigitalInput(Ports.LN_MID);
         // LN_rightSensor = new DigitalInput(Ports.LN_RIGHT);
@@ -64,6 +73,7 @@ public class Feedback {
         updateEncoders();
         updateNavX();
         updateLineSensors();
+        //updateUltrasonic();
         updateNetworkTables();
     }
 
@@ -178,11 +188,24 @@ public class Feedback {
     public boolean lineRightTrue() {
         return LN_right;
     }
-
-
-
    
+    // ========= Ultrasonic sensors ========
 
+    private double LF_robotDistance;
+    private double RT_robotDistance;
+
+    public void updateUltrasonic(){
+        //LF_robotDistance = LF_ultrasonic.getValue() * ULTRASONIC_CONVERSION;
+        //RT_robotDistance = RT_ultrasonic.getValue() * ULTRASONIC_CONVERSION;
+    }
+
+    public double getRobotLeftDistance(){
+        return LF_robotDistance;
+    }
+
+    public double getRobotRightDistance(){
+        return RT_robotDistance;
+    }
 
     // ===== RPi feedback from NetworkTables =====
     private double DB_targetOffset;

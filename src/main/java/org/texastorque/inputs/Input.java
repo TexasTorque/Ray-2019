@@ -120,7 +120,7 @@ public class Input {
     }
 
     // ========== Rotary ==========
-    private final double[] RT_setpoints = {0, 10};//index 0=down 1=up
+    private final double[] RT_setpoints = {0, 25};//index 0=down 1=up
     private volatile boolean elevated;//true= up false = down
 
     public void updateRotary() {
@@ -151,15 +151,15 @@ public class Input {
     private volatile double IN_wheelsSpeed;
     private volatile boolean IN_hatchEngaged;
     
-
+    // right bumper = cargo intake/hatch outtake
     public void updateIntake() {
         IN_wheelsSpeed = 0;
-        if(operator.getRightTrigger()){
+        if(driver.getRightTrigger()){ 
             IN_hatchEngaged = true;
             elevated = false;
             IN_wheelsSpeed = .5;         
-        }
-        else if(operator.getRightBumper()){
+        } // hatch intake / cargo outtake
+        /*else if(operator.getRightBumper()){
             IN_hatchEngaged = false;
             elevated = true;
             IN_wheelsSpeed = 0;
@@ -173,13 +173,17 @@ public class Input {
             IN_hatchEngaged = true;
             elevated = false;
             IN_wheelsSpeed = .5;
-        }
+        } */
+        else if (driver.getYButtonPressed()){
+            IN_hatchEngaged = false;
+            elevated = true;
+            IN_wheelsSpeed = 0.0;
+        } // move tusks (spiderman fingers) in and out
         else{
             IN_hatchEngaged = true;
             elevated = true;
             IN_wheelsSpeed = 0;
         }
-
     }
 
     public double getINWheelsSpeed(){
