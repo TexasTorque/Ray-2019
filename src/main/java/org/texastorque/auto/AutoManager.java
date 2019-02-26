@@ -21,10 +21,6 @@ public class AutoManager {
         autoSequences.add(new BackupDrive());
         autoSequences.add(new OneHatchRocket());
 
-        for (Sequence sequence : autoSequences) {
-            sequence.init();
-        }
-
         autoSelector.setDefaultOption("BackupDrive", "BackupDrive");
         autoSelector.addOption("OneHatchRocket", "OneHatchRocket");
     }

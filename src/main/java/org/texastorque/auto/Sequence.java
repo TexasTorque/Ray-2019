@@ -2,40 +2,49 @@ package org.texastorque.auto;
 
 import edu.wpi.first.wpilibj.Timer;
 
-import java.util.Arrays;
 import java.util.ArrayList;
 
 public abstract class Sequence {
 
     private ArrayList<ArrayList<Command>> sequence;
-    private double startTime = -1;
+    private double startTime;
+    private boolean started;
 
-    public abstract void init();
+    protected abstract void init();
 
-    protected void addBlocks(ArrayList<Command>... blocks) {
-        sequence.addAll(Arrays.asList(blocks));
+    protected Sequence() {
+        this.sequence = new ArrayList<ArrayList<Command>>();
+        this.started = false;
+        init();
+    }
+
+    protected void addBlock(ArrayList<Command> block) {
+        this.sequence.add(block);
     }
 
     public void run() {
-        if (startTime == -1) {
+        if (!started) {
             startTime = Timer.getFPGATimestamp();
+            started = true;
+            System.out.println(sequence);
         }
 
         if (sequence.size() > 0) {
             boolean blockEnded = true;
+            double currentTime = Timer.getFPGATimestamp();
             for (Command command : sequence.get(0)) {
-                if (Timer.getFPGATimestamp() - startTime > command.getDelay()) {
+                if (currentTime - startTime > command.getDelay()) {
                     if (!command.run()) {
                         blockEnded = false;
                     }
-                }
-                else {
+                } else {
                     blockEnded = false;
                 }
             }
 
             if (blockEnded) {
                 sequence.remove(0);
+                startTime = Timer.getFPGATimestamp();
             }
         }
     }

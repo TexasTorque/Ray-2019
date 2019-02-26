@@ -10,7 +10,7 @@ public abstract class Command {
     private boolean started;
     private boolean ended;
 
-    public Command(double delay) {
+    protected Command(double delay) {
         this.delay = delay;
         this.started = false;
         this.ended = false;

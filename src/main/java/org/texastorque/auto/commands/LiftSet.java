@@ -1,7 +1,6 @@
 package org.texastorque.auto.commands;
 
 import org.texastorque.auto.Command;
-import edu.wpi.first.wpilibj.Timer;
 
 public class LiftSet extends Command {
 

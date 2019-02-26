@@ -27,10 +27,10 @@ public class Climber extends Subsystem {
         rearA = new TorqueMotor(new VictorSP(Ports.CM_REAR_A_MOTOR), clockwise);
         rearB = new TorqueMotor(new VictorSP(Ports.CM_REAR_B_MOTOR), clockwise);
 
-        rearPID = new ScheduledPID.Builder(0, -0.2, 0.2, 1)
+        rearPID = new ScheduledPID.Builder(0, -0.3, 0.3, 1)
             .setPGains(0.5)
-            .setIGains(0)
-            .setDGains(0)
+            // .setIGains(0)
+            // .setDGains(0)
             .build();
     }
 
@@ -59,18 +59,17 @@ public class Climber extends Subsystem {
 
         else if (state == RobotState.TELEOP) {
             if (input.getCMEnabled()) {
-                tomSpeed = 0.5;
+                tomSpeed = 0.6;
 
                 double currentPitch = feedback.getPitch();
-                rearSpeed = -rearPID.calculate(currentPitch) + 0.6;
+                rearSpeed = 0.7 - rearPID.calculate(currentPitch);
+            }
+            else if (input.getCMRetract()) {
+                rearSpeed = -0.5;
             }
             else {
                 tomSpeed = 0;
                 rearSpeed = 0;
-
-                if (input.getCMRetract()) {
-                    rearSpeed = -0.4;
-                }
             }
         }
 

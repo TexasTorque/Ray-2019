@@ -2,7 +2,6 @@ package org.texastorque.auto.commands;
 
 import org.texastorque.auto.Command;
 
-import edu.wpi.first.wpilibj.Encoder;
 import jaci.pathfinder.*;
 import jaci.pathfinder.modifiers.TankModifier;
 import jaci.pathfinder.followers.EncoderFollower;
@@ -13,7 +12,9 @@ public class DrivePath extends Command {
     private EncoderFollower rightFollower;
 
     /**
-     * Go to https://www.chiefdelphi.com/t/pathfinder-coordinate-system/159870 to see how Waypoint coordinates work
+     * Resources
+     * https://www.chiefdelphi.com/t/pathfinder-coordinate-system/159870
+     * https://www.chiefdelphi.com/t/problems-with-pathfinder-motion-profiling/163830
      */
     public DrivePath(double delay, Waypoint[] points) {
         super(delay);
@@ -39,7 +40,7 @@ public class DrivePath extends Command {
     }
 
     @Override
-    public void init() {
+    protected void init() {
         /**
          * Initial position
          * Pulses per rotation
