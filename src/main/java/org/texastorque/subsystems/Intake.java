@@ -1,5 +1,4 @@
 package org.texastorque.subsystems;
-
 import org.texastorque.inputs.State.RobotState;
 import org.texastorque.constants.Ports;
 import org.texastorque.torquelib.component.TorqueMotor;
@@ -14,38 +13,38 @@ public class Intake extends Subsystem {
     private static volatile Intake instance;
     
     private TorqueMotor intakeWheels;
-    private DoubleSolenoid intakeWristLeft;
-    private DoubleSolenoid intakeWristRight;
-    private double intakeSpeed;
+    private DoubleSolenoid hatchWrist;
 
-    private boolean wheelsOn;
-    private boolean wristExtended;
-    private boolean hatchEngaged;
+
+    private double wheelsSpeed;//+= forward - = backwards
+    private boolean hatchEngaged;//true = parallel false = perpendicular
+
 
     private boolean clockwise = true;
 
     private Intake() {
         intakeWheels = new TorqueMotor(new VictorSP(Ports.IN_MOTOR), clockwise);
         
-        intakeWristLeft = new DoubleSolenoid(2, Ports.IN_HATCH_LEFT_SOLE_A, Ports.IN_HATCH_LEFT_SOLE_B);
-        intakeWristRight = new DoubleSolenoid(2, Ports.IN_HATCH_RIGHT_SOLE_A, Ports.IN_HATcH_RIGHT_SOLE_B);
+        hatchWrist = new DoubleSolenoid(0, Ports.IN_HATCH_SOLE_A, Ports.IN_HATCH_SOLE_B);
     }
 
     @Override
     public void autoInit() {
-        wheelsOn = false;
-        wristExtended = false;
         hatchEngaged = false;
+        hatchWrist.set(Value.kReverse);
+        wheelsSpeed = 0;
     }
 
     @Override
     public void teleopInit() {
-        wheelsOn = false;
+        wheelsSpeed = 0;
     }
 
     @Override
     public void disabledInit() {
-        wheelsOn = false;
+        wheelsSpeed = 0;
+        hatchEngaged = false;
+        output();
     }
 
     @Override
@@ -54,22 +53,16 @@ public class Intake extends Subsystem {
         }
 
         else if (state == RobotState.TELEOP) {
-            wheelsOn = input.getINWheelsOn();
-            wristExtended = input.getINWristExtended();
+            wheelsSpeed = input.getINWheelsSpeed();
             hatchEngaged = input.getINHatchEngaged();
-            if (wheelsOn)
-                intakeSpeed = .5;    
         }
 
         else if (state == RobotState.VISION) {
-            wheelsOn = false;
-            wristExtended = false;
+            wheelsSpeed = 0;
             hatchEngaged = input.getINHatchEngaged();
         }
 
         else if (state == RobotState.LINE) {
-            wheelsOn = input.getINWheelsOn();
-            wristExtended = input.getINWristExtended();
             hatchEngaged = input.getINHatchEngaged();
         }
         
@@ -78,15 +71,11 @@ public class Intake extends Subsystem {
 
     @Override
     public void output() {
-        if (wristExtended){
-            intakeWristLeft.set(Value.kForward);
-            intakeWristRight.set(Value.kForward);
-        }
-        else {
-            intakeWristLeft.set(Value.kReverse);
-            intakeWristRight.set(Value.kReverse);
-        }
-
+        if(hatchEngaged)
+            hatchWrist.set(Value.kReverse);
+        else    
+            hatchWrist.set(Value.kForward);
+        intakeWheels.set(wheelsSpeed);
     }
 
     @Override

@@ -42,7 +42,7 @@ public class DriveBase extends Subsystem {
         rightMid = new TorqueMotor(new VictorSP(Ports.DB_RIGHT_MID_MOTOR), clockwise);
         rightRear = new TorqueMotor(new VictorSP(Ports.DB_RIGHT_REAR_MOTOR), clockwise);
         
-        gearShift = new DoubleSolenoid(2, Ports.DB_SOLE_A, Ports.DB_SOLE_B);
+        gearShift = new DoubleSolenoid(0, Ports.DB_SOLE_A, Ports.DB_SOLE_B);
 
         visionPID = new ScheduledPID.Builder(0, -0.5, 0.5, 5)
                 .setRegions(-0.4, -0.2, 0.2, 0.4)

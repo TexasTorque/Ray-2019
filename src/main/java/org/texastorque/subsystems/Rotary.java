@@ -45,6 +45,7 @@ public class Rotary extends Subsystem {
     @Override
     public void disabledInit() {
         speed = 0;
+        output();
     }
 
     @Override
@@ -91,7 +92,7 @@ public class Rotary extends Subsystem {
 
     @Override
     public void output() {
-
+        rotary.set(speed);
     }
 
     @Override

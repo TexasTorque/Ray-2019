@@ -55,12 +55,12 @@ public class Input {
 		DB_leftSpeed = -driver.getLeftYAxis() + driver.getRightXAxis();
         DB_rightSpeed = -driver.getLeftYAxis() - driver.getRightXAxis();
 
-        if (driver.getRightBumper()) {
-            DB_highGear = true;
-        }
-        else if (driver.getLeftBumper()) {
-            DB_highGear = false;
-        }
+        // if (driver.getRightBumper()) {
+        //     DB_highGear = true;
+        // }
+        // else if (driver.getLeftBumper()) {
+        //     DB_highGear = false;
+        // }
     }
 
     public double getDBLeftSpeed() {
@@ -120,20 +120,27 @@ public class Input {
     }
 
     // ========== Rotary ==========
-    private final double[] RT_setpoints = {0, 10};
-    private volatile int RT_setpoint;
+    private final double[] RT_setpoints = {0, 10};//index 0=down 1=up
+    private volatile boolean elevated;//true= up false = down
 
     public void updateRotary() {
-        if (operator.getLeftBumper()) {
-            RT_setpoint = 1;
+        if (operator.getDPADDown()) {
+            elevated = false;
         }
-        else if (operator.getLeftTrigger()) {
-            RT_setpoint = 0;
+        else if (operator.getDPADUp()) {
+            elevated = true;
         }
     }
 
+    public boolean getElevated(){
+        return elevated;
+    }
+
     public double getRTSetpoint() {
-        return RT_setpoints[RT_setpoint];
+        if (elevated)
+            return RT_setpoints[1];
+        else 
+            return RT_setpoints[0];
     }
 
     public double getRTSetpoint(int i) {
@@ -141,36 +148,65 @@ public class Input {
     }
 
     // ========== Intake ==========
-    private volatile boolean IN_wheelsOn;
-    private volatile boolean IN_wristExtended;
+    private volatile double IN_wheelsSpeed;
     private volatile boolean IN_hatchEngaged;
+    
 
-    public void updateIntake() {}
+    public void updateIntake() {
+        IN_wheelsSpeed = 0;
+        if(operator.getRightTrigger()){
+            IN_hatchEngaged = true;
+            elevated = false;
+            IN_wheelsSpeed = .5;         
+        }
+        else if(operator.getRightBumper()){
+            IN_hatchEngaged = false;
+            elevated = true;
+            IN_wheelsSpeed = 0;
+        }
+        else if(operator.getLeftTrigger()){
+            IN_hatchEngaged = true;
+            elevated = false;
+            IN_wheelsSpeed = -.5;
+        }
+        else if (operator.getLeftBumper()){
+            IN_hatchEngaged = true;
+            elevated = false;
+            IN_wheelsSpeed = .5;
+        }
+        else{
+            IN_hatchEngaged = true;
+            elevated = true;
+            IN_wheelsSpeed = 0;
+        }
 
-    public boolean getINWheelsOn() {
-        return IN_wheelsOn;
     }
 
-    public boolean getINWristExtended() {
-        return IN_wristExtended;
+    public double getINWheelsSpeed(){
+        return IN_wheelsSpeed;
     }
 
     public boolean getINHatchEngaged() {
         return IN_hatchEngaged;
     }
 
-
     //========== Climber ==========
     private volatile boolean CM_enabled;
+    private volatile boolean CM_retract;
     
-    public void updateClimber() {
-        if (driver.getRightCenterButton()&& driver.getLeftCenterButton()) {
+    public void updateClimber(){
+        if (driver.getAButtonPressed()) 
             CM_enabled = !CM_enabled;
-        }
+        
+        if (driver.getBButton())
+            CM_retract= true;
     }
 
     public boolean getCMEnabled() {
         return CM_enabled;
+    }
+    public boolean getCMRetract(){
+        return CM_retract;
     }
     
     public static Input getInstance() {
