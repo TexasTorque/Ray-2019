@@ -28,8 +28,6 @@ public class Robot extends TorqueIterative {
 		initSubsystems();
 		//CameraServer.getInstance().startAutomaticCapture(0);
 		autoManager.displayChoices();
-		autoInit();
-		autoContinuous();
 	}
 
 	private void initSubsystems() {
@@ -45,6 +43,8 @@ public class Robot extends TorqueIterative {
 	public void autoInit() {
 		state.setRobotState(RobotState.AUTO);
 		autoManager.chooseSequence();
+		feedback.resetEncoders();
+		feedback.resetNavX();
 
 		for (Subsystem system : subsystems) {
 			system.autoInit();
@@ -54,6 +54,8 @@ public class Robot extends TorqueIterative {
 	@Override
 	public void teleopInit() {
 		state.setRobotState(RobotState.TELEOP);
+		feedback.resetEncoders();
+		feedback.resetNavX();
 		for (Subsystem system : subsystems) {
 			system.teleopInit();
 		}

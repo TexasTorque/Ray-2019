@@ -7,19 +7,21 @@ import java.util.ArrayList;
 public abstract class Sequence {
 
     private ArrayList<ArrayList<Command>> sequence;
-    private double startTime;
     private boolean started;
+    private double startTime;
+    private int blockIndex;
 
     protected abstract void init();
 
     protected Sequence() {
-        this.sequence = new ArrayList<ArrayList<Command>>();
-        this.started = false;
+        sequence = new ArrayList<ArrayList<Command>>();
+        started = false;
+        blockIndex = 0;
         init();
     }
 
     protected void addBlock(ArrayList<Command> block) {
-        this.sequence.add(block);
+        sequence.add(block);
     }
 
     public void run() {
@@ -29,10 +31,10 @@ public abstract class Sequence {
             System.out.println(sequence);
         }
 
-        if (sequence.size() > 0) {
+        if (blockIndex < sequence.size()) {
             boolean blockEnded = true;
             double currentTime = Timer.getFPGATimestamp();
-            for (Command command : sequence.get(0)) {
+            for (Command command : sequence.get(blockIndex)) {
                 if (currentTime - startTime > command.getDelay()) {
                     if (!command.run()) {
                         blockEnded = false;
@@ -43,9 +45,14 @@ public abstract class Sequence {
             }
 
             if (blockEnded) {
-                sequence.remove(0);
+                blockIndex++;
                 startTime = Timer.getFPGATimestamp();
             }
         }
+    }
+
+    public void reset() {
+        blockIndex = 0;
+        started = false;
     }
 }

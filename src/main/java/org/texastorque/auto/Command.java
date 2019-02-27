@@ -12,8 +12,8 @@ public abstract class Command {
 
     protected Command(double delay) {
         this.delay = delay;
-        this.started = false;
-        this.ended = false;
+        started = false;
+        ended = false;
     }
 
     public double getDelay() {

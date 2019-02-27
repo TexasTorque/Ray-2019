@@ -8,6 +8,7 @@ import org.texastorque.torquelib.controlLoop.ScheduledPID;
 import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DriveBase extends Subsystem {
 
@@ -146,7 +147,9 @@ public class DriveBase extends Subsystem {
     public void teleopContinuous() {}
 
     @Override
-    public void smartDashboard() {}
+    public void smartDashboard() {
+        SmartDashboard.putBoolean("DB_highGear", highGear);
+    }
 
     public static DriveBase getInstance() {
         if (instance == null) {

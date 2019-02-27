@@ -96,10 +96,10 @@ public class Lift extends Subsystem {
 
     private double addBaseOutput(double speed) {
         if (feedback.getLFPosition() < input.getLFSetpoint(1)) {
-            return speed + 0.04;
+            return speed + 0.07;
         }
         else if (feedback.getLFPosition() < input.getLFSetpoint(2)) {
-            return speed + 0.07;
+            return speed + 0.12;
         }
         return speed;
     }

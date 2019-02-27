@@ -12,12 +12,12 @@ public class AutoManager {
     private static AutoManager instance;
 
     private ArrayList<Sequence> autoSequences;
-    private SendableChooser<String> autoSelector = new SendableChooser<>();
+    private SendableChooser<String> autoSelector = new SendableChooser<String>();
 
     private Sequence currentSequence;
 
     private AutoManager() {
-        autoSequences = new ArrayList<>();
+        autoSequences = new ArrayList<Sequence>();
         autoSequences.add(new BackupDrive());
         autoSequences.add(new OneHatchRocket());
 
@@ -40,6 +40,8 @@ public class AutoManager {
                 currentSequence = autoSequences.get(1);
                 break;
         }
+
+        currentSequence.reset();
     }
 
     public void runSequence() {

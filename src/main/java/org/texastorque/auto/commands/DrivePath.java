@@ -1,20 +1,22 @@
 package org.texastorque.auto.commands;
 
 import org.texastorque.auto.Command;
+import org.texastorque.constants.Constants;
 
 import jaci.pathfinder.*;
 import jaci.pathfinder.modifiers.TankModifier;
-import jaci.pathfinder.followers.EncoderFollower;
+import jaci.pathfinder.followers.DistanceFollower;
 
 public class DrivePath extends Command {
 
-    private EncoderFollower leftFollower;
-    private EncoderFollower rightFollower;
+    private DistanceFollower leftFollower;
+    private DistanceFollower rightFollower;
 
     /**
      * Resources
      * https://www.chiefdelphi.com/t/pathfinder-coordinate-system/159870
      * https://www.chiefdelphi.com/t/problems-with-pathfinder-motion-profiling/163830
+     * https://www.chiefdelphi.com/t/tuning-pathfinder-pid-talon-motion-profiling-magic-etc/162516/4
      */
     public DrivePath(double delay, Waypoint[] points) {
         super(delay);
@@ -27,33 +29,34 @@ public class DrivePath extends Command {
          * Max Acceleration (ft/s/s)
          * Max Jerk (ft/s/s/s)
          */
-        Trajectory.Config config = new Trajectory.Config(Trajectory.FitMethod.HERMITE_CUBIC, Trajectory.Config.SAMPLES_LOW, 0.01, 12.0, 8.0, 100.0);
+        Trajectory.Config config = new Trajectory.Config(Trajectory.FitMethod.HERMITE_CUBIC, Trajectory.Config.SAMPLES_LOW, 0.05, Constants.DB_LOW_MAX_SPEED, 6.0, 60.0);
         
         Trajectory path = Pathfinder.generate(points, config);
         TankModifier modifier = new TankModifier(path);
         modifier.modify(2); // DriveBase width (ft)
 
-        leftFollower = new EncoderFollower(modifier.getLeftTrajectory());
-        rightFollower = new EncoderFollower(modifier.getRightTrajectory());
-        leftFollower.configurePIDVA(0.5, 0, 0, 1/12.0, 0);
-        rightFollower.configurePIDVA(0.5, 0, 0, 1/12.0, 0);
+        leftFollower = new DistanceFollower(modifier.getLeftTrajectory());
+        rightFollower = new DistanceFollower(modifier.getRightTrajectory());
+        leftFollower.configurePIDVA(0.8, 0, 0.1, 1/Constants.DB_LOW_MAX_SPEED, 0);
+        rightFollower.configurePIDVA(0.8, 0, 0.1, 1/Constants.DB_LOW_MAX_SPEED, 0);
     }
 
     @Override
     protected void init() {
-        /**
-         * Initial position
-         * Pulses per rotation
-         * Wheel diameter (ft)
-         */
-        leftFollower.configureEncoder(feedback.getDBLeftRaw(), 1000, 0.5);
-        rightFollower.configureEncoder(feedback.getDBRightRaw(), 1000, 0.5);
+        feedback.resetEncoders();
+        feedback.resetNavX();
     }
 
 	@Override
 	protected void continuous() {
-		input.setDBLeftSpeed(leftFollower.calculate(feedback.getDBLeftRaw()));
-        input.setDBRightSpeed(rightFollower.calculate(feedback.getDBRightRaw()));
+        double currentHeading = feedback.getYaw();
+        double targetHeading = Pathfinder.r2d(leftFollower.getHeading());
+
+        double angleDifference = Pathfinder.boundHalfDegrees(targetHeading - currentHeading);
+        double turn = 0.8 * (-1.0/80.0) * angleDifference;
+
+		input.setDBLeftSpeed(leftFollower.calculate(feedback.getDBLeftDistance()) + turn);
+        input.setDBRightSpeed(rightFollower.calculate(feedback.getDBRightDistance()) - turn);
 	}
 
 	@Override

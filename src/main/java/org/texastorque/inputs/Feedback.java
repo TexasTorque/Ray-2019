@@ -1,6 +1,6 @@
 package org.texastorque.inputs;
 
-import org.texastorque.constants.Ports;
+import org.texastorque.constants.*;
 import org.texastorque.torquelib.component.TorqueEncoder;
 
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -17,13 +17,10 @@ public class Feedback {
 
     private static volatile Feedback instance;
 
-    // Constants
-    public static final double PULSES_PER_ROTATION = 1000;
-    public static final double WHEEL_DIAMETER_FEET = 0.5;
-
-    public static final double DISTANCE_PER_PULSE = Math.PI * WHEEL_DIAMETER_FEET / PULSES_PER_ROTATION;
-    public static final double ANGLE_PER_PULSE = 360 / PULSES_PER_ROTATION;
-    public static final double LF_FEET_CONVERSION = Math.PI * (1.0/20) / PULSES_PER_ROTATION; // Using approximate shaft diameter
+    // Conversions
+    public final double DISTANCE_PER_PULSE = Math.PI * Constants.WHEEL_DIAMETER / Constants.PULSES_PER_ROTATION;
+    public final double ANGLE_PER_PULSE = 360 / Constants.PULSES_PER_ROTATION;
+    public final double LF_FEET_CONVERSION = Math.PI * (1.0/20) / Constants.PULSES_PER_ROTATION; // Using approximate shaft diameter
 
     public static boolean clockwise = true;
 
@@ -33,7 +30,9 @@ public class Feedback {
     private final TorqueEncoder LF_encoder;
     private final TorqueEncoder RT_encoder;
 
-    private AHRS NX_gyro;
+    private final AHRS NX_gyro;
+
+    private final DigitalInput CM_switch;
 
     // private final DigitalInput LN_leftSensor;
     // private final DigitalInput LN_midSensor;
@@ -50,6 +49,8 @@ public class Feedback {
         LF_encoder = new TorqueEncoder(Ports.LF_ENCODER_A, Ports.LF_ENCODER_B, clockwise, EncodingType.k4X);
         RT_encoder = new TorqueEncoder(Ports.RT_ENCODER_A, Ports.RT_ENCODER_B, clockwise, EncodingType.k4X);
 
+        CM_switch = new DigitalInput(Ports.CM_SWITCH);
+
         NX_gyro = new AHRS(SPI.Port.kMXP);
 
         // LN_leftSensor = new DigitalInput(Ports.LN_LEFT);
@@ -63,6 +64,7 @@ public class Feedback {
     public void update() {
         updateEncoders();
         updateNavX();
+        updateSwitch();
         updateLineSensors();
         updateNetworkTables();
     }
@@ -142,6 +144,10 @@ public class Feedback {
     private double NX_pitch;
     private double NX_yaw;
 
+    public void resetNavX() {
+        NX_gyro.reset();
+    }
+
     public void updateNavX() {
         NX_pitch = NX_gyro.getPitch();
         NX_yaw = NX_gyro.getAngle();
@@ -153,6 +159,19 @@ public class Feedback {
 
     public double getYaw() {
         return NX_yaw;
+    }
+
+
+    // ========== Limit switch ==========
+
+    private boolean CM_atBottom;
+
+    public void updateSwitch() {
+        CM_atBottom = CM_switch.get();
+    }
+
+    public boolean getCMAtBottom() {
+        return CM_atBottom;
     }
 
 
@@ -183,7 +202,6 @@ public class Feedback {
 
     // ===== RPi feedback from NetworkTables =====
     private double DB_targetOffset;
-    private double[] pastTargetErrors = new double[50];
 
     public void updateNetworkTables() {
         DB_targetOffset = NT_target.getEntry("target_offset").getDouble(0);
@@ -201,12 +219,15 @@ public class Feedback {
         SmartDashboard.putNumber("DB_rightSpeed", DB_rightSpeed);
         SmartDashboard.putNumber("LF_position", LF_position);
         SmartDashboard.putNumber("RT_angle", RT_angle);
+
         SmartDashboard.putNumber("NX_pitch", NX_pitch);
         SmartDashboard.putNumber("NX_yaw", NX_yaw);
 
-        SmartDashboard.putBoolean("L", LN_left);
-        SmartDashboard.putBoolean("M", LN_mid);
-        SmartDashboard.putBoolean("R", LN_right);
+        SmartDashboard.putBoolean("CM_atBottom", CM_atBottom);
+
+        // SmartDashboard.putBoolean("L", LN_left);
+        // SmartDashboard.putBoolean("M", LN_mid);
+        // SmartDashboard.putBoolean("R", LN_right);
     }
 
     public static Feedback getInstance() {

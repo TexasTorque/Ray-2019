@@ -161,14 +161,19 @@ public class Input {
     //========== Climber ==========
     private volatile boolean CM_enabled;
     private volatile boolean CM_retract;
+    private boolean lastLeftCenter = false;
     
     public void updateClimber() {
         CM_retract = false;
 
-        if (driver.getAButtonPressed()) {
+        if (driver.getLeftCenterButton() && !lastLeftCenter) {
             CM_enabled = !CM_enabled;
+            lastLeftCenter = true;
+        } else if (!driver.getLeftCenterButton()) {
+            lastLeftCenter = false;
         }
-        else if (driver.getBButton()) {
+
+        else if (driver.getRightCenterButton()) {
             CM_retract = true;
         }
     }
