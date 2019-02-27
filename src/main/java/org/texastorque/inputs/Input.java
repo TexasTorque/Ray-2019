@@ -120,16 +120,21 @@ public class Input {
     }
 
     // ========== Rotary ==========
-    private final double[] RT_setpoints = {0, 25};//index 0=down 1=up
-    private volatile boolean elevated;//true= up false = down
-
+    private final double[] RT_setpoints = {20, 50};//index 0=down 1=up
+    private volatile boolean elevated;//true= up false = down // 5 85
+    private volatile boolean rotaryManualF;
+    private volatile boolean rotaryManualB;
     public void updateRotary() {
-        if (operator.getDPADDown()) {
+        rotaryManualB = false;
+        rotaryManualF = false;
+        if (operator.getDPADDown()) 
             elevated = false;
-        }
-        else if (operator.getDPADUp()) {
+        else if (operator.getDPADUp()) 
             elevated = true;
-        }
+        if (operator.getDPADLeft()) 
+            rotaryManualF = true;
+        else if (operator.getDPADRight()) 
+            rotaryManualB = true;
     }
 
     public boolean getElevated(){
@@ -138,13 +143,21 @@ public class Input {
 
     public double getRTSetpoint() {
         if (elevated)
-            return RT_setpoints[1];
-        else 
             return RT_setpoints[0];
+        else 
+            return RT_setpoints[1];
     }
 
     public double getRTSetpoint(int i) {
         return RT_setpoints[i];
+    }
+
+    public boolean getRTForward(){
+        return rotaryManualF;
+    }
+
+    public boolean getRTBackward(){
+        return rotaryManualB;
     }
 
     // ========== Intake ==========

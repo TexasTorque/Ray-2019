@@ -18,6 +18,8 @@ public class Rotary extends Subsystem {
     private double setpoint;
     private double prevSetpoint;
     private boolean clockwise = true;
+    private boolean rotaryTestF;
+    private boolean rotaryTestB;
 
     private Rotary() {
         rotary = new TorqueMotor(new VictorSP(Ports.RT_MOTOR), clockwise);
@@ -69,14 +71,22 @@ public class Rotary extends Subsystem {
     }
 
     private void runRotaryPID() {
-        setpoint = input.getRTSetpoint();
-        currentPos = feedback.getRTPosition();
-        if (setpoint != prevSetpoint) {
-            rotaryPID.changeSetpoint(setpoint);
-            prevSetpoint = setpoint;
-        }
+        // setpoint = input.getRTSetpoint();
+        // currentPos = feedback.getRTPosition();
+        // if (setpoint != prevSetpoint) {
+        //     rotaryPID.changeSetpoint(setpoint);
+        //     prevSetpoint = setpoint;
+        // }
 
-        speed = rotaryPID.calculate(currentPos);
+        // speed = rotaryPID.calculate(currentPos);
+        speed =0;
+        rotaryTestF = input.getRTForward();
+        rotaryTestB = input.getRTBackward();
+        if (rotaryTestF) 
+            speed = .3;
+        else if (rotaryTestB)
+            speed = -.3;
+ 
     }
 
     private void runRotaryBottom() {

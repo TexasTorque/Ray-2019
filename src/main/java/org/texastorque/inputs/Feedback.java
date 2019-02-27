@@ -90,8 +90,8 @@ public class Feedback {
     private double RT_angle;
 
     private AHRS gyro;
-    private NetworkTable lnNetworkTable;
-    private double lastAngle = 0.0;
+    // private NetworkTable lnNetworkTable;
+    // private double lastAngle = 0.0;
 
 
 
@@ -114,7 +114,7 @@ public class Feedback {
         DB_rightDistance = DB_rightEncoder.get() * DISTANCE_PER_PULSE;
 
         LF_position = LF_encoder.get() * LF_FEET_CONVERSION;
-        RT_angle = RT_encoder.get() * ANGLE_PER_PULSE;
+        RT_angle = -RT_encoder.get() * ANGLE_PER_PULSE;
     }
 
     public double getDBLeftSpeed() {
@@ -177,17 +177,17 @@ public class Feedback {
         // LN_right = LN_rightSensor.get();
     }
 
-    public boolean lineLeftTrue() {
-        return LN_left;
-    }
+    // public boolean lineLeftTrue() {
+    //     return LN_left;
+    // }
 
-    public boolean lineMidTrue() {
-        return LN_mid;
-    }
+    // public boolean lineMidTrue() {
+    //     return LN_mid;
+    // }
 
-    public boolean lineRightTrue() {
-        return LN_right;
-    }
+    // public boolean lineRightTrue() {
+    //     return LN_right;
+    // }
    
     // ========= Ultrasonic sensors ========
 
