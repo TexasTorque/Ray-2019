@@ -3,38 +3,53 @@ package org.texastorque.subsystems;
 import org.texastorque.inputs.State.RobotState;
 import org.texastorque.constants.Ports;
 import org.texastorque.torquelib.component.TorqueMotor;
+import org.texastorque.torquelib.controlLoop.ScheduledPID;
 
 import edu.wpi.first.wpilibj.VictorSP;
-// import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
-// import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 public class DriveBase extends Subsystem {
 
     private static volatile DriveBase instance;
-    private RobotState currentState;
 
     private TorqueMotor leftFore;
+    private TorqueMotor leftMid;
 	private TorqueMotor leftRear;
-	private TorqueMotor rightFore;
+    private TorqueMotor rightFore;
+    private TorqueMotor rightMid;
     private TorqueMotor rightRear;
- //   private DoubleSolenoid leftGearShift;
- //   private DoubleSolenoid rightGearShift;
+    private DoubleSolenoid gearShift;
     
+    private final ScheduledPID visionPID;
     private double leftSpeed = 0.0;
     private double rightSpeed = 0.0;
-    private boolean leftHighGear = false;
-    private boolean rightHighGear = false;
+    private boolean highGear = false;
     
-    private static boolean clockwise = true;
+    private boolean clockwise = true;
+
+    private ScheduledPID linePID;
+    private boolean reset;
+    private double angleDegree = 45;
+    private String lineDirection;
 
     private DriveBase() {
-        leftFore = new TorqueMotor(new VictorSP(Ports.DB_LEFT_FORE_MOTOR), clockwise);
-		leftRear = new TorqueMotor(new VictorSP(Ports.DB_LEFT_REAR_MOTOR), !clockwise);
-		rightFore = new TorqueMotor(new VictorSP(Ports.DB_RIGHT_FORE_MOTOR), clockwise);
+        leftFore = new TorqueMotor(new VictorSP(Ports.DB_LEFT_FORE_MOTOR), !clockwise);
+        leftMid = new TorqueMotor(new VictorSP(Ports.DB_LEFT_MID_MOTOR), !clockwise);
+        leftRear = new TorqueMotor(new VictorSP(Ports.DB_LEFT_REAR_MOTOR), !clockwise);
+        
+        rightFore = new TorqueMotor(new VictorSP(Ports.DB_RIGHT_FORE_MOTOR), clockwise);
+        rightMid = new TorqueMotor(new VictorSP(Ports.DB_RIGHT_MID_MOTOR), clockwise);
         rightRear = new TorqueMotor(new VictorSP(Ports.DB_RIGHT_REAR_MOTOR), clockwise);
         
-        // leftGearShift = new DoubleSolenoid(2, Ports.DB_LEFT_SOLE_A, Ports.DB_LEFT_SOLE_B);
-		// rightGearShift = new DoubleSolenoid(2, Ports.DB_RIGHT_SOLE_A, Ports.IN_RIGHT_SOLE_B);
+        gearShift = new DoubleSolenoid(0, Ports.DB_SOLE_A, Ports.DB_SOLE_B);
+
+        visionPID = new ScheduledPID.Builder(0, -0.5, 0.5, 5)
+                .setRegions(-0.4, -0.2, 0.2, 0.4)
+                .setPGains(0.3, 0.5, 0.8, 0.5, 0.3)
+                //.setIGains(0.1, 0, 0, 0, 0.1)
+                //.setDGains(0, 0.02, 0, 0.02, 0)
+                .build();
     }
 
     @Override
@@ -47,6 +62,7 @@ public class DriveBase extends Subsystem {
     public void teleopInit() {
         leftSpeed = 0.0;
         rightSpeed = 0.0;
+        // feedback.gyroReset();
     }
 
     @Override
@@ -56,72 +72,77 @@ public class DriveBase extends Subsystem {
     }
 
     @Override
-    public void disabledContinuous() {
-        output();
-    }
-
-    @Override
-    public void autoContinuous() {
-        // Do something
-        output();
-    }
-
-    @Override
-    public void teleopContinuous() {
-        currentState = state.getRobotState();
-
-        if (currentState == RobotState.TELEOP) {
+    public void run(RobotState state) {
+        if (state == RobotState.AUTO) {
             leftSpeed = input.getDBLeftSpeed();
             rightSpeed = input.getDBRightSpeed();
-            output();
         }
-        else if (currentState == RobotState.LINE) {
-            // Read feedback for NetworkTables input, calculate output
-            feedback.lineLeftTrue();
-            output();
+
+        else if (state == RobotState.TELEOP) {
+            leftSpeed = input.getDBLeftSpeed();
+            rightSpeed = input.getDBRightSpeed();
         }
-        else if (currentState == RobotState.VISION) {
+
+        else if (state == RobotState.VISION) {
+            double currentOffset = feedback.getTargetOffset();
+            double adjustment = visionPID.calculate(currentOffset);
+            // if (Math.abs(adjustment) < 0.1)
+            //     adjustment = 0;
+            System.out.println("Offset: " + currentOffset + " || Adjustment: " + adjustment);
+
+            leftSpeed = 0.5 * input.getDBLeftSpeed() - adjustment;
+            rightSpeed = 0.5 * input.getDBRightSpeed() + adjustment;
+
+            // leftSpeed = input.getDBLeftSpeed() * (0.5 - adjustment);
+            // rightSpeed = input.getDBRightSpeed() * (adjustment + 0.5);
+        }
+
+        else if (state == RobotState.LINE) {
             // Read feedback for NetworkTables input, calculate output
-            output();
         }
         
+        setGears(state);
+        output();
     }
 
     @Override
-    public void output() {
-        setGears();
-        /*
-        if (leftHighGear)
-            leftGearShift.set(Value.kForward);
+    protected void output() {
+        if (highGear)
+            gearShift.set(Value.kForward);
         else
-            leftGearShift.set(Value.kReverse);
+            gearShift.set(Value.kReverse);
         
-        if (rightHighGear)
-            rightGearShift.set(Value.kForward);
-        else
-            rightGearShift.set(Value.kReverse);
-        */
         leftFore.set(leftSpeed);
-		leftRear.set(leftSpeed);
+        leftMid.set(leftSpeed);
+        leftRear.set(leftSpeed);
+        
 		rightFore.set(rightSpeed);
+		rightMid.set(rightSpeed);
         rightRear.set(rightSpeed);
     }
 
-    public boolean getLeftHighGear() {
-        return leftHighGear;
-    }
-
-    public boolean getRightHighGear() {
-        return rightHighGear;
+    public boolean getHighGear() {
+        return highGear;
     }
 
     /**
-     * Potential auto transmission
+     * auto transmission
      */
-    private void setGears() {
-        leftHighGear = (leftSpeed < 0.5) ? false : true;
-        rightHighGear = (rightSpeed < 0.5) ? false : true;
+    private void setGears(RobotState state) {
+        if (state == RobotState.TELEOP)
+            highGear = input.getDBHighGear();
+        else
+            highGear = false;
     }
+
+    @Override
+    public void disabledContinuous() {}
+
+    @Override
+    public void autoContinuous() {}
+
+    @Override
+    public void teleopContinuous() {}
 
     @Override
     public void smartDashboard() {}
@@ -135,4 +156,6 @@ public class DriveBase extends Subsystem {
         }
         return instance;
     }
+
+
 }

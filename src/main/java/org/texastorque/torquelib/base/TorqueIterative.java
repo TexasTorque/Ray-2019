@@ -246,7 +246,7 @@ public abstract class TorqueIterative extends RobotBase {
 	}
 
 	public void autoInit() {
-		System.out.println("Default TorqueIterative.autonomousInit() method... Overload me!");
+		System.out.println("Default TorqueIterative.autoInit() method... Overload me!");
 	}
 
 	public void teleopInit() {
