@@ -47,7 +47,7 @@ public class Ports {
     public static final int RT_ENCODER_B = 7;
     public static final int CM_SWITCH = 8;
 
-    public static final int LN_LEFT = 9;
-    public static final int LN_MID = 8;
-    public static final int LN_RIGHT = 7;
+    // public static final int LN_LEFT = 9;
+    // public static final int LN_MID = 8;
+    // public static final int LN_RIGHT = 7;
 }

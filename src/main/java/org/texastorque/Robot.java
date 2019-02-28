@@ -28,10 +28,11 @@ public class Robot extends TorqueIterative {
 		initSubsystems();
 		//CameraServer.getInstance().startAutomaticCapture(0);
 		autoManager.displayChoices();
+		feedback.resetNavX();
 	}
 
 	private void initSubsystems() {
-		subsystems = new ArrayList<>();
+		subsystems = new ArrayList<Subsystem>();
 		subsystems.add(driveBase);
 		subsystems.add(lift);
 		subsystems.add(rotary);
@@ -44,7 +45,6 @@ public class Robot extends TorqueIterative {
 		state.setRobotState(RobotState.AUTO);
 		autoManager.chooseSequence();
 		feedback.resetEncoders();
-		feedback.resetNavX();
 
 		for (Subsystem system : subsystems) {
 			system.autoInit();

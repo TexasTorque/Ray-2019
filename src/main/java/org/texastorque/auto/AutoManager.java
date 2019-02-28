@@ -31,6 +31,8 @@ public class AutoManager {
 
     public void chooseSequence() {
         String autoChoice = autoSelector.getSelected();
+        
+        autoChoice = "OneHatchRocket";
 
         switch(autoChoice) {
             case "BackupDrive":
