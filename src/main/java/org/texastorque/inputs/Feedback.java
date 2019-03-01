@@ -164,7 +164,6 @@ public class Feedback {
         NX_gyro.reset();
     }
 
-
     // ========== Line sensors ==========
 
     private boolean LN_left;
@@ -227,8 +226,8 @@ public class Feedback {
         SmartDashboard.putNumber("DB_rightSpeed", DB_rightSpeed);
         SmartDashboard.putNumber("LF_position", LF_position);
         SmartDashboard.putNumber("RT_angle", RT_angle);
-        SmartDashboard.putNumber("NX_pitch", NX_pitch);
-        SmartDashboard.putNumber("NX_yaw", NX_yaw);
+        // SmartDashboard.putNumber("NX_pitch", NX_pitch);
+        // SmartDashboard.putNumber("NX_yaw", NX_yaw);
 
         SmartDashboard.putBoolean("L", LN_left);
         SmartDashboard.putBoolean("M", LN_mid);

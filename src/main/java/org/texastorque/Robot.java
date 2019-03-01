@@ -70,7 +70,6 @@ public class Robot extends TorqueIterative {
 		else {
 			input.updateControllers();
 		}
-		feedback.update();
 
 		for (Subsystem system : subsystems) {
 			system.run(state.getRobotState());
@@ -80,7 +79,6 @@ public class Robot extends TorqueIterative {
 	@Override
 	public void teleopContinuous() {
 		input.updateControllers();
-		feedback.update();
 		for (Subsystem system : subsystems) {
 			system.run(state.getRobotState());
 		}
@@ -88,6 +86,7 @@ public class Robot extends TorqueIterative {
 
 	@Override
 	public void alwaysContinuous() {
+		feedback.update();
 		feedback.smartDashboard();
 		for (Subsystem system : subsystems) {
 			system.run(state.getRobotState());

@@ -96,7 +96,6 @@ public class Rotary extends Subsystem {
             rotaryPID.changeSetpoint(setpoint);
             prevSetpoint = setpoint;
         }
-
         speed = rotaryPID.calculate(currentPos);
     }
 
