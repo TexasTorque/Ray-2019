@@ -14,35 +14,32 @@ public class FourBarIntake extends Subsystem {
     private static volatile FourBarIntake instance;
     
     private TorqueMotor intakeWheels;
-    private DoubleSolenoid hatchLeft;
-    private DoubleSolenoid hatchRight;
+    private DoubleSolenoid hatchTusk;
 
-    private boolean wheelsOn;
-    private boolean hatchEngaged;
+    private double wheelSpeed;
+    private boolean tuskEngaged;
 
     private boolean clockwise = true;
 
     private FourBarIntake() {
-        intakeWheels = new TorqueMotor(new VictorSP(Ports.IN_MOTOR), clockwise);
+        intakeWheels = new TorqueMotor(new VictorSP(Ports.IN_MOTOR), !clockwise);
 
-        hatchLeft = new DoubleSolenoid(2, Ports.IN_HATCH_LEFT_SOLE_A, Ports.IN_HATCH_LEFT_SOLE_B);
-        hatchRight = new DoubleSolenoid(2, Ports.IN_HATCH_RIGHT_SOLE_A, Ports.IN_HATCH_RIGHT_SOLE_B);
+        hatchTusk = new DoubleSolenoid(0, Ports.IN_HATCH_SOLE_A, Ports.IN_HATCH_SOLE_B);
     }
 
     @Override
     public void autoInit() {
-        wheelsOn = false;
-        hatchEngaged = false;
+        wheelSpeed = 0;
     }
 
     @Override
     public void teleopInit() {
-        wheelsOn = false;
+        wheelSpeed = 0;
     }
 
     @Override
     public void disabledInit() {
-        wheelsOn = false;
+        wheelSpeed = 0;
     }
 
     @Override
@@ -51,18 +48,25 @@ public class FourBarIntake extends Subsystem {
         }
 
         else if (state == RobotState.TELEOP) {
-            wheelsOn = input.getINWheelsOn();
-            hatchEngaged = input.getINHatchEngaged();
+            if (input.getINActive()) {
+                if (input.getHatchState()) {
+                    wheelSpeed = 0.5;
+                } else {
+                    wheelSpeed = -0.5;
+                }
+            } else {
+                wheelSpeed = 0;
+            }
+
+            tuskEngaged = input.getINTuskEngaged();
         }
 
         else if (state == RobotState.VISION) {
-            wheelsOn = false;
-            hatchEngaged = input.getINHatchEngaged();
+            wheelSpeed = 0;
         }
 
         else if (state == RobotState.LINE) {
-            wheelsOn = false;
-            hatchEngaged = input.getINHatchEngaged();
+            wheelSpeed = 0;
         }
         
         output();
@@ -70,18 +74,12 @@ public class FourBarIntake extends Subsystem {
 
     @Override
     public void output() {
-        if (wheelsOn) {
-            intakeWheels.set(0.5);
-        } else {
-            intakeWheels.set(0);
-        }
+        intakeWheels.set(wheelSpeed);
 
-        if (hatchEngaged) {
-            hatchLeft.set(Value.kForward);
-            hatchRight.set(Value.kForward);
+        if (tuskEngaged) {
+            hatchTusk.set(Value.kReverse);
         } else {
-            hatchLeft.set(Value.kReverse);
-            hatchRight.set(Value.kReverse);
+            hatchTusk.set(Value.kForward);
         }
     }
 

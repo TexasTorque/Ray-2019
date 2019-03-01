@@ -25,10 +25,8 @@ public class Ports {
 
     // Intake
     public static final int IN_MOTOR = 13;
-    public static final int IN_HATCH_LEFT_SOLE_A = 2;
-    public static final int IN_HATCH_LEFT_SOLE_B = 3;
-    public static final int IN_HATCH_RIGHT_SOLE_A = 4;
-    public static final int IN_HATCH_RIGHT_SOLE_B = 5;
+    public static final int IN_HATCH_SOLE_A = 2;
+    public static final int IN_HATCH_SOLE_B = 3;
 
     //Climber
     public static final int CM_LEFT_TOM_MOTOR = 6;
@@ -45,9 +43,15 @@ public class Ports {
     public static final int LF_ENCODER_B = 1;
     public static final int RT_ENCODER_A = 6;
     public static final int RT_ENCODER_B = 7;
+
     public static final int CM_SWITCH = 8;
 
     // public static final int LN_LEFT = 9;
     // public static final int LN_MID = 8;
     // public static final int LN_RIGHT = 7;
+
+    public static final int RT_ULTRASONIC = 0;
+    public static final int LF_ULTRASONIC = 0;
+
+    public static final int IN_SWITCH = 0;
 }

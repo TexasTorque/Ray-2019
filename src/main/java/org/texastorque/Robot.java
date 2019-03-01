@@ -44,7 +44,7 @@ public class Robot extends TorqueIterative {
 	public void autoInit() {
 		state.setRobotState(RobotState.AUTO);
 		autoManager.chooseSequence();
-		feedback.resetEncoders();
+		feedback.resetDriveEncoders();
 
 		for (Subsystem system : subsystems) {
 			system.autoInit();
@@ -54,8 +54,8 @@ public class Robot extends TorqueIterative {
 	@Override
 	public void teleopInit() {
 		state.setRobotState(RobotState.TELEOP);
-		feedback.resetEncoders();
-		feedback.resetNavX();
+		feedback.resetDriveEncoders();
+
 		for (Subsystem system : subsystems) {
 			system.teleopInit();
 		}

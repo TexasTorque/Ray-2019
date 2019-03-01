@@ -44,8 +44,7 @@ public class DrivePath extends Command {
 
     @Override
     protected void init() {
-        feedback.resetEncoders();
-        // feedback.resetNavX();
+        feedback.resetDriveEncoders();
     }
 
 	@Override

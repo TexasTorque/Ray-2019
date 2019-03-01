@@ -27,8 +27,8 @@ public class Climber extends Subsystem {
         rearA = new TorqueMotor(new VictorSP(Ports.CM_REAR_A_MOTOR), clockwise);
         rearB = new TorqueMotor(new VictorSP(Ports.CM_REAR_B_MOTOR), clockwise);
 
-        rearPID = new ScheduledPID.Builder(0, -0.3, 1.0, 1) //-0.3, 0.3
-            .setPGains(0.2) //0.5
+        rearPID = new ScheduledPID.Builder(0, -0.2, 1.0, 1)
+            .setPGains(0.2)
             // .setIGains(0)
             // .setDGains(0)
             .build();

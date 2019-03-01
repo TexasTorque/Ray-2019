@@ -31,7 +31,6 @@ public class Lift extends Subsystem {
                 .setIGains(0.2)
                 //.setDGains(0.01)
                 .build();
-
         speed = 0;
         setpoint = input.getLFSetpoint(0);
     }

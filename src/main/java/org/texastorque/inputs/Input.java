@@ -2,6 +2,14 @@ package org.texastorque.inputs;
 
 import org.texastorque.inputs.State.RobotState;
 import org.texastorque.torquelib.util.GenericController;
+import org.texastorque.torquelib.component.TorqueEncoder;
+import org.texastorque.inputs.Feedback.*;
+
+/**
+ * All forms of input, including driver/operator controllers and input from the code itself.
+ * 
+ * Setters should only be used by Commands. Subsystems should only use getters.
+ */
 
 /**
  * All forms of input, including driver/operator controllers and input from the code itself.
@@ -118,43 +126,72 @@ public class Input {
     }
 
     // ========== Rotary ==========
-    private final double[] RT_setpoints = {0, 10};
+    private final double[] RT_setpoints = {0, 60, 85};
     private volatile int RT_setpoint;
-
+    private volatile double RT_offset = 0;
+    
     public void updateRotary() {
-        if (operator.getLeftBumper()) {
+        if (operator.getDPADDown()) {
+            RT_setpoint = 2;
+        }
+        else if (operator.getDPADRight()) {
             RT_setpoint = 1;
         }
-        else if (operator.getLeftTrigger()) {
+        else if (operator.getDPADUp()) {
             RT_setpoint = 0;
+        }
+        else if (operator.getLeftYAxis() > 0.1) {
+            RT_offset += 0.2;
+        }
+        else if (operator.getLeftYAxis() < -0.1) {
+            RT_offset -= 0.2;
         }
     }
 
     public double getRTSetpoint() {
-        return RT_setpoints[RT_setpoint];
+        return RT_setpoints[RT_setpoint] + RT_offset;
     }
 
     public double getRTSetpoint(int i) {
-        return RT_setpoints[i];
+        return RT_setpoints[i] + RT_offset;
     }
 
     // ========== Intake ==========
-    private volatile boolean IN_wheelsOn;
-    private volatile boolean IN_wristExtended;
-    private volatile boolean IN_hatchEngaged;
+    private volatile boolean IN_active;
+    private volatile boolean IN_hatchState;
+    private volatile boolean IN_tuskEngaged = true;
+    
+    // right bumper = cargo intake/hatch outtake
+    public void updateIntake() {
+        IN_active = false;
 
-    public void updateIntake() {}
-
-    public boolean getINWheelsOn() {
-        return IN_wheelsOn;
+        if (driver.getLeftTrigger()) { 
+            IN_active = true;
+            IN_hatchState = true;
+        } // hatch intake, cargo outtake
+        else if (driver.getRightTrigger()) {
+            IN_active = true;
+            IN_hatchState = false;
+        } //hatch outtake, cargo intake
+        
+        if (driver.getAButtonPressed()) {
+            IN_tuskEngaged = false;
+        } 
+        else if (driver.getAButtonReleased()) {
+            IN_tuskEngaged = true;
+        }
     }
 
-    public boolean getINWristExtended() {
-        return IN_wristExtended;
+    public boolean getINActive() {
+        return IN_active;
     }
 
-    public boolean getINHatchEngaged() {
-        return IN_hatchEngaged;
+    public boolean getHatchState() {
+        return IN_hatchState;
+    }
+
+    public boolean getINTuskEngaged() {
+        return IN_tuskEngaged;
     }
 
 
@@ -185,6 +222,7 @@ public class Input {
     public boolean getCMRetract() {
         return CM_retract;
     }
+
     
     public static Input getInstance() {
         if (instance == null) {

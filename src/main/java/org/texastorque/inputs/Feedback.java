@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.networktables.*;
 import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.wpilibj.AnalogInput;
 
 /**
  * Retrieve values from all sensors and NetworkTables
@@ -45,9 +46,9 @@ public class Feedback {
 
     private Feedback() {
         DB_leftEncoder = new TorqueEncoder(Ports.DB_LEFT_ENCODER_A, Ports.DB_LEFT_ENCODER_B, clockwise, EncodingType.k4X);
-        DB_rightEncoder = new TorqueEncoder(Ports.DB_RIGHT_ENCODER_A, Ports.DB_RIGHT_ENCODER_B, clockwise, EncodingType.k4X);
+        DB_rightEncoder = new TorqueEncoder(Ports.DB_RIGHT_ENCODER_A, Ports.DB_RIGHT_ENCODER_B, !clockwise, EncodingType.k4X);
         LF_encoder = new TorqueEncoder(Ports.LF_ENCODER_A, Ports.LF_ENCODER_B, clockwise, EncodingType.k4X);
-        RT_encoder = new TorqueEncoder(Ports.RT_ENCODER_A, Ports.RT_ENCODER_B, clockwise, EncodingType.k4X);
+        RT_encoder = new TorqueEncoder(Ports.RT_ENCODER_A, Ports.RT_ENCODER_B, !clockwise, EncodingType.k4X);
 
         CM_switch = new DigitalInput(Ports.CM_SWITCH);
 
@@ -65,7 +66,8 @@ public class Feedback {
         updateEncoders();
         updateNavX();
         updateSwitch();
-        updateLineSensors();
+        // updateLineSensors();
+        updateUltrasonic();
         updateNetworkTables();
     }
 
@@ -82,11 +84,9 @@ public class Feedback {
     private double LF_position;
     private double RT_angle;
 
-    public void resetEncoders() {
+    public void resetDriveEncoders() {
 		DB_leftEncoder.reset();
         DB_rightEncoder.reset();
-        LF_encoder.reset();
-        RT_encoder.reset();
     }
 
     public void updateEncoders() {
@@ -177,31 +177,52 @@ public class Feedback {
 
     // ========== Line sensors ==========
 
-    private boolean LN_left;
-    private boolean LN_mid;
-    private boolean LN_right;
+    // private boolean LN_left;
+    // private boolean LN_mid;
+    // private boolean LN_right;
 
-    public void updateLineSensors() {
-        // LN_left = LN_leftSensor.get();
-        // LN_mid = LN_midSensor.get();
-        // LN_right = LN_rightSensor.get();
+    // public void updateLineSensors() {
+    //     LN_left = LN_leftSensor.get();
+    //     LN_mid = LN_midSensor.get();
+    //     LN_right = LN_rightSensor.get();
+    // }
+
+    // public boolean lineLeftTrue() {
+    //     return LN_left;
+    // }
+
+    // public boolean lineMidTrue() {
+    //     return LN_mid;
+    // }
+
+    // public boolean lineRightTrue() {
+    //     return LN_right;
+    // }
+
+   
+    // ========= Ultrasonic sensors ========
+
+    private double LF_robotDistance;
+    private double RT_robotDistance;
+
+    public void updateUltrasonic(){
+        //LF_robotDistance = LF_ultrasonic.getValue() * ULTRASONIC_CONVERSION;
+        //RT_robotDistance = RT_ultrasonic.getValue() * ULTRASONIC_CONVERSION;
     }
 
-    public boolean lineLeftTrue() {
-        return LN_left;
+    public double getRobotLeftDistance(){
+        return LF_robotDistance;
     }
 
-    public boolean lineMidTrue() {
-        return LN_mid;
-    }
-
-    public boolean lineRightTrue() {
-        return LN_right;
+    public double getRobotRightDistance(){
+        return RT_robotDistance;
     }
 
 
     // ===== RPi feedback from NetworkTables =====
+
     private double DB_targetOffset;
+    private double[] pastTargetErrors = new double[50];
 
     public void updateNetworkTables() {
         DB_targetOffset = NT_target.getEntry("target_offset").getDouble(0);
@@ -224,10 +245,6 @@ public class Feedback {
         SmartDashboard.putNumber("NX_yaw", NX_yaw);
 
         SmartDashboard.putBoolean("CM_atBottom", CM_atBottom);
-
-        // SmartDashboard.putBoolean("L", LN_left);
-        // SmartDashboard.putBoolean("M", LN_mid);
-        // SmartDashboard.putBoolean("R", LN_right);
     }
 
     public static Feedback getInstance() {
@@ -239,5 +256,4 @@ public class Feedback {
         }
         return instance;
     }
-
 }

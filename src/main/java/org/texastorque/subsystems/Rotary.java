@@ -1,5 +1,4 @@
 package org.texastorque.subsystems;
-
 import org.texastorque.inputs.State.RobotState;
 import org.texastorque.constants.Ports;
 import org.texastorque.torquelib.component.TorqueMotor;
@@ -21,12 +20,12 @@ public class Rotary extends Subsystem {
     private boolean clockwise = true;
 
     private Rotary() {
-        rotary = new TorqueMotor(new VictorSP(Ports.RT_MOTOR), clockwise);
+        rotary = new TorqueMotor(new VictorSP(Ports.RT_MOTOR), !clockwise);
 
         this.rotaryPID = new ScheduledPID.Builder(0, 0.5)
-                .setPGains(0.01)
-                .setIGains(0.01)
-                .setDGains(0.01)
+                .setPGains(0.025)
+                .setIGains(0.0)
+                .setDGains(0.0)
                 .build();
 
         speed = 0;
@@ -80,19 +79,18 @@ public class Rotary extends Subsystem {
     }
 
     private void runRotaryBottom() {
-        setpoint = input.getRTSetpoint(0);
+        setpoint = input.getRTSetpoint(1);
         currentPos = feedback.getRTPosition();
         if (setpoint != prevSetpoint) {
             rotaryPID.changeSetpoint(setpoint);
             prevSetpoint = setpoint;
         }
-
         speed = rotaryPID.calculate(currentPos);
     }
 
     @Override
     public void output() {
-
+        rotary.set(speed);
     }
 
     @Override
