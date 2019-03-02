@@ -47,7 +47,7 @@ public class Feedback {
     private Feedback() {
         DB_leftEncoder = new TorqueEncoder(Ports.DB_LEFT_ENCODER_A, Ports.DB_LEFT_ENCODER_B, clockwise, EncodingType.k4X);
         DB_rightEncoder = new TorqueEncoder(Ports.DB_RIGHT_ENCODER_A, Ports.DB_RIGHT_ENCODER_B, !clockwise, EncodingType.k4X);
-        LF_encoder = new TorqueEncoder(Ports.LF_ENCODER_A, Ports.LF_ENCODER_B, clockwise, EncodingType.k4X);
+        LF_encoder = new TorqueEncoder(Ports.LF_ENCODER_A, Ports.LF_ENCODER_B, !clockwise, EncodingType.k4X);
         RT_encoder = new TorqueEncoder(Ports.RT_ENCODER_A, Ports.RT_ENCODER_B, !clockwise, EncodingType.k4X);
 
         CM_switch = new DigitalInput(Ports.CM_SWITCH);
@@ -143,6 +143,7 @@ public class Feedback {
 
     private double NX_pitch;
     private double NX_yaw;
+    private double NX_roll;
 
     public void resetNavX() {
         NX_gyro.reset();
@@ -150,7 +151,8 @@ public class Feedback {
 
     public void updateNavX() {
         NX_pitch = NX_gyro.getPitch();
-        NX_yaw = NX_gyro.getAngle();
+        NX_yaw = NX_gyro.getYaw();
+        NX_roll = NX_gyro.getRoll();
     }
 
     public double getPitch() {
@@ -159,6 +161,10 @@ public class Feedback {
 
     public double getYaw() {
         return NX_yaw;
+    }
+
+    public double getRoll() {
+        return NX_roll;
     }
 
 
@@ -243,6 +249,7 @@ public class Feedback {
 
         SmartDashboard.putNumber("NX_pitch", NX_pitch);
         SmartDashboard.putNumber("NX_yaw", NX_yaw);
+        SmartDashboard.putNumber("NX_roll", NX_roll);
 
         SmartDashboard.putBoolean("CM_atBottom", CM_atBottom);
     }

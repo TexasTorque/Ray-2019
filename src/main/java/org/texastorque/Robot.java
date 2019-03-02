@@ -29,6 +29,7 @@ public class Robot extends TorqueIterative {
 		//CameraServer.getInstance().startAutomaticCapture(0);
 		autoManager.displayChoices();
 		feedback.resetNavX();
+		feedback.resetDriveEncoders();
 	}
 
 	private void initSubsystems() {
@@ -54,7 +55,6 @@ public class Robot extends TorqueIterative {
 	@Override
 	public void teleopInit() {
 		state.setRobotState(RobotState.TELEOP);
-		feedback.resetDriveEncoders();
 
 		for (Subsystem system : subsystems) {
 			system.teleopInit();
@@ -92,6 +92,13 @@ public class Robot extends TorqueIterative {
 	}
 
 	@Override
+	public void disabledContinuous() {
+		for (Subsystem system : subsystems) {
+			system.disabledContinuous();
+		}
+	}
+
+	@Override
 	public void alwaysContinuous() {
 		feedback.update();
 		feedback.smartDashboard();
@@ -99,9 +106,5 @@ public class Robot extends TorqueIterative {
 		for (Subsystem system : subsystems) {
 			system.smartDashboard();
 		}
-	}
-
-	@Override
-	public void disabledContinuous() {
 	}
 }

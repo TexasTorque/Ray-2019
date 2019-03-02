@@ -75,14 +75,8 @@ public class DriveBase extends Subsystem {
         }
 
         else if (state == RobotState.TELEOP) {
-            if (input.getCMEnabled()) {
-                leftSpeed = 0.5;
-                rightSpeed = 0.5;
-            }
-            else {
-                leftSpeed = input.getDBLeftSpeed();
-                rightSpeed = input.getDBRightSpeed();
-            }
+            leftSpeed = input.getDBLeftSpeed();
+            rightSpeed = input.getDBRightSpeed();
         }
 
         else if (state == RobotState.VISION) {

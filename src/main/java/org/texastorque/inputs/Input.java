@@ -23,11 +23,13 @@ public class Input {
     private volatile State state;
 	private GenericController driver;
     private  GenericController operator;
+    private  GenericController tester;
     
     private Input() {
         state = State.getInstance();
 		driver = new GenericController(0, .1);
-		operator = new GenericController(1, .1);
+        operator = new GenericController(1, .1);
+        tester = new GenericController(2, .1);
     }
     
     public void updateControllers() {
@@ -91,7 +93,7 @@ public class Input {
 
 
     // ========== Lift ==========
-    private final double[] LF_setpoints = {0.0, 2.5, 5.0};
+    private final double[] LF_setpoints = {0.0, 3.9, 5.0}; //{0.0, 2.5, 5.0};
     private double LF_offset = 0;
     private volatile int LF_setpoint;
 
@@ -106,10 +108,10 @@ public class Input {
             LF_setpoint = 2;
         }
         else if (operator.getRightYAxis() > 0.1) {
-            LF_offset -= 0.005;
+            LF_offset -= 0.01;
         }
         else if (operator.getRightYAxis() < -0.1) {
-            LF_offset += 0.005;
+            LF_offset += 0.01;
         }
     }
 
@@ -126,7 +128,7 @@ public class Input {
     }
 
     // ========== Rotary ==========
-    private final double[] RT_setpoints = {0, 60, 85};
+    private final double[] RT_setpoints = {0, 71, 88};
     private volatile int RT_setpoint;
     private volatile double RT_offset = 0;
     
@@ -196,9 +198,12 @@ public class Input {
 
 
     //========== Climber ==========
-    private volatile boolean CM_enabled;
-    private volatile boolean CM_retract;
-    private boolean lastLeftCenter = false;
+    private volatile boolean CM_enabled = false;
+    private volatile boolean CM_retract = false;
+    private volatile boolean lastLeftCenter = false; //being held
+
+    public volatile double CM_tomSpeed;
+    public volatile double CM_rearSpeed;
     
     public void updateClimber() {
         CM_retract = false;
@@ -208,11 +213,14 @@ public class Input {
             lastLeftCenter = true;
         } else if (!driver.getLeftCenterButton()) {
             lastLeftCenter = false;
+            if (driver.getRightCenterButton()) {
+                CM_retract = true;
+            }
         }
 
-        else if (driver.getRightCenterButton()) {
-            CM_retract = true;
-        }
+        CM_rearSpeed = tester.getLeftYAxis();
+        CM_tomSpeed = tester.getRightYAxis();
+        
     }
 
     public boolean getCMEnabled() {
