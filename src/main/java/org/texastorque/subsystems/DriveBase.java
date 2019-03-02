@@ -33,6 +33,10 @@ public class DriveBase extends Subsystem {
     private double angleDegree = 45;
     private String lineDirection;
 
+    private boolean rotaryPos = false;
+    private double ultrasonicDist_L = 0.0;
+    private double ultrasonicDist_R = 0.0;
+
     private DriveBase() {
         leftFore = new TorqueMotor(new VictorSP(Ports.DB_LEFT_FORE_MOTOR), !clockwise);
         leftMid = new TorqueMotor(new VictorSP(Ports.DB_LEFT_MID_MOTOR), !clockwise);
@@ -81,6 +85,7 @@ public class DriveBase extends Subsystem {
         else if (state == RobotState.TELEOP) {
             leftSpeed = input.getDBLeftSpeed();
             rightSpeed = input.getDBRightSpeed();
+            rotaryPos = input.getElevated();
         }
 
         else if (state == RobotState.VISION) {
@@ -103,23 +108,35 @@ public class DriveBase extends Subsystem {
         
         setGears(state);
         output();
-    }
+    } // run
 
     @Override
     protected void output() {
-        if (highGear)
-            gearShift.set(Value.kForward);
-        else
-            gearShift.set(Value.kReverse);
-        
+        // if (highGear) {
+        //     gearShift.set(Value.kForward);
+        // } else {
+        //     gearShift.set(Value.kReverse);
+        // }
+    
+        // if (!rotaryPos){
+        //     if (ultrasonicDist_L < 45 && ultrasonicDist_R < 45) {
+        //         // if (leftSpeed > 0.1){ 
+        //         //     leftSpeed = 0.1;
+        //         // } 
+        //         // if (rightSpeed > 0.1){
+        //         //     rightSpeed = 0.1;
+        //         // } 
+        //     } // set cap speed on motors to 0.1 at 45-ish inches
+        // } // if intake is down 
+
         leftFore.set(leftSpeed);
         leftMid.set(leftSpeed);
         leftRear.set(leftSpeed);
-        
-		rightFore.set(rightSpeed);
-		rightMid.set(rightSpeed);
-        rightRear.set(rightSpeed);
-    }
+
+        rightFore.set(rightSpeed);
+        rightMid.set(rightSpeed);
+        rightRear.set(rightSpeed); 
+    } // output
 
     public boolean getHighGear() {
         return highGear;

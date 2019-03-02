@@ -38,8 +38,8 @@ public class Feedback {
 
     //private AHRS NX_gyro;
 
-    //private final AnalogInput RT_ultrasonic;
-    //private final AnalogInput LF_ultrasonic;
+    private final AnalogInput L_ultrasonic;
+    private final AnalogInput R_ultrasonic;
 
     // private final DigitalInput LN_leftSensor;
     // private final DigitalInput LN_midSensor;
@@ -58,8 +58,8 @@ public class Feedback {
 
         //NX_gyro = new AHRS(SPI.Port.kMXP);
 
-        //RT_ultrasonic = new AnalogInput(Ports.RT_ULTRASONIC);
-        //LF_ultrasonic = new AnalogInput(Ports.LF_ULTRASONIC);
+        R_ultrasonic = new AnalogInput(Ports.R_ULTRASONIC);
+        L_ultrasonic = new AnalogInput(Ports.L_ULTRASONIC);
 
         // LN_leftSensor = new DigitalInput(Ports.LN_LEFT);
         // LN_midSensor = new DigitalInput(Ports.LN_MID);
@@ -73,7 +73,7 @@ public class Feedback {
         updateEncoders();
         //updateNavX();
         updateLineSensors();
-        //updateUltrasonic();
+        updateUltrasonic();
         updateNetworkTables();
     }
 
@@ -92,8 +92,6 @@ public class Feedback {
     //private AHRS gyro;
     // private NetworkTable lnNetworkTable;
     // private double lastAngle = 0.0;
-
-
 
     public void resetEncoders() {
 		DB_leftEncoder.reset();
@@ -191,20 +189,20 @@ public class Feedback {
    
     // ========= Ultrasonic sensors ========
 
-    private double LF_robotDistance;
-    private double RT_robotDistance;
+    private double L_robotDistance;
+    private double R_robotDistance;
 
     public void updateUltrasonic(){
-        //LF_robotDistance = LF_ultrasonic.getValue() * ULTRASONIC_CONVERSION;
-        //RT_robotDistance = RT_ultrasonic.getValue() * ULTRASONIC_CONVERSION;
+        L_robotDistance = L_ultrasonic.getValue() * ULTRASONIC_CONVERSION;
+        R_robotDistance = R_ultrasonic.getValue() * ULTRASONIC_CONVERSION;
     }
 
     public double getRobotLeftDistance(){
-        return LF_robotDistance;
+        return L_robotDistance;
     }
 
     public double getRobotRightDistance(){
-        return RT_robotDistance;
+        return R_robotDistance;
     }
 
     // ===== RPi feedback from NetworkTables =====
@@ -229,6 +227,8 @@ public class Feedback {
         SmartDashboard.putNumber("RT_angle", RT_angle);
         // SmartDashboard.putNumber("NX_pitch", NX_pitch);
         // SmartDashboard.putNumber("NX_yaw", NX_yaw);
+        SmartDashboard.putNumber("Left_Distance", L_robotDistance);
+        SmartDashboard.putNumber("Right_Distance", R_robotDistance);
 
         SmartDashboard.putBoolean("L", LN_left);
         SmartDashboard.putBoolean("M", LN_mid);

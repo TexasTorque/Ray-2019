@@ -27,9 +27,9 @@ public class Rotary extends Subsystem {
         rotary = new TorqueMotor(new VictorSP(Ports.RT_MOTOR), !clockwise);
 
         this.rotaryPID = new ScheduledPID.Builder(0, 0.5)
-                .setPGains(0.01)
-                .setIGains(0.0)
-                .setDGains(0.0001)
+                .setPGains(0.026) // keep increasing by small increments (NEEDS MORE TUNING)
+                .setIGains(0.0) // get it until it vibrates then take 2/3 
+                .setDGains(0.0)
                 .build();
 
         speed = 0;
@@ -109,7 +109,7 @@ public class Rotary extends Subsystem {
 
     @Override
     public void output() {
-        rotary.set(speed);
+        rotary.set(speed + 0.07);
     }
 
     @Override

@@ -48,8 +48,8 @@ public class Ports {
     // public static final int LN_MID = 8;
     // public static final int LN_RIGHT = 7;
 
-    public static final int RT_ULTRASONIC = 0;
-    public static final int LF_ULTRASONIC = 0;
+    public static final int R_ULTRASONIC = 0;
+    public static final int L_ULTRASONIC = 1;
 
     public static final int IN_SWITCH = 0;
 }

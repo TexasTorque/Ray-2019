@@ -121,7 +121,7 @@ public class Input {
     }
 
     // ========== Rotary ==========
-    private final double[] RT_setpoints = {0, 89};//index 0=down 1=up
+    private final double[] RT_setpoints = {3, 85};//index 0=down 1=up
     private volatile boolean elevated;//true= up false = down // 5 85
     // private volatile boolean rotaryManualF;
     // private volatile boolean rotaryManualB;
@@ -182,42 +182,23 @@ public class Input {
     // }
 
     // ========== Intake ==========
-    private volatile double IN_wheelsSpeed;
-    private volatile boolean IN_hatchEngaged;
+    private volatile double IN_wheelsSpeed; // wheels
+    private volatile boolean IN_hatchEngaged; // tusks - true = extended = parallel / false = contracted = perpendicular
     
-    // right bumper = cargo intake/hatch outtake
+    // right trigger = cargo intake/hatch outtake
     public void updateIntake() {
         IN_wheelsSpeed = 0;
-        if(driver.getRightTrigger()){ 
-            IN_hatchEngaged = true;
+        if(driver.getLeftTrigger()){ // hatch intake / cargo outtake
             elevated = false;
             IN_wheelsSpeed = .5;         
-        } // hatch intake / cargo outtake
-        /*else if(operator.getRightBumper()){
-            IN_hatchEngaged = false;
-            elevated = true;
-            IN_wheelsSpeed = 0;
-        }
-        else if(operator.getLeftTrigger()){
-            IN_hatchEngaged = true;
+        } else if (driver.getRightTrigger()){ // hatch outtake / cargo intake
             elevated = false;
             IN_wheelsSpeed = -.5;
         }
-        else if (operator.getLeftBumper()){
+        if (driver.getAButtonPressed()){
             IN_hatchEngaged = true;
-            elevated = false;
-            IN_wheelsSpeed = .5;
-        } */
-        else if (driver.getYButtonPressed()){
-            IN_hatchEngaged = false;
-            elevated = true;
-            IN_wheelsSpeed = 0.0;
-        } // move tusks (spiderman fingers) in and out
-        else{
-            IN_hatchEngaged = true;
-            elevated = true;
-            IN_wheelsSpeed = 0;
         }
+        if (operator.getYButtonPressed()) {}
     }
 
     public double getINWheelsSpeed(){
