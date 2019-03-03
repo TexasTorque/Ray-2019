@@ -14,18 +14,18 @@ Ray's software also receives feedback from many sources:
 * Gyroscope provides 3-axis angle measurements that are crucial for many operations
 * NetworkTables enable communication between the RoboRIO and a Raspberry Pi
 
-Many of the more advanced software features (to be described later) in Ray are made possible by thse sources of feedback.
+Many of the more advanced software features (to be described later) in Ray are made possible by these sources of feedback.
 
 ### TorqueAuto
 This season, we redesigned our autonomous library so that we can easily program complex robot maneuvers during the sandstorm period. 
 
-The smallest unit of TorqueAuto is the COMMAND. Each command is designed to control the action of one subsystem and is terminated by an end condition. Multiple COMMANDS may be placed in a BLOCK, and several BLOCKS may be chained to form a SEQUENCE. At run time, all the COMMANDS in one BLOCK are executed simultaneously, and once all COMMANDS within a block are terminated, the next block begins. COMMANDS may also be delayed within each BLOCK for increased flexibility.
+The smallest unit of TorqueAuto is the Command. Each Command is designed to control the action of one subsystem and is terminated by an end condition. Multiple Commands may be placed in a block, and several blocks may be chained to form a Sequence. At run time, all the Commands in one block are executed simultaneously, and once all Commands within a block are terminated, the next block begins. Commnads may also be delayed within each block for increased flexibility.
 
 **(Insert diagram here)**
 
-The MANAGER is responsible for selecting the SEQUENCE to be used before each match and running it. All SEQUENCES are synchronized with the base loop, which simplifies the process of programming motion profiles.
+The AutoManager is responsible for selecting the Sequence to be used before each match and running it. All Sequences are synchronized with the base loop, which simplifies the process of programming motion profiles.
 
-Last but not least, we have implemented the Pathfinder library as a COMMAND in TorqueAuto. The ability to generate spline paths onboard and follow them gives Ray the advantages of speed and precision during sandstorm.
+Last but not least, we have implemented the Pathfinder library as a Command in TorqueAuto. The ability to generate spline paths onboard and follow them gives Ray the advantages of speed and precision during sandstorm.
 
 ### Vision
 This year, we invested a lot of time in learning and implementing vision processing. The goal is to enable Ray to make automatic horizontal adjustments when placing hatch panels.
@@ -42,9 +42,9 @@ The logic of our vision program is as follows:
 We use our own PID library for most control loops. Our library supports the declaration of variable kp, ki, and kd coefficients based on error regions, which allows for greater precision.
 
 We have put our PID library to many uses:
-* The climber subsystem, which is capable of putting Ray on habitat level 3, uses pitch angle of the gyroscope as the process variable for a P controller. This helps the robot stay level as it is rising.
-* The lift subsystem uses a PI controller with two sets of coefficients to help counteract gravity. During a match, the operator presses buttons to quickly move the lift to setpoints, and the setpoints can be manually adjusted using joysticks
-* The rotary of the intake subsystem is implemented in a similar way to the lift
+* The Climber subsystem, which is capable of putting Ray on habitat level 3, uses pitch angle of the gyroscope as the process variable for a P controller. This helps the robot stay level as it is rising.
+* The Lift subsystem uses a PI controller with two sets of coefficients to help counteract gravity. During a match, the operator presses buttons to quickly move the Lift to setpoints, and the setpoints can be manually adjusted using joysticks
+* The Rotary of the Intake subsystem is implemented in a similar way to the Lift
 
 ### TorqueLib
 TorqueLib, written by Gijs Landwehr, has provided core functionality and utilities for Texas Torque software since 2015. 
