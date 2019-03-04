@@ -19,7 +19,7 @@ Many of the more advanced software features (to be described later) in Ray are m
 ### TorqueAuto
 This season, we redesigned our autonomous library so that we can easily program complex robot maneuvers during the sandstorm period. 
 
-The smallest unit of TorqueAuto is the Command. Each Command is designed to control the action of one subsystem and is terminated by an end condition. Multiple Commands may be placed in a block, and several blocks may be chained to form a Sequence. At run time, all the Commands in one block are executed simultaneously, and once all Commands within a block are terminated, the next block begins. Commnads may also be delayed within each block for increased flexibility.
+The smallest unit of TorqueAuto is the Command. Each Command is designed to control the action of one subsystem and is terminated by an end condition. Multiple Commands may be placed in a block, and several blocks may be chained to form a Sequence. At run time, all the Commands in one block are executed simultaneously, and once all Commands within a block are terminated, the next block begins. Commands may also be delayed within each block for increased flexibility.
 
 **(Insert diagram here)**
 
@@ -28,7 +28,7 @@ The AutoManager is responsible for selecting the Sequence to be used before each
 Last but not least, we have implemented the Pathfinder library as a Command in TorqueAuto. The ability to generate spline paths onboard and follow them gives Ray the advantages of speed and precision during sandstorm.
 
 ### Vision
-This year, we invested a lot of time in learning and implementing vision processing. The goal is to enable Ray to make automatic horizontal adjustments when placing hatch panels.
+We invested a lot of time this season to learn and implement vision processing. The goal is to enable Ray to make automatic horizontal adjustments when placing hatch panels.
 
 Our setup consists of a ring light and a webcam connected to a Raspberry Pi 3. The Pi is configured to run our own OpenCV-Python vision program, which not only sends a JPEG stream of the camera view, but also puts output values on NetworkTables to be read by the RoboRIO as feedback.
 

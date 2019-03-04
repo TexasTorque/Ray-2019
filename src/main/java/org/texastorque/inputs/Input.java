@@ -93,7 +93,7 @@ public class Input {
 
 
     // ========== Lift ==========
-    private final double[] LF_setpoints = {0.0, 3.9, 5.0}; //{0.0, 2.5, 5.0};
+    private final double[] LF_setpoints = {0.0, 3.8, 5.0}; //{0.0, 2.5, 5.0};
     private double LF_offset = 0;
     private volatile int LF_setpoint;
 
