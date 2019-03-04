@@ -20,12 +20,13 @@ public class DriveBase extends Subsystem {
     private TorqueMotor rightMid;
     private TorqueMotor rightRear;
     private DoubleSolenoid gearShift;
-    
+    private boolean shiftOkay = false;
     private final ScheduledPID visionPID;
     private double leftSpeed = 0.0;
     private double rightSpeed = 0.0;
     private boolean highGear = false;
-    
+    private final double shiftUpSpeed = 11;
+    private final double shiftDownSpeed = 9;
     private boolean clockwise = true;
 
     private ScheduledPID linePID;
@@ -105,10 +106,11 @@ public class DriveBase extends Subsystem {
 
     @Override
     protected void output() {
-        if (highGear)
+        if (highGear) {
             gearShift.set(Value.kForward);
-        else
+        } else {
             gearShift.set(Value.kReverse);
+        }
         
         leftFore.set(leftSpeed);
         leftMid.set(leftSpeed);
@@ -123,12 +125,20 @@ public class DriveBase extends Subsystem {
         return highGear;
     }
 
-    /**
-     * auto transmission
-     */
+
+    //auto transmission
     private void setGears(RobotState state) {
-        if (state == RobotState.TELEOP)
-            highGear = input.getDBHighGear();
+        shiftOkay = (feedback.getLFPosition() < 0.5);
+        if (state == RobotState.TELEOP) {
+            if (shiftOkay) {
+                if (((feedback.getDBLeftSpeed()+feedback.getDBRightSpeed())/2) > shiftUpSpeed)
+                    highGear = true;
+                else if (((feedback.getDBLeftSpeed()+feedback.getDBRightSpeed())/2) < shiftDownSpeed)
+                    highGear = false;
+            }
+            else
+                highGear = false;
+        }
         else
             highGear = false;
     }
@@ -154,6 +164,4 @@ public class DriveBase extends Subsystem {
         }
         return instance;
     }
-
-
 }
