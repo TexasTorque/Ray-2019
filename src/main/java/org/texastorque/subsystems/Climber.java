@@ -22,15 +22,15 @@ public class Climber extends Subsystem {
     private boolean clockwise = true;
 
     private Climber() {
-        leftTom = new TorqueMotor(new VictorSP(Ports.CM_LEFT_TOM_MOTOR), clockwise);
+        leftTom = new TorqueMotor(new VictorSP(Ports.CM_LEFT_TOM_MOTOR), !clockwise);
         rightTom = new TorqueMotor(new VictorSP(Ports.CM_RIGHT_TOM_MOTOR), clockwise);
         rearA = new TorqueMotor(new VictorSP(Ports.CM_REAR_A_MOTOR), clockwise);
         rearB = new TorqueMotor(new VictorSP(Ports.CM_REAR_B_MOTOR), clockwise);
 
-        rearPID = new ScheduledPID.Builder(0, -.2, 0.2, 1)
-            .setPGains(0.1)
-            .setIGains(0)
-            .setDGains(0)
+        rearPID = new ScheduledPID.Builder(0, -0.1, 1.0, 1)
+            .setPGains(0.25)
+            // .setIGains(0)
+            // .setDGains(0)
             .build();
     }
 
@@ -55,27 +55,43 @@ public class Climber extends Subsystem {
     @Override
     public void run(RobotState state) {
         if (state == RobotState.AUTO) {
+            tomSpeed = 0;
+            rearSpeed = 0;
         }
 
         else if (state == RobotState.TELEOP) {
             if (input.getCMEnabled()) {
-                tomSpeed = 0.1;
-                // rearSpeed = 0.1;
-                double currentPitch = feedback.getPitch();
-                rearSpeed = rearPID.calculate(currentPitch)+.3;
+                tomSpeed = 0.5;
+
+                if (feedback.getCMAtBottom()) {
+                    rearSpeed = 0;
+                } else {
+                    double currentPitch = feedback.getPitch();
+                    rearSpeed = rearPID.calculate(-currentPitch);
+                }
             }
-            else if(input.getCMRetract()){
-                rearSpeed = -.4;
+            else if (input.getCMRetract()) {
+                tomSpeed = -0.2;
+                rearSpeed = -0.4;
             }
             else {
                 tomSpeed = 0;
                 rearSpeed = 0;
             }
+
+            // tomSpeed = input.CM_tomSpeed;
+            // rearSpeed = input.CM_rearSpeed;
         }
 
-        else if (state == RobotState.VISION) {}
+        else if (state == RobotState.VISION) {
+            tomSpeed = 0;
+            rearSpeed = 0;
+        }
 
-        else if (state == RobotState.LINE) {}
+        else if (state == RobotState.LINE) {
+            tomSpeed = 0;
+            rearSpeed = 0;
+        }
         
         output();
     }

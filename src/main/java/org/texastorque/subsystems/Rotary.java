@@ -24,14 +24,20 @@ public class Rotary extends Subsystem {
     private Rotary() {
         rotary = new TorqueMotor(new VictorSP(Ports.RT_MOTOR), clockwise);
 
-        this.rotaryPID = new ScheduledPID.Builder(0, 0.5)
-                .setPGains(0.01)
-                .setIGains(0.01)
-                .setDGains(0.01)
-                .build();
-
         speed = 0;
         setpoint = input.getRTSetpoint(0);
+
+        this.rotaryPID = new ScheduledPID.Builder(setpoint, -0.8, 0.1, 2)
+                .setRegions(0)
+                .setPGains(0.025, 0)
+                .setIGains(0.01, 0)
+                // .setDGains(0.0)
+
+                // ku = 0.5;
+                // pu = 0.54;
+                // .setPGains(0.225) // 0.45 * ku
+                // .setIGains(0.5) // 1.2 * kp / pu/ 8
+                .build();
     }
 
     @Override
@@ -51,6 +57,12 @@ public class Rotary extends Subsystem {
     }
 
     @Override
+    public void disabledContinuous() {
+        runRotaryPID(0);
+        output();
+    }
+
+    @Override
     public void run(RobotState state) {
         if (state == RobotState.AUTO) {
         }
@@ -60,7 +72,7 @@ public class Rotary extends Subsystem {
         }
 
         else if (state == RobotState.VISION) {
-            runRotaryBottom();
+            runRotaryPID(1);
         }
 
         else if (state == RobotState.LINE) {
@@ -89,8 +101,8 @@ public class Rotary extends Subsystem {
  
     }
 
-    private void runRotaryBottom() {
-        setpoint = input.getRTSetpoint(0);
+    private void runRotaryPID(int position) {
+        setpoint = input.getRTSetpoint(position);
         currentPos = feedback.getRTPosition();
         if (setpoint != prevSetpoint) {
             rotaryPID.changeSetpoint(setpoint);
@@ -103,9 +115,6 @@ public class Rotary extends Subsystem {
     public void output() {
         rotary.set(speed);
     }
-
-    @Override
-    public void disabledContinuous() {}
 
     @Override
     public void autoContinuous() {}
