@@ -3,12 +3,12 @@ package org.texastorque.inputs;
 import org.texastorque.constants.*;
 import org.texastorque.torquelib.component.TorqueEncoder;
 
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.networktables.*;
 import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.AnalogInput;
 
 /**
@@ -39,6 +39,9 @@ public class Feedback {
     // private final DigitalInput LN_midSensor;
     // private final DigitalInput LN_rightSensor;
 
+    // private final AnalogInput UL_left;
+    // private final AnalogInput UL_right;
+
     // NetworkTables
     private NetworkTableInstance NT_instance;
     private NetworkTable NT_target;
@@ -53,10 +56,6 @@ public class Feedback {
         CM_switch = new DigitalInput(Ports.CM_SWITCH);
 
         NX_gyro = new AHRS(SPI.Port.kMXP);
-
-        // LN_leftSensor = new DigitalInput(Ports.LN_LEFT);
-        // LN_midSensor = new DigitalInput(Ports.LN_MID);
-        // LN_rightSensor = new DigitalInput(Ports.LN_RIGHT);
         
         NT_instance = NetworkTableInstance.getDefault();
         NT_target = NT_instance.getTable("TargetDetection");
@@ -208,27 +207,26 @@ public class Feedback {
    
     // ========= Ultrasonic sensors ========
 
-    private double LF_robotDistance;
-    private double RT_robotDistance;
+    private double UL_leftDistance;
+    private double UL_rightDistance;
 
-    public void updateUltrasonic(){
-        //LF_robotDistance = LF_ultrasonic.getValue() * ULTRASONIC_CONVERSION;
-        //RT_robotDistance = RT_ultrasonic.getValue() * ULTRASONIC_CONVERSION;
+    public void updateUltrasonic() {
+        // UL_leftDistance = UL_left.getValue() * ULTRA_CONVERSION;
+        // UL_rightDistance = UL_right.getValue() * ULTRA_CONVERSION;
     }
 
-    public double getRobotLeftDistance(){
-        return LF_robotDistance;
+    public double getULLeft() {
+        return UL_leftDistance;
     }
 
-    public double getRobotRightDistance(){
-        return RT_robotDistance;
+    public double getULRight() {
+        return UL_rightDistance;
     }
 
 
     // ===== RPi feedback from NetworkTables =====
 
     private double DB_targetOffset;
-    private double[] pastTargetErrors = new double[50];
 
     public void updateNetworkTables() {
         DB_targetOffset = NT_target.getEntry("target_offset").getDouble(0);
