@@ -20,8 +20,9 @@ public class Feedback {
 
     // Conversions
     public final double DISTANCE_PER_PULSE = Math.PI * Constants.WHEEL_DIAMETER / Constants.PULSES_PER_ROTATION;
-    public final double ANGLE_PER_PULSE = 360 / Constants.PULSES_PER_ROTATION;
+    public final double ANGLE_PER_PULSE = 360.0 / Constants.PULSES_PER_ROTATION;
     public final double LF_FEET_CONVERSION = Math.PI * (1.0/20) / Constants.PULSES_PER_ROTATION; // Using approximate shaft diameter
+    public final double ULTRA_CONVERSION = 1.0 / 84;
 
     public static boolean clockwise = true;
 
@@ -35,12 +36,8 @@ public class Feedback {
 
     private final DigitalInput CM_switch;
 
-    // private final DigitalInput LN_leftSensor;
-    // private final DigitalInput LN_midSensor;
-    // private final DigitalInput LN_rightSensor;
-
-    // private final AnalogInput UL_left;
-    // private final AnalogInput UL_right;
+    private final AnalogInput UL_left;
+    private final AnalogInput UL_right;
 
     // NetworkTables
     private NetworkTableInstance NT_instance;
@@ -53,9 +50,12 @@ public class Feedback {
         LF_encoder = new TorqueEncoder(Ports.LF_ENCODER_A, Ports.LF_ENCODER_B, !clockwise, EncodingType.k4X);
         RT_encoder = new TorqueEncoder(Ports.RT_ENCODER_A, Ports.RT_ENCODER_B, !clockwise, EncodingType.k4X);
 
+        NX_gyro = new AHRS(SPI.Port.kMXP);
+
         CM_switch = new DigitalInput(Ports.CM_SWITCH);
 
-        NX_gyro = new AHRS(SPI.Port.kMXP);
+        UL_left = new AnalogInput(Ports.UL_LEFT);
+        UL_right = new AnalogInput(Ports.UL_RIGHT);
         
         NT_instance = NetworkTableInstance.getDefault();
         NT_target = NT_instance.getTable("TargetDetection");
@@ -65,8 +65,7 @@ public class Feedback {
         updateEncoders();
         updateNavX();
         updateSwitch();
-        // updateLineSensors();
-        updateUltrasonic();
+        updateUltrasonics();
         updateNetworkTables();
     }
 
@@ -179,40 +178,15 @@ public class Feedback {
         return CM_atBottom;
     }
 
-
-    // ========== Line sensors ==========
-
-    // private boolean LN_left;
-    // private boolean LN_mid;
-    // private boolean LN_right;
-
-    // public void updateLineSensors() {
-    //     LN_left = LN_leftSensor.get();
-    //     LN_mid = LN_midSensor.get();
-    //     LN_right = LN_rightSensor.get();
-    // }
-
-    // public boolean lineLeftTrue() {
-    //     return LN_left;
-    // }
-
-    // public boolean lineMidTrue() {
-    //     return LN_mid;
-    // }
-
-    // public boolean lineRightTrue() {
-    //     return LN_right;
-    // }
-
    
     // ========= Ultrasonic sensors ========
 
     private double UL_leftDistance;
     private double UL_rightDistance;
 
-    public void updateUltrasonic() {
-        // UL_leftDistance = UL_left.getValue() * ULTRA_CONVERSION;
-        // UL_rightDistance = UL_right.getValue() * ULTRA_CONVERSION;
+    public void updateUltrasonics() {
+        UL_leftDistance = UL_left.getValue() * ULTRA_CONVERSION;
+        UL_rightDistance = UL_right.getValue() * ULTRA_CONVERSION;
     }
 
     public double getULLeft() {

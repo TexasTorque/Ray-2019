@@ -40,8 +40,8 @@ public class DriveVision extends Command {
     @Override
     protected boolean endCondition() {
         return Math.abs(currentOffset) < 0.1 
-                && feedback.getULLeft() < 12 
-                && feedback.getULRight() < 12;
+                && feedback.getULLeft() < 1 
+                && feedback.getULRight() < 1;
     }
 
     @Override
