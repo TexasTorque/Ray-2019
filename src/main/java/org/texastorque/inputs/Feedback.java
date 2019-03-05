@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.networktables.*;
 import edu.wpi.first.wpilibj.AnalogInput;
-// import com.kauailabs.navx.frc.AHRS;
+import com.kauailabs.navx.frc.AHRS;
 
 /**
  * Retrieve values from all sensors and NetworkTables
@@ -26,7 +26,7 @@ public class Feedback {
     public static final double ANGLE_PER_PULSE = 360 / PULSES_PER_ROTATION;
     public static final double LF_FEET_CONVERSION = Math.PI * (1.0/20) / PULSES_PER_ROTATION; // Using approximate shaft diameter
 
-    public static final double ULTRASONIC_CONVERSION = 0.125;
+    public static final double ULTRASONIC_CONVERSION = 0.142857;
 
     public static boolean clockwise = true;
 
@@ -36,7 +36,7 @@ public class Feedback {
     private final TorqueEncoder LF_encoder;
     private final TorqueEncoder RT_encoder;
 
-    //private AHRS NX_gyro;
+    private AHRS NX_gyro;
 
     private final AnalogInput L_ultrasonic;
     private final AnalogInput R_ultrasonic;
@@ -56,7 +56,7 @@ public class Feedback {
         LF_encoder = new TorqueEncoder(Ports.LF_ENCODER_A, Ports.LF_ENCODER_B, clockwise, EncodingType.k4X);
         RT_encoder = new TorqueEncoder(Ports.RT_ENCODER_A, Ports.RT_ENCODER_B, clockwise, EncodingType.k4X);
 
-        //NX_gyro = new AHRS(SPI.Port.kMXP);
+        NX_gyro = new AHRS(SPI.Port.kMXP);
 
         R_ultrasonic = new AnalogInput(Ports.R_ULTRASONIC);
         L_ultrasonic = new AnalogInput(Ports.L_ULTRASONIC);
@@ -71,7 +71,7 @@ public class Feedback {
 
     public void update() {
         updateEncoders();
-        //updateNavX();
+        updateNavX();
         updateLineSensors();
         updateUltrasonic();
         updateNetworkTables();
@@ -89,13 +89,12 @@ public class Feedback {
     private double LF_position;
     private double RT_angle;
 
-    //private AHRS gyro;
-    // private NetworkTable lnNetworkTable;
-    // private double lastAngle = 0.0;
+    private AHRS gyro;
+    private NetworkTable lnNetworkTable;
+    private double lastAngle = 0.0;
 
     public void resetEncoders() {
-		DB_leftEncoder.reset();
-        DB_rightEncoder.reset();
+		resetDriveEncoders();
         LF_encoder.reset();
         RT_encoder.reset();
     }
@@ -139,28 +138,33 @@ public class Feedback {
         return RT_angle;
     }
 
+    public void resetDriveEncoders(){
+        DB_leftEncoder.reset();
+        DB_rightEncoder.reset();
+    }
+
 
     // ========== Gyro ==========
 
-    // private double NX_pitch;
-    // private double NX_yaw;
+    private double NX_pitch;
+    private double NX_yaw;
 
-    // public void updateNavX() {
-    //     NX_pitch = NX_gyro.getPitch();
-    //     NX_yaw = NX_gyro.getAngle();
-    // }
+    public void updateNavX() {
+        NX_pitch = NX_gyro.getPitch();
+        NX_yaw = NX_gyro.getAngle();
+    }
 
-    // public double getPitch() {
-    //     return NX_pitch;
-    // }
+    public double getPitch() {
+        return NX_pitch;
+    }
 
-    // public double getYaw() {
-    //     return NX_yaw;
-    // }
+    public double getYaw() {
+        return NX_yaw;
+    }
 
-    // public void gyroReset(){
-    //     NX_gyro.reset();
-    // }
+    public void gyroReset(){
+        NX_gyro.reset();
+    }
 
 
     // ========== Line sensors ==========
@@ -225,8 +229,8 @@ public class Feedback {
         SmartDashboard.putNumber("DB_rightSpeed", DB_rightSpeed);
         SmartDashboard.putNumber("LF_position", LF_position);
         SmartDashboard.putNumber("RT_angle", RT_angle);
-        // SmartDashboard.putNumber("NX_pitch", NX_pitch);
-        // SmartDashboard.putNumber("NX_yaw", NX_yaw);
+        SmartDashboard.putNumber("NX_pitch", NX_pitch);
+        SmartDashboard.putNumber("NX_yaw", NX_yaw);
         SmartDashboard.putNumber("Left_Distance", L_robotDistance);
         SmartDashboard.putNumber("Right_Distance", R_robotDistance);
 

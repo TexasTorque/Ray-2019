@@ -66,7 +66,7 @@ public class DriveBase extends Subsystem {
     public void teleopInit() {
         leftSpeed = 0.0;
         rightSpeed = 0.0;
-        // feedback.gyroReset();
+        feedback.gyroReset();
     }
 
     @Override
@@ -86,6 +86,8 @@ public class DriveBase extends Subsystem {
             leftSpeed = input.getDBLeftSpeed();
             rightSpeed = input.getDBRightSpeed();
             rotaryPos = input.getElevated();
+            ultrasonicDist_L = feedback.getRobotLeftDistance();
+            ultrasonicDist_R = feedback.getRobotRightDistance();
         }
 
         else if (state == RobotState.VISION) {
@@ -98,7 +100,7 @@ public class DriveBase extends Subsystem {
             leftSpeed = 0.5 * input.getDBLeftSpeed() - adjustment;
             rightSpeed = 0.5 * input.getDBRightSpeed() + adjustment;
 
-            // leftSpeed = input.getDBLeftSpeed() * (0.5 - adjustment);
+            // leftSpeed = input.getDBLeftSpeed() * (0.5 - adjusstment);
             // rightSpeed = input.getDBRightSpeed() * (adjustment + 0.5);
         }
 
@@ -112,22 +114,22 @@ public class DriveBase extends Subsystem {
 
     @Override
     protected void output() {
-        // if (highGear) {
-        //     gearShift.set(Value.kForward);
-        // } else {
-        //     gearShift.set(Value.kReverse);
-        // }
+        if (highGear) {
+             gearShift.set(Value.kForward);
+        } else {
+            gearShift.set(Value.kReverse);
+        }
     
-        // if (!rotaryPos){
-        //     if (ultrasonicDist_L < 45 && ultrasonicDist_R < 45) {
-        //         // if (leftSpeed > 0.1){ 
-        //         //     leftSpeed = 0.1;
-        //         // } 
-        //         // if (rightSpeed > 0.1){
-        //         //     rightSpeed = 0.1;
-        //         // } 
-        //     } // set cap speed on motors to 0.1 at 45-ish inches
-        // } // if intake is down 
+        //if (!rotaryPos){
+        if (ultrasonicDist_L < 45 && ultrasonicDist_R < 45) {
+            if (leftSpeed > 0.1){ 
+                leftSpeed = 0.1;
+            } 
+            if (rightSpeed > 0.1){
+                rightSpeed = 0.1;
+            } 
+        } // set cap speed on motors to 0.1 at 45-ish inches
+        //} // if intake is down 
 
         leftFore.set(leftSpeed);
         leftMid.set(leftSpeed);
@@ -173,6 +175,4 @@ public class DriveBase extends Subsystem {
         }
         return instance;
     }
-
-
 }

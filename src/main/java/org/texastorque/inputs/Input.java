@@ -53,8 +53,8 @@ public class Input {
     private volatile boolean DB_highGear = false;
 
     public void updateDrive() {
-		DB_leftSpeed = -driver.getLeftYAxis() + driver.getRightXAxis();
-        DB_rightSpeed = -driver.getLeftYAxis() - driver.getRightXAxis();
+		DB_leftSpeed = -driver.getLeftYAxis() + driver.getRightXAxis() * 0.7;
+        DB_rightSpeed = -driver.getLeftYAxis() - driver.getRightXAxis() * 0.7;
 
         // if (driver.getRightBumper()) {
         //     DB_highGear = true;
