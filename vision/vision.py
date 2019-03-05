@@ -63,7 +63,7 @@ showAllReturnedObjects = False
 config = {"properties":[
     {"name":"connect_verbose","value":1},
     {"name":"raw_brightness","value":100},
-    {"name":"brightness","value":20}, 
+    {"name":"brightness","value":0}, 
     {"name":"raw_contrast","value":0},
     {"name":"contrast","value":50},
     {"name":"raw_saturation","value":0},

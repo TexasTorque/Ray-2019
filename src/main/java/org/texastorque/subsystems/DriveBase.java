@@ -8,6 +8,7 @@ import org.texastorque.torquelib.controlLoop.ScheduledPID;
 import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DriveBase extends Subsystem {
 
@@ -27,11 +28,6 @@ public class DriveBase extends Subsystem {
     private boolean highGear = false;
     
     private boolean clockwise = true;
-
-    private ScheduledPID linePID;
-    private boolean reset;
-    private double angleDegree = 45;
-    private String lineDirection;
 
     private DriveBase() {
         leftFore = new TorqueMotor(new VictorSP(Ports.DB_LEFT_FORE_MOTOR), !clockwise);
@@ -62,7 +58,7 @@ public class DriveBase extends Subsystem {
     public void teleopInit() {
         leftSpeed = 0.0;
         rightSpeed = 0.0;
-        feedback.gyroReset();
+        feedback.resetNavX();
     }
 
     @Override
@@ -107,10 +103,11 @@ public class DriveBase extends Subsystem {
 
     @Override
     protected void output() {
-        if (highGear)
+        if (highGear) {
             gearShift.set(Value.kForward);
-        else
+        } else {
             gearShift.set(Value.kReverse);
+        }
         
         leftFore.set(leftSpeed);
         leftMid.set(leftSpeed);
@@ -145,8 +142,10 @@ public class DriveBase extends Subsystem {
     public void teleopContinuous() {}
 
     @Override
-    public void smartDashboard() {}
-
+    public void smartDashboard() {
+        SmartDashboard.putBoolean("DB_highGear", highGear);
+    }
+    
     public static DriveBase getInstance() {
         if (instance == null) {
             synchronized (DriveBase.class) {
@@ -156,6 +155,4 @@ public class DriveBase extends Subsystem {
         }
         return instance;
     }
-
-
 }

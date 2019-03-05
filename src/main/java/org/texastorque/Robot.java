@@ -7,6 +7,7 @@ import org.texastorque.inputs.State.RobotState;
 
 import org.texastorque.torquelib.base.TorqueIterative;
 
+import edu.wpi.first.cameraserver.CameraServer;
 import java.util.ArrayList;
 
 public class Robot extends TorqueIterative {
@@ -15,7 +16,7 @@ public class Robot extends TorqueIterative {
 	private Subsystem driveBase = DriveBase.getInstance();
 	private Subsystem lift = Lift.getInstance();
 	private Subsystem rotary = Rotary.getInstance();
-	private Subsystem intake = Intake.getInstance();
+	private Subsystem intake = FourBarIntake.getInstance();
 	private Subsystem climber = Climber.getInstance();
 	
 	private State state = State.getInstance();
@@ -25,12 +26,14 @@ public class Robot extends TorqueIterative {
 
 	public void robotInit() {
 		initSubsystems();
-
+		CameraServer.getInstance().startAutomaticCapture(0);
 		autoManager.displayChoices();
+		feedback.resetNavX();
+		feedback.resetDriveEncoders();
 	}
 
 	private void initSubsystems() {
-		subsystems = new ArrayList<>();
+		subsystems = new ArrayList<Subsystem>();
 		subsystems.add(driveBase);
 		subsystems.add(lift);
 		subsystems.add(rotary);
@@ -40,7 +43,9 @@ public class Robot extends TorqueIterative {
 
 	@Override
 	public void autoInit() {
+		state.setRobotState(RobotState.AUTO);
 		autoManager.chooseSequence();
+		feedback.resetDriveEncoders();
 
 		for (Subsystem system : subsystems) {
 			system.autoInit();
@@ -49,6 +54,8 @@ public class Robot extends TorqueIterative {
 	
 	@Override
 	public void teleopInit() {
+		state.setRobotState(RobotState.TELEOP);
+
 		for (Subsystem system : subsystems) {
 			system.teleopInit();
 		}
@@ -88,12 +95,9 @@ public class Robot extends TorqueIterative {
 	public void alwaysContinuous() {
 		feedback.update();
 		feedback.smartDashboard();
+		
 		for (Subsystem system : subsystems) {
-			system.run(state.getRobotState());
+			system.smartDashboard();
 		}
-	}
-
-	@Override
-	public void disabledContinuous() {
 	}
 }
