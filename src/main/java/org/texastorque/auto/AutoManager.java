@@ -18,7 +18,7 @@ public class AutoManager {
 
     private AutoManager() {
         autoSequences = new ArrayList<>();
-        autoSequences.add(new BackupDrive());
+        // autoSequences.add(new BackupDrive());
 
         for (Sequence sequence : autoSequences) {
             sequence.init();
