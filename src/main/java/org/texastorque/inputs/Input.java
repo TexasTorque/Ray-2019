@@ -99,11 +99,8 @@ public class Input {
         else if (operator.getYButtonPressed()) {
             LF_setpoint = 2;
         }
-        else if (operator.getRightYAxis() > 0.1) {
-            LF_offset -= 0.005;
-        }
-        else if (operator.getRightYAxis() < -0.1) {
-            LF_offset += 0.005;
+        else if (Math.abs(operator.getRightYAxis()) > 0.1) {
+            LF_offset -= operator.getRightYAxis() / 200;
         }
     }
 
