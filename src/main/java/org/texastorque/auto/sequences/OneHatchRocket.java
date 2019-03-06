@@ -14,21 +14,21 @@ public class OneHatchRocket extends Sequence {
         ArrayList<Command> block1 = new ArrayList<>();
         Waypoint[] points1 = new Waypoint[] {
             new Waypoint(0, 0, 0),
-            new Waypoint(15, -10, Pathfinder.d2r(-30))
+            new Waypoint(12, -8, Pathfinder.d2r(-30))
         };
-        block1.add(new DrivePath(0, points1));
+        block1.add(new DrivePath(0, points1, true));
         // block1.add(new LiftSet(1, 1));
 
         ArrayList<Command> block2 = new ArrayList<>();
         Waypoint[] points2 = new Waypoint[] {
             new Waypoint(0, 0, 0),
-            new Waypoint(-5, 5, Pathfinder.d2r(-89))
+            new Waypoint(4, 4, Pathfinder.d2r(89))
         };
-        block2.add(new DrivePath(0, points2));
+        block2.add(new DrivePath(0, points2, false));
         // block2.add(new LiftSet(1, 0));
 
         addBlock(block1);
-        //addBlock(block2);
+        addBlock(block2);
     }
 
 }

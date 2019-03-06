@@ -224,6 +224,9 @@ public class Feedback {
         SmartDashboard.putNumber("NX_roll", NX_roll);
 
         SmartDashboard.putBoolean("CM_atBottom", CM_atBottom);
+
+        SmartDashboard.putNumber("UL_leftDistance", UL_leftDistance);
+        SmartDashboard.putNumber("UL_rightDistance", UL_rightDistance);
     }
 
     public static Feedback getInstance() {

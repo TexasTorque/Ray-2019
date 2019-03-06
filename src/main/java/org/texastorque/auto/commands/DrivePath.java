@@ -11,6 +11,7 @@ public class DrivePath extends Command {
 
     private DistanceFollower leftFollower;
     private DistanceFollower rightFollower;
+    private int direction;
 
     /**
      * Resources
@@ -19,8 +20,11 @@ public class DrivePath extends Command {
      * https://www.chiefdelphi.com/t/tuning-pathfinder-pid-talon-motion-profiling-magic-etc/162516/4
      * https://www.thorlabs.com/tutorials.cfm?tabID=5dfca308-d07e-46c9-baa0-4defc5c40c3e
      */
-    public DrivePath(double delay, Waypoint[] points) {
+    public DrivePath(double delay, Waypoint[] points, boolean isForward) {
         super(delay);
+
+        // For reverse paths, Waypoints should be mirroed across y-axis
+        direction = isForward ? 1 : -1;
 
         /**
          * Fit method: HERMITE_CUBIC or HERMITE_QUINTIC
@@ -50,12 +54,12 @@ public class DrivePath extends Command {
 	@Override
 	protected void continuous() {
         double currentHeading = -feedback.getYaw();
-        double targetHeading = Pathfinder.r2d(leftFollower.getHeading());
+        double targetHeading = direction * Pathfinder.r2d(leftFollower.getHeading());
         double angleDifference = Pathfinder.boundHalfDegrees(targetHeading - currentHeading);
         double turn = 0.8 * (-1.0/80.0) * angleDifference;
 
-		input.setDBLeftSpeed(leftFollower.calculate(feedback.getDBLeftDistance()) + turn);
-        input.setDBRightSpeed(rightFollower.calculate(feedback.getDBRightDistance()) - turn);
+		input.setDBLeftSpeed(direction * leftFollower.calculate(feedback.getDBLeftDistance()) + turn);
+        input.setDBRightSpeed(direction * rightFollower.calculate(feedback.getDBRightDistance()) - turn);
 	}
 
 	@Override

@@ -51,6 +51,19 @@ TorqueLib, written by Gijs Landwehr, has provided core functionality and utiliti
 
 TorqueLib includes the TorqueIterative robot base class that is used for Ray. It is similar to IterativeRobot, but implements a second Continuous thread that is scheduled to run at 100 Hz. 
 
+## Addendum
+
+### 5-year plan to take over FRC
+Listen up future programmers, I'm gonna tell you right now how Texas Torque will take over FRC:
+1. Implement lidar, which would allow the robot to map the whole field
+2. Integrate lidar with camera vision processing
+3. With lidar + vision, the robot should now be able to generate drive base motion profiles to drive to anywhere it can see
+4. Run simulations of the year's game and use machine learning to develop the best strategy
+5. Retire the driver and operator, because the robot is now fully autonomous
+6. World champs 2025
+
+Okay yeah that was kind of a joke, but it also does sort of make sense, right? Try it, tell me how far you get. -Daniel
+
 ## Contributors
 Mentors: William Vo, Jacob Lubecki
 
