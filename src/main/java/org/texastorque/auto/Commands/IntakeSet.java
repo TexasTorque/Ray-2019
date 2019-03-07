@@ -20,6 +20,7 @@ public class IntakeSet extends Command {
     protected void init(){
         input.setINTuskEngaged(tuskEngaged);
         input.setHatchState(hatchEngaged);
+        input.setRTSetpoint(setPoint);
     }
 
     @Override
@@ -27,12 +28,12 @@ public class IntakeSet extends Command {
 
     @Override
     protected void end(){
-        input.setINActive(false);
+        input.setINActive(true);
     }
 
     @Override
     protected boolean endCondition(){
-        return (Math.abs(feedback.getRTPosition() - setPoint) > 0.2);
+        return (Math.abs(feedback.getRTPosition() - setPoint) < 0.2);
     }
 
 }
