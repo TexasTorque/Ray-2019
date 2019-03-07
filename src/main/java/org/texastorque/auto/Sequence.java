@@ -11,14 +11,14 @@ public abstract class Sequence {
     private double startTime;
     private int blockIndex;
 
-    protected abstract void init();
-
     protected Sequence() {
         sequence = new ArrayList<ArrayList<Command>>();
         started = false;
         blockIndex = 0;
         init();
     }
+
+    protected abstract void init();
 
     protected void addBlock(ArrayList<Command> block) {
         sequence.add(block);
@@ -28,7 +28,7 @@ public abstract class Sequence {
         if (!started) {
             startTime = Timer.getFPGATimestamp();
             started = true;
-            System.out.println(sequence);
+            System.out.println("Starting sequence:" + sequence);
         }
 
         if (blockIndex < sequence.size()) {

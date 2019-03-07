@@ -59,10 +59,10 @@ Listen up future programmers, I'm gonna tell you right now how Texas Torque will
 2. Integrate lidar with camera vision processing
 3. With lidar + vision, the robot should now be able to generate drive base motion profiles to drive to anywhere it can see
 4. Run simulations of the year's game and use machine learning to develop the best strategy
-5. Retire the driver and operator, because the robot is now fully autonomous
-6. World champs 2025
+5. Retire the driver and operator because the robot is now fully autonomous
+6. World champs 2025 as alliance captain
 
-Okay yeah that was kind of a joke, but it also does sort of make sense, right? Try it, tell me how far you get. -Daniel
+Okay yeah that was kind of a joke, but hey, there's no harm in trying... -Daniel
 
 ## Contributors
 Mentors: William Vo, Jacob Lubecki

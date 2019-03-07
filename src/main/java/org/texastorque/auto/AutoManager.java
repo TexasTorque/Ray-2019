@@ -19,10 +19,14 @@ public class AutoManager {
     private AutoManager() {
         autoSequences = new ArrayList<Sequence>();
         autoSequences.add(new BackupDrive());
-        autoSequences.add(new OneHatchRocket());
+        autoSequences.add(new OneHatchRocket1());
+        autoSequences.add(new OneHatchRocket3());
+
+        System.out.println("Auto sequences loaded");
 
         autoSelector.setDefaultOption("BackupDrive", "BackupDrive");
-        autoSelector.addOption("OneHatchRocket", "OneHatchRocket");
+        autoSelector.addOption("1 OneHatchRocket", "1 OneHatchRocket");
+        autoSelector.addOption("3 OneHatchRocket", "3 OneHatchRocket");
     }
 
     public void displayChoices() {
@@ -31,15 +35,19 @@ public class AutoManager {
 
     public void chooseSequence() {
         String autoChoice = autoSelector.getSelected();
-        
-        autoChoice = "OneHatchRocket";
+        // autoChoice = "OneHatchRocket";
 
         switch(autoChoice) {
             case "BackupDrive":
                 currentSequence = autoSequences.get(0);
                 break;
-            case "OneHatchRocket":
+
+            case "1 OneHatchRocket":
                 currentSequence = autoSequences.get(1);
+                break;
+
+            case "3 OneHatchRocket":
+                currentSequence = autoSequences.get(2);
                 break;
         }
 

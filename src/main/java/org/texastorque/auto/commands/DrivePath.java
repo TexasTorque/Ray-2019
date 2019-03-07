@@ -11,7 +11,8 @@ public class DrivePath extends Command {
 
     private DistanceFollower leftFollower;
     private DistanceFollower rightFollower;
-    private int direction;
+    private boolean isForward;
+    // private int direction;
 
     /**
      * Resources
@@ -23,8 +24,8 @@ public class DrivePath extends Command {
     public DrivePath(double delay, Waypoint[] points, boolean isForward) {
         super(delay);
 
-        // For reverse paths, Waypoints should be mirroed across y-axis
-        direction = isForward ? 1 : -1;
+        // For reverse driving, Waypoints should be as if robot is driving forward
+        this.isForward = isForward;
 
         /**
          * Fit method: HERMITE_CUBIC or HERMITE_QUINTIC
@@ -34,7 +35,7 @@ public class DrivePath extends Command {
          * Max Acceleration (ft/s/s)
          * Max Jerk (ft/s/s/s)
          */
-        Trajectory.Config config = new Trajectory.Config(Trajectory.FitMethod.HERMITE_CUBIC, Trajectory.Config.SAMPLES_LOW, 0.01, Constants.DB_LOW_MAX_SPEED, 4.0, 40.0);
+        Trajectory.Config config = new Trajectory.Config(Trajectory.FitMethod.HERMITE_CUBIC, Trajectory.Config.SAMPLES_LOW, 0.01, Constants.DB_LOW_MAX_SPEED, Constants.DB_LOW_MAX_ACCEL, Constants.DB_LOW_MAX_JERK);
         
         Trajectory path = Pathfinder.generate(points, config);
         TankModifier modifier = new TankModifier(path);
@@ -53,13 +54,20 @@ public class DrivePath extends Command {
 
 	@Override
 	protected void continuous() {
+        // Heading values are absolute
         double currentHeading = -feedback.getYaw();
-        double targetHeading = direction * Pathfinder.r2d(leftFollower.getHeading());
+        double targetHeading = Pathfinder.r2d(leftFollower.getHeading());
         double angleDifference = Pathfinder.boundHalfDegrees(targetHeading - currentHeading);
         double turn = 0.8 * (-1.0/80.0) * angleDifference;
 
-		input.setDBLeftSpeed(direction * leftFollower.calculate(feedback.getDBLeftDistance()) + turn);
-        input.setDBRightSpeed(direction * rightFollower.calculate(feedback.getDBRightDistance()) - turn);
+        if (isForward) {
+            input.setDBLeftSpeed(leftFollower.calculate(feedback.getDBLeftDistance()) + turn);
+            input.setDBRightSpeed(rightFollower.calculate(feedback.getDBRightDistance()) - turn);
+        }
+        else {
+            input.setDBLeftSpeed(-rightFollower.calculate(-feedback.getDBLeftDistance()) - turn);
+            input.setDBRightSpeed(-leftFollower.calculate(-feedback.getDBRightDistance()) + turn);
+        }
 	}
 
 	@Override

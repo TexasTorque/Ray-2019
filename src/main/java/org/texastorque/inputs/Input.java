@@ -93,9 +93,10 @@ public class Input {
 
 
     // ========== Lift ==========
-    private final double[] LF_setpoints = {0.0, 3.8, 5.0}; //{0.0, 2.5, 5.0};
-    private double LF_offset = 0;
-    private volatile int LF_setpoint;
+    private final double[] LF_setpoints = {0.0, 3.8, 5.0}; // {0.0, 2.5, 5.0};
+    private volatile int LF_setpoint = 0;
+    private volatile int LF_modifier = 0;
+    private volatile double LF_offset = 0;
 
     public void updateLift() {
         if (operator.getAButtonPressed()) {
@@ -128,18 +129,21 @@ public class Input {
     }
 
     // ========== Rotary ==========
-    private final double[] RT_setpoints = {0, 71, 88};
-    private volatile int RT_setpoint;
+    private final double[] RT_setpoints = {0, 50, 71, 88};
+    private volatile int RT_setpoint = 0;
     private volatile double RT_offset = 0;
     
     public void updateRotary() {
         if (operator.getDPADDown()) {
-            RT_setpoint = 2;
+            RT_setpoint = 3;
         }
         else if (operator.getDPADRight()) {
-            RT_setpoint = 1;
+            RT_setpoint = 2;
         }
         else if (operator.getDPADUp()) {
+            RT_setpoint = 1;
+        }
+        else if (operator.getDPADLeft()) {
             RT_setpoint = 0;
         }
         else if (operator.getLeftYAxis() > 0.1) {
