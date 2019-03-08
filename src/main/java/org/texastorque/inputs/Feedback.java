@@ -53,7 +53,7 @@ public class Feedback {
     private Feedback() {
         DB_leftEncoder = new TorqueEncoder(Ports.DB_LEFT_ENCODER_A, Ports.DB_LEFT_ENCODER_B, clockwise, EncodingType.k4X);
         DB_rightEncoder = new TorqueEncoder(Ports.DB_RIGHT_ENCODER_A, Ports.DB_RIGHT_ENCODER_B, clockwise, EncodingType.k4X);
-        LF_encoder = new TorqueEncoder(Ports.LF_ENCODER_A, Ports.LF_ENCODER_B, clockwise, EncodingType.k4X);
+        LF_encoder = new TorqueEncoder(Ports.LF_ENCODER_A, Ports.LF_ENCODER_B, !clockwise, EncodingType.k4X);
         RT_encoder = new TorqueEncoder(Ports.RT_ENCODER_A, Ports.RT_ENCODER_B, clockwise, EncodingType.k4X);
 
         NX_gyro = new AHRS(SPI.Port.kMXP);
@@ -72,7 +72,6 @@ public class Feedback {
     public void update() {
         updateEncoders();
         updateNavX();
-        updateLineSensors();
         updateUltrasonic();
         updateNetworkTables();
     }
@@ -143,6 +142,14 @@ public class Feedback {
         DB_rightEncoder.reset();
     }
 
+    public void resetLiftEncoder(){
+        LF_encoder.reset();
+    }
+
+    public void resetRotaryEncoder(){
+        RT_encoder.reset();
+    }
+
 
     // ========== Gyro ==========
 
@@ -165,31 +172,6 @@ public class Feedback {
     public void gyroReset(){
         NX_gyro.reset();
     }
-
-
-    // ========== Line sensors ==========
-
-    private boolean LN_left;
-    private boolean LN_mid;
-    private boolean LN_right;
-
-    public void updateLineSensors() {
-        // LN_left = LN_leftSensor.get();
-        // LN_mid = LN_midSensor.get();
-        // LN_right = LN_rightSensor.get();
-    }
-
-    // public boolean lineLeftTrue() {
-    //     return LN_left;
-    // }
-
-    // public boolean lineMidTrue() {
-    //     return LN_mid;
-    // }
-
-    // public boolean lineRightTrue() {
-    //     return LN_right;
-    // }
    
     // ========= Ultrasonic sensors ========
 
@@ -233,10 +215,6 @@ public class Feedback {
         SmartDashboard.putNumber("NX_yaw", NX_yaw);
         SmartDashboard.putNumber("Left_Distance", L_robotDistance);
         SmartDashboard.putNumber("Right_Distance", R_robotDistance);
-
-        SmartDashboard.putBoolean("L", LN_left);
-        SmartDashboard.putBoolean("M", LN_mid);
-        SmartDashboard.putBoolean("R", LN_right);
     }
 
     public static Feedback getInstance() {

@@ -4,10 +4,15 @@ import edu.wpi.first.wpilibj.Timer;
 
 import java.util.ArrayList;
 
+import org.texastorque.inputs.*;
+
 public abstract class Sequence {
 
     private ArrayList<ArrayList<Command>> sequence; 
     // sequence = arraylist of arraylists - the nested arraylist is a block - within each block is a series of commands
+
+    protected Input input = Input.getInstance();
+
     private boolean started;
     private double startTime;
     private int blockIndex;

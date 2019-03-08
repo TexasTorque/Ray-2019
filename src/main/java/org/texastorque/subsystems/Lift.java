@@ -6,6 +6,7 @@ import org.texastorque.torquelib.component.TorqueMotor;
 import org.texastorque.torquelib.controlLoop.ScheduledPID;
 
 import edu.wpi.first.wpilibj.VictorSP;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Lift extends Subsystem {
 
@@ -15,7 +16,6 @@ public class Lift extends Subsystem {
     private TorqueMotor pulleyB;
 
     private final ScheduledPID liftPID;
-    
     private double speed;
     private double currentPos;
     private double setpoint;
@@ -23,21 +23,24 @@ public class Lift extends Subsystem {
     private boolean clockwise = true;
 
     private Lift() {
-        pulleyA = new TorqueMotor(new VictorSP(Ports.LF_MOTOR_A), !clockwise);
-        pulleyB = new TorqueMotor(new VictorSP(Ports.LF_MOTOR_B), !clockwise);
+        pulleyA = new TorqueMotor(new VictorSP(Ports.LF_MOTOR_A), clockwise);
+        pulleyB = new TorqueMotor(new VictorSP(Ports.LF_MOTOR_B), clockwise);
 
-        liftPID = new ScheduledPID.Builder(0, -0.4, 0.4, 1)
-                .setPGains(0.7)
-                .setIGains(0.2)
-                //.setDGains(0.01)
-                .build();
         speed = 0;
         setpoint = input.getLFSetpoint(0);
+
+        liftPID = new ScheduledPID.Builder(setpoint, -0.3, 0.8, 2)
+                .setRegions(0)
+                .setPGains(0.1, 1.0)
+                .setIGains(0, 0.5)
+                //.setDGains(0.01)
+                .build();
     }
 
     @Override
     public void autoInit() {
         speed = 0;
+        feedback.resetLiftEncoder();
     }
 
     @Override
@@ -53,7 +56,7 @@ public class Lift extends Subsystem {
     @Override
     public void run(RobotState state) {
         if (state == RobotState.AUTO) {
-
+            //runLiftPID();
         }
 
         else if (state == RobotState.TELEOP) {
@@ -61,7 +64,7 @@ public class Lift extends Subsystem {
         }
 
         else if (state == RobotState.VISION) {
-            runLiftBottom();
+            runLiftPID(0);
         }
 
         else if (state == RobotState.LINE) {
@@ -79,11 +82,11 @@ public class Lift extends Subsystem {
             prevSetpoint = setpoint;
         }
 
-        speed = liftPID.calculate(currentPos) ;
+        speed = liftPID.calculate(currentPos);
     }
 
-    private void runLiftBottom() {
-        setpoint = input.getLFSetpoint(0);
+    private void runLiftPID(int position) {
+        setpoint = input.getLFSetpoint(position);
         currentPos = feedback.getLFPosition();
         if (setpoint != prevSetpoint) {
             liftPID.changeSetpoint(setpoint);
@@ -95,7 +98,7 @@ public class Lift extends Subsystem {
 
     private double addBaseOutput(double speed) {
         if (feedback.getLFPosition() < input.getLFSetpoint(1)) {
-            return speed + 0.04;
+            return speed + 0.05;
         }
         else if (feedback.getLFPosition() < input.getLFSetpoint(2)) {
             return speed + 0.08;
@@ -105,7 +108,7 @@ public class Lift extends Subsystem {
 
     @Override
     protected void output() {
-        //speed = addBaseOutput(speed);
+        // speed = addBaseOutput(speed);
         pulleyA.set(speed);
         pulleyB.set(speed);
     }
@@ -120,7 +123,9 @@ public class Lift extends Subsystem {
     public void teleopContinuous() {}
 
     @Override
-    public void smartDashboard() {}
+    public void smartDashboard() {
+        SmartDashboard.putNumber("LF_output", speed);
+    }
 
     public static Lift getInstance() {
         if (instance == null) {

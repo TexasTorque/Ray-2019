@@ -37,6 +37,10 @@ public class DriveBase extends Subsystem {
     private double ultrasonicDist_L = 0.0;
     private double ultrasonicDist_R = 0.0;
 
+    private boolean shiftOkay = false;
+    private double shiftUpSpeed = 11;
+    private double shiftDownSpeed = 9;
+
     private DriveBase() {
         leftFore = new TorqueMotor(new VictorSP(Ports.DB_LEFT_FORE_MOTOR), !clockwise);
         leftMid = new TorqueMotor(new VictorSP(Ports.DB_LEFT_MID_MOTOR), !clockwise);
@@ -153,8 +157,17 @@ public class DriveBase extends Subsystem {
      * auto transmission
      */
     private void setGears(RobotState state) {
-        if (state == RobotState.TELEOP)
-            highGear = input.getDBHighGear();
+        shiftOkay = (feedback.getLFPosition() < 0.5);
+        if (state == RobotState.TELEOP) {
+            if (shiftOkay) {
+                if (((feedback.getDBLeftSpeed()+feedback.getDBRightSpeed())/2) > shiftUpSpeed)
+                    highGear = true;
+                else if (((feedback.getDBLeftSpeed()+feedback.getDBRightSpeed())/2) < shiftDownSpeed)
+                    highGear = false;
+            }
+            else
+                highGear = false;
+        }
         else
             highGear = false;
     }

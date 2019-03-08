@@ -20,8 +20,8 @@ public class Rotary extends Subsystem {
     private double prevSetpoint;
     private boolean clockwise = true;
 
-    private boolean rotaryTestF;
-    private boolean rotaryTestB;
+    private boolean rotTestBool = false;
+    private double rotTestSpeed = 0.0;
 
     private Rotary() {
         rotary = new TorqueMotor(new VictorSP(Ports.RT_MOTOR), !clockwise);
@@ -53,11 +53,20 @@ public class Rotary extends Subsystem {
 
     @Override
     public void run(RobotState state) {
+        rotTestBool = input.getTempRotBool();
+        rotTestSpeed = input.getTempRotSpeed();
+        
         if (state == RobotState.AUTO) {
+            runRotaryPID();
         }
 
         else if (state == RobotState.TELEOP) {
-            runRotaryPID();
+            if (rotTestBool) {
+                speed = rotTestSpeed;
+            } 
+            else {
+                runRotaryPID();
+            }
         }
 
         else if (state == RobotState.VISION) {

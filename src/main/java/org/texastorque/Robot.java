@@ -25,7 +25,6 @@ public class Robot extends TorqueIterative {
 
 	public void robotInit() {
 		initSubsystems();
-
 		autoManager.displayChoices();
 	}
 
@@ -40,7 +39,9 @@ public class Robot extends TorqueIterative {
 
 	@Override
 	public void autoInit() {
+		state.setRobotState(RobotState.AUTO);
 		autoManager.chooseSequence();
+		feedback.resetDriveEncoders();
 
 		for (Subsystem system : subsystems) {
 			system.autoInit();
@@ -89,11 +90,14 @@ public class Robot extends TorqueIterative {
 		feedback.update();
 		feedback.smartDashboard();
 		for (Subsystem system : subsystems) {
-			system.run(state.getRobotState());
+			system.smartDashboard();
 		}
 	}
 
 	@Override
 	public void disabledContinuous() {
+		for (Subsystem system : subsystems) {
+			system.disabledContinuous();
+		}
 	}
 }

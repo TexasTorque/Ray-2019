@@ -55,13 +55,6 @@ public class Input {
     public void updateDrive() {
 		DB_leftSpeed = -driver.getLeftYAxis() + driver.getRightXAxis() * 0.7;
         DB_rightSpeed = -driver.getLeftYAxis() - driver.getRightXAxis() * 0.7;
-
-        // if (driver.getRightBumper()) {
-        //     DB_highGear = true;
-        // }
-        // else if (driver.getLeftBumper()) {
-        //     DB_highGear = false;
-        // }
     }
 
     public double getDBLeftSpeed() {
@@ -86,9 +79,10 @@ public class Input {
 
 
     // ========== Lift ==========
-    private final double[] LF_setpoints = {0.0, 2.6, 5.0};
-    private double LF_offset = 0;
-    private volatile int LF_setpoint;
+    private final double[] LF_setpoints = {0.0, 3.8, 5.0}; // {0.0, 2.5, 5.0};
+    private volatile int LF_setpoint = 0;
+    private volatile int LF_modifier = 0;
+    private volatile double LF_offset = 0;
 
     public void updateLift() {
         if (operator.getAButtonPressed()) {
@@ -101,10 +95,10 @@ public class Input {
             LF_setpoint = 2;
         }
         else if (operator.getRightYAxis() > 0.1) {
-            LF_offset -= 0.005;
+            LF_offset -= 0.01;
         }
         else if (operator.getRightYAxis() < -0.1) {
-            LF_offset += 0.005;
+            LF_offset += 0.01;
         }
     }
 
@@ -121,92 +115,117 @@ public class Input {
     }
 
     // ========== Rotary ==========
-    private final double[] RT_setpoints = {3, 85};//index 0=down 1=up
-    private volatile boolean elevated;//true= up false = down // 5 85
-    // private volatile boolean rotaryManualF;
-    // private volatile boolean rotaryManualB;
-    private volatile int RT_setpoint;
+    private final double[] RT_setpoints = {0, 50, 71, 88};
+    private volatile int RT_setpoint = 0;
     private volatile double RT_offset = 0;
+    private boolean elevated = true;
+    private double tempRotSpeed = 0.0;
+    private boolean tempRotBool = false;
     
     public void updateRotary() {
-        // rotaryManualB = false;
-        // rotaryManualF = false;
+        tempRotSpeed = 0.0;
         if (operator.getDPADDown()) {
-            System.out.println("DPAD down");
-            RT_setpoint = 1;
+            RT_setpoint = 3;
+            elevated = false;
+        }
+        else if (operator.getDPADRight()) {
+            RT_setpoint = 2;
             elevated = false;
         }
         else if (operator.getDPADUp()) {
-            System.out.println("DPAD up");
-            RT_setpoint = 0;
-            elevated = true;
+            RT_setpoint = 1;
+            elevated = false;
         }
-        // if (operator.getDPADLeft()) {
-        //     System.out.println("DPAD left");
-        //     rotaryManualF = true;
-        // }
-        // else if (operator.getDPADRight()) {
-        //     rotaryManualB = true;
-        //     System.out.println("DPAD right");
-        // }
+        else if (operator.getDPADLeft()) {
+            RT_setpoint = 0;
+        }
         else if (operator.getLeftYAxis() > 0.1) {
-            RT_offset -= 0.005;
+            RT_offset += 0.2;
         }
         else if (operator.getLeftYAxis() < -0.1) {
-            RT_offset += 0.005;
+            RT_offset -= 0.2;
         }
+        else if (driver.getDPADDown()) {
+            tempRotSpeed = 0.4;
+            tempRotBool = true;
+        }
+        else if (driver.getDPADUp()) {
+            tempRotSpeed = -0.4;
+            tempRotBool = true;
+        }
+    }
+
+    public double getRTSetpoint() {
+        return RT_setpoints[RT_setpoint] + RT_offset;
+    }
+
+    public double getRTSetpoint(int i) {
+        return RT_setpoints[i] + RT_offset;
     }
 
     public boolean getElevated(){
         return elevated;
     }
 
-    public double getRTSetpoint() {
-        if (elevated){
-            return RT_setpoints[RT_setpoint] + RT_offset;
-        } else {
-            return RT_setpoints[RT_setpoint] + RT_offset;
-        }
+    public boolean getTempRotBool(){
+        return tempRotBool;
     }
 
-    public double getRTSetpoint(int i) {
-        return RT_setpoints[i];
+    public double getTempRotSpeed() {
+        return tempRotSpeed;
     }
 
-    // public boolean getRTForward(){
-    //     return rotaryManualF;
-    // }
-
-    // public boolean getRTBackward(){
-    //     return rotaryManualB;
-    // }
+    public void setRTSetpoint(int setpoint){
+        RT_setpoint = setpoint;
+    }
 
     // ========== Intake ==========
-    private volatile double IN_wheelsSpeed; // wheels
-    private volatile boolean IN_hatchEngaged; // tusks - true = extended = parallel / false = contracted = perpendicular
+    private volatile boolean IN_active;
+    private volatile boolean IN_hatchState;
+    private volatile boolean IN_tuskEngaged = true;
     
-    // right trigger = cargo intake/hatch outtake
     public void updateIntake() {
-        IN_wheelsSpeed = 0;
-        if(driver.getLeftTrigger()){ // hatch intake / cargo outtake
-            elevated = false;
-            IN_wheelsSpeed = .5;         
-        } else if (driver.getRightTrigger()){ // hatch outtake / cargo intake
-            elevated = false;
-            IN_wheelsSpeed = -.5;
+        IN_active = false;
+
+        if (driver.getLeftTrigger()) { 
+            IN_active = true;
+            IN_hatchState = true;
+        } // hatch intake, cargo outtake
+        else if (driver.getRightTrigger()) {
+            IN_active = true;
+            IN_hatchState = false;
+        } //hatch outtake, cargo intake
+        
+        if (driver.getAButtonPressed()) {
+            IN_tuskEngaged = false;
+        } 
+        else if (driver.getAButtonReleased()) {
+            IN_tuskEngaged = true;
         }
-        if (driver.getAButtonPressed()){
-            IN_hatchEngaged = true;
-        }
-        if (operator.getYButtonPressed()) {}
     }
 
-    public double getINWheelsSpeed(){
-        return IN_wheelsSpeed;
+    public boolean getINActive() {
+        return IN_active;
     }
 
-    public boolean getINHatchEngaged() {
-        return IN_hatchEngaged;
+    public boolean getHatchState() {
+        return IN_hatchState;
+    }
+
+    public boolean getINTuskEngaged() {
+        return IN_tuskEngaged;
+    }
+
+    public void setINActive(boolean active){
+        IN_active = active;
+    }
+
+    public void setINHatchState(boolean hatchState){
+        IN_hatchState = hatchState;
+    }
+
+    public void setINTuskEngaged(boolean tuskEngaged){
+        IN_tuskEngaged = tuskEngaged;
     }
 
     //========== Climber ==========
