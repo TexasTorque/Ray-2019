@@ -6,6 +6,7 @@ import org.texastorque.torquelib.component.TorqueMotor;
 import org.texastorque.torquelib.controlLoop.ScheduledPID;
 
 import edu.wpi.first.wpilibj.VictorSP;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Climber extends Subsystem {
 
@@ -27,7 +28,7 @@ public class Climber extends Subsystem {
         rearA = new TorqueMotor(new VictorSP(Ports.CM_REAR_A_MOTOR), clockwise);
         rearB = new TorqueMotor(new VictorSP(Ports.CM_REAR_B_MOTOR), clockwise);
 
-        rearPID = new ScheduledPID.Builder(0, -0.1, 1.0, 1)
+        rearPID = new ScheduledPID.Builder(0, -0.2, 1.0, 1)
             .setPGains(0.25)
             // .setIGains(0)
             // .setDGains(0)
@@ -115,7 +116,9 @@ public class Climber extends Subsystem {
     public void teleopContinuous() {}
 
     @Override
-    public void smartDashboard() {}
+    public void smartDashboard() {
+        SmartDashboard.putBoolean("CM_enabled", input.getCMEnabled());
+    }
 
     public static Climber getInstance() {
         if (instance == null) {

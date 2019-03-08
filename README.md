@@ -6,7 +6,7 @@ Texas Torque is proud to present Ray, our robot for the 2019 FIRST Robotics Comp
 ### Basics
 Texas Torque software has historically been written in Java, and this year is no exception. Because Java is taught in the AP Computer Science course, it is the most familiar language to us.
 
-Throughout each match, Ray operates based on several defined states that are controlled by the driver. The main states are AUTO, TELEOP, and VISION.
+Throughout each match, Ray operates based on several defined states that are controlled by the driver. The main states are AUTO, TELEOP, and VISION. During the sandstorm, the initial state is AUTO, but the driver may manually override this to enter the TELEOP state and drive with the help of a camera feed. During the teleop period, the driver may freely toggle between TELEOP and VISION.
 
 Ray's software also receives feedback from many sources:
 * Encoders are used on all motors whose positions are important
@@ -20,8 +20,6 @@ Many of the more advanced software features (to be described later) in Ray are m
 This season, we redesigned our autonomous library so that we can easily program complex robot maneuvers during the sandstorm period. 
 
 The smallest unit of TorqueAuto is the Command. Each Command is designed to control the action of one subsystem and is terminated by an end condition. Multiple Commands may be placed in a block, and several blocks may be chained to form a Sequence. At run time, all the Commands in one block are executed simultaneously, and once all Commands within a block are terminated, the next block begins. Commands may also be delayed within each block for increased flexibility.
-
-**(Insert diagram here)**
 
 The AutoManager is responsible for selecting the Sequence to be used before each match and running it. All Sequences are synchronized with the base loop, which simplifies the process of programming motion profiles.
 
@@ -43,6 +41,7 @@ We use our own PID library for most control loops. Our library supports the decl
 
 We have put our PID library to many uses:
 * The Climber subsystem, which is capable of putting Ray on habitat level 3, uses pitch angle of the gyroscope as the process variable for a P controller. This helps the robot stay level as it is rising.
+* Vision processing, where a PID controller sets drive base output to center the robot with respect to the target
 * The Lift subsystem uses a PI controller with two sets of coefficients to help counteract gravity. During a match, the operator presses buttons to quickly move the Lift to setpoints, and the setpoints can be manually adjusted using joysticks
 * The Rotary of the Intake subsystem is implemented in a similar way to the Lift
 

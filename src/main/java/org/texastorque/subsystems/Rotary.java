@@ -63,7 +63,7 @@ public class Rotary extends Subsystem {
         }
 
         else if (state == RobotState.VISION) {
-            runRotaryPID(1);
+            runRotaryPID(2);
         }
 
         else if (state == RobotState.LINE) {
