@@ -7,7 +7,7 @@ public class State {
     public enum RobotState {
         AUTO, TELEOP, VISION, LINE;
     }
-    private RobotState robotState = RobotState.AUTO;
+    private RobotState robotState = RobotState.TELEOP;
 
     public RobotState getRobotState() {
         return robotState;

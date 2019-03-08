@@ -18,11 +18,13 @@ public class AutoManager {
 
     private AutoManager() {
         autoSequences = new ArrayList<Sequence>();
-
+        
         // addition of different sequences - one sequence per match - each sequence has multiple blocks in it 
         autoSequences.add(new BackupDrive());
         autoSequences.add(new OneHatchRocket());
         autoSequences.add(new Baseline());
+
+        System.out.println("Auto sequences loaded.");
 
         // options 
         autoSelector.setDefaultOption("Baseline", "Baseline");

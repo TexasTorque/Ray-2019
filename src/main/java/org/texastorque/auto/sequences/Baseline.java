@@ -19,20 +19,14 @@ public class Baseline extends Sequence{
     @Override
     protected void init(){
         ArrayList<Command> forewardLift = new ArrayList<>();
-        // forewardLift.add(new DrivePath(0,points1));
-        forewardLift.add(new DriveTime(0,2,.5));
+        
+        //forewardLift.add(new DriveTime(0,2,.5));
 
-        input.setLFSetpoint(0);
-        forewardLift.add(new LiftSet(2, 2));
+        forewardLift.add(new RotarySet(1,1));
 
-        ArrayList<Command> liftRotary = new ArrayList<>();
-        liftRotary.add(new RotarySet(0, 1));
-
-        ArrayList<Command> outtake = new ArrayList<>();
-        //outtake.add()
+        // input.setLFSetpoint(0);
+        // forewardLift.add(new LiftSet(2, 2));
 
         addBlock(forewardLift);
-        //addBlock(liftRotary);
-        // //addBlock(outtake);
     } // init
 } // Baseline

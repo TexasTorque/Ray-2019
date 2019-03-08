@@ -44,12 +44,14 @@ public class Ports {
     public static final int RT_ENCODER_A = 6;
     public static final int RT_ENCODER_B = 7;
 
+    public static final int CM_SWITCH = 8;
+
     // public static final int LN_LEFT = 9;
     // public static final int LN_MID = 8;
     // public static final int LN_RIGHT = 7;
 
-    public static final int R_ULTRASONIC = 0;
-    public static final int L_ULTRASONIC = 1;
+    public static final int UL_LEFT = 0;
+    public static final int UL_RIGHT = 1;
 
     public static final int IN_SWITCH = 0;
 }

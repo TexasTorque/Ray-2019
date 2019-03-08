@@ -40,7 +40,7 @@ public class Lift extends Subsystem {
     @Override
     public void autoInit() {
         speed = 0;
-        feedback.resetLiftEncoder();
+        feedback.resetLFEncoder();
     }
 
     @Override
@@ -56,7 +56,7 @@ public class Lift extends Subsystem {
     @Override
     public void run(RobotState state) {
         if (state == RobotState.AUTO) {
-            //runLiftPID();
+            runLiftPID();
         }
 
         else if (state == RobotState.TELEOP) {

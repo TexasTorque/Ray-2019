@@ -13,7 +13,6 @@ public class Rotary extends Subsystem {
     private TorqueMotor rotary;
 
     private final ScheduledPID rotaryPID;
-
     private double speed;
     private double currentPos;
     private double setpoint;
@@ -26,14 +25,14 @@ public class Rotary extends Subsystem {
     private Rotary() {
         rotary = new TorqueMotor(new VictorSP(Ports.RT_MOTOR), !clockwise);
 
-        this.rotaryPID = new ScheduledPID.Builder(0, 0.5)
-                .setPGains(0.026) // keep increasing by small increments (NEEDS MORE TUNING)
-                .setIGains(0.0) // get it until it vibrates then take 2/3 
-                .setDGains(0.0)
-                .build();
-
         speed = 0;
         setpoint = input.getRTSetpoint(0);
+
+        this.rotaryPID = new ScheduledPID.Builder(setpoint, -0.7, 0.6, 1)
+                .setPGains(0.02)
+                // .setIGains(0.01)
+                // .setDGains(0.0)
+                .build();
     }
 
     @Override
@@ -49,6 +48,12 @@ public class Rotary extends Subsystem {
     @Override
     public void disabledInit() {
         speed = 0;
+    }
+
+    @Override
+    public void disabledContinuous() {
+        runRotaryPID(0);
+        output();
     }
 
     @Override
@@ -70,7 +75,7 @@ public class Rotary extends Subsystem {
         }
 
         else if (state == RobotState.VISION) {
-            runRotaryBottom();
+            runRotaryPID(2);
         }
 
         else if (state == RobotState.LINE) {
@@ -82,7 +87,6 @@ public class Rotary extends Subsystem {
 
     private void runRotaryPID() {
         setpoint = input.getRTSetpoint();
-        System.out.println("Setpoint" + setpoint);
         currentPos = feedback.getRTPosition();
         if (setpoint != prevSetpoint) {
             rotaryPID.changeSetpoint(setpoint);
@@ -90,24 +94,10 @@ public class Rotary extends Subsystem {
         }
 
         speed = rotaryPID.calculate(currentPos);
-        System.out.println("Speed" + speed);
-    
-        // rotaryTestF = input.getRTForward();
-        // rotaryTestB = input.getRTBackward();
-
-        // if (rotaryTestF) {
-        //     speed = .3;
-        // }
-        // else if (rotaryTestB) {
-        //     speed = -.3;
-        // } else {
-        //     speed =0;
-        // }
-
     }
 
-    private void runRotaryBottom() {
-        setpoint = input.getRTSetpoint(0);
+    private void runRotaryPID(int position) {
+        setpoint = input.getRTSetpoint(position);
         currentPos = feedback.getRTPosition();
         if (setpoint != prevSetpoint) {
             rotaryPID.changeSetpoint(setpoint);
@@ -120,9 +110,6 @@ public class Rotary extends Subsystem {
     public void output() {
         rotary.set(speed + 0.07);
     }
-
-    @Override
-    public void disabledContinuous() {}
 
     @Override
     public void autoContinuous() {}

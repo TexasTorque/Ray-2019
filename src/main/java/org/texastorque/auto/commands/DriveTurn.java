@@ -20,7 +20,7 @@ public class DriveTurn extends Command {
     @Override
     protected void init() {
         feedback.resetDriveEncoders();
-        feedback.gyroReset();
+        feedback.resetNavX();
     }
 
     @Override

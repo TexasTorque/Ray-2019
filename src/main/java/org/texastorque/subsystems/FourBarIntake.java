@@ -1,4 +1,5 @@
 package org.texastorque.subsystems;
+
 import org.texastorque.inputs.State.RobotState;
 import org.texastorque.constants.Ports;
 import org.texastorque.torquelib.component.TorqueMotor;
@@ -8,9 +9,10 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 import edu.wpi.first.wpilibj.VictorSP;
 
-public class Intake extends Subsystem {
+public class FourBarIntake extends Subsystem {
 
-    private static volatile Intake instance;
+    private static volatile FourBarIntake instance;
+    
     private TorqueMotor intakeWheels;
     private DoubleSolenoid hatchTusk;
 
@@ -19,7 +21,7 @@ public class Intake extends Subsystem {
 
     private boolean clockwise = true;
 
-    private Intake() {
+    private FourBarIntake() {
         intakeWheels = new TorqueMotor(new VictorSP(Ports.IN_MOTOR), clockwise);
 
         hatchTusk = new DoubleSolenoid(0, Ports.IN_HATCH_SOLE_A, Ports.IN_HATCH_SOLE_B);
@@ -112,11 +114,11 @@ public class Intake extends Subsystem {
     @Override
     public void smartDashboard() {}
 
-    public static Intake getInstance() {
+    public static FourBarIntake getInstance() {
         if (instance == null) {
-            synchronized (Intake.class) {
+            synchronized (FourBarIntake.class) {
                 if (instance == null)
-                    instance = new Intake();
+                    instance = new FourBarIntake();
             }
         }
         return instance;

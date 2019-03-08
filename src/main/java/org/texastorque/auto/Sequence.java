@@ -34,10 +34,10 @@ public abstract class Sequence {
         if (!started) {
             startTime = Timer.getFPGATimestamp();
             started = true;
-            System.out.println(sequence);
+            System.out.println("Starting sequence:" + sequence);
         }
 
-        if (blockIndex < sequence.size()) { // runs all the blocks in each
+        if (blockIndex < sequence.size()) {
             boolean blockEnded = true;
             double currentTime = Timer.getFPGATimestamp();
             for (Command command : sequence.get(blockIndex)) {

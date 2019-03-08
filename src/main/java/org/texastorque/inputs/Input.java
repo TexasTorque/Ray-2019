@@ -11,6 +11,11 @@ import org.texastorque.inputs.Feedback.*;
  * Setters should only be used by Commands. Subsystems should only use getters.
  */
 
+/**
+ * All forms of input, including driver/operator controllers and input from the code itself.
+ * 
+ * Setters should only be used by Commands. Subsystems should only use getters.
+ */
 public class Input {
 
     private static volatile Input instance;
@@ -18,11 +23,13 @@ public class Input {
     private volatile State state;
 	private GenericController driver;
     private  GenericController operator;
+    // private  GenericController tester;
     
     private Input() {
         state = State.getInstance();
 		driver = new GenericController(0, .1);
-		operator = new GenericController(1, .1);
+        operator = new GenericController(1, .1);
+        // tester = new GenericController(2, .1);
     }
     
     public void updateControllers() {
@@ -53,8 +60,15 @@ public class Input {
     private volatile boolean DB_highGear = false;
 
     public void updateDrive() {
-		DB_leftSpeed = -driver.getLeftYAxis() + driver.getRightXAxis() * 0.7;
-        DB_rightSpeed = -driver.getLeftYAxis() - driver.getRightXAxis() * 0.7;
+		DB_leftSpeed = -driver.getLeftYAxis() + 0.6 * driver.getRightXAxis();
+        DB_rightSpeed = -driver.getLeftYAxis() - 0.6 * driver.getRightXAxis();
+
+        if (driver.getRightBumper()) {
+            DB_highGear = true;
+        }
+        else if (driver.getLeftBumper()) {
+            DB_highGear = false;
+        }
     }
 
     public double getDBLeftSpeed() {
@@ -115,7 +129,7 @@ public class Input {
     }
 
     // ========== Rotary ==========
-    private final double[] RT_setpoints = {0, 50, 71, 88};
+    private final double[] RT_setpoints = {0, 45, 71, 88};
     private volatile int RT_setpoint = 0;
     private volatile double RT_offset = 0;
     private boolean elevated = true;
@@ -228,24 +242,40 @@ public class Input {
         IN_tuskEngaged = tuskEngaged;
     }
 
+
     //========== Climber ==========
-    private volatile boolean CM_enabled;
-    private volatile boolean CM_retract;
+    private volatile boolean CM_enabled = false;
+    private volatile boolean CM_retract = false;
+    private volatile boolean lastLeftCenter = false; //being held
+
+    public volatile double CM_tomSpeed;
+    public volatile double CM_rearSpeed;
     
-    public void updateClimber(){
-        if (driver.getAButtonPressed()) 
+    public void updateClimber() {
+        CM_retract = false;
+
+        if (driver.getLeftCenterButton() && !lastLeftCenter) {
             CM_enabled = !CM_enabled;
-        
-        if (driver.getBButton())
-            CM_retract= true;
+            lastLeftCenter = true;
+        } else if (!driver.getLeftCenterButton()) {
+            lastLeftCenter = false;
+            if (driver.getRightCenterButton()) {
+                CM_retract = true;
+            }
+        }
+
+        // CM_rearSpeed = tester.getLeftYAxis();
+        // CM_tomSpeed = tester.getRightYAxis();
     }
 
     public boolean getCMEnabled() {
         return CM_enabled;
     }
-    public boolean getCMRetract(){
+
+    public boolean getCMRetract() {
         return CM_retract;
     }
+
     
     public static Input getInstance() {
         if (instance == null) {
