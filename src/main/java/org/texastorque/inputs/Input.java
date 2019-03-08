@@ -23,13 +23,13 @@ public class Input {
     private volatile State state;
 	private GenericController driver;
     private  GenericController operator;
-    private  GenericController tester;
+    // private  GenericController tester;
     
     private Input() {
         state = State.getInstance();
 		driver = new GenericController(0, .1);
         operator = new GenericController(1, .1);
-        tester = new GenericController(2, .1);
+        // tester = new GenericController(2, .1);
     }
     
     public void updateControllers() {
@@ -60,8 +60,8 @@ public class Input {
     private volatile boolean DB_highGear = false;
 
     public void updateDrive() {
-		DB_leftSpeed = -driver.getLeftYAxis() + 0.7 * driver.getRightXAxis();
-        DB_rightSpeed = -driver.getLeftYAxis() - 0.7 * driver.getRightXAxis();
+		DB_leftSpeed = -driver.getLeftYAxis() + 0.6 * driver.getRightXAxis();
+        DB_rightSpeed = -driver.getLeftYAxis() - 0.6 * driver.getRightXAxis();
 
         if (driver.getRightBumper()) {
             DB_highGear = true;
@@ -129,7 +129,7 @@ public class Input {
     }
 
     // ========== Rotary ==========
-    private final double[] RT_setpoints = {0, 50, 71, 88};
+    private final double[] RT_setpoints = {0, 45, 71, 88};
     private volatile int RT_setpoint = 0;
     private volatile double RT_offset = 0;
     
@@ -222,9 +222,8 @@ public class Input {
             }
         }
 
-        CM_rearSpeed = tester.getLeftYAxis();
-        CM_tomSpeed = tester.getRightYAxis();
-        
+        // CM_rearSpeed = tester.getLeftYAxis();
+        // CM_tomSpeed = tester.getRightYAxis();
     }
 
     public boolean getCMEnabled() {

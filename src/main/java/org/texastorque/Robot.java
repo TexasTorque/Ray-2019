@@ -26,7 +26,7 @@ public class Robot extends TorqueIterative {
 
 	public void robotInit() {
 		initSubsystems();
-		CameraServer.getInstance().startAutomaticCapture(0);
+		// CameraServer.getInstance().startAutomaticCapture(0);
 		autoManager.displayChoices();
 		feedback.resetNavX();
 		feedback.resetDriveEncoders();

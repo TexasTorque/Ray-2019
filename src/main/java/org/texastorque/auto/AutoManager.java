@@ -22,7 +22,7 @@ public class AutoManager {
         autoSequences.add(new OneHatchRocket1());
         autoSequences.add(new OneHatchRocket3());
 
-        System.out.println("Auto sequences loaded");
+        System.out.println("Auto sequences loaded.");
 
         autoSelector.setDefaultOption("BackupDrive", "BackupDrive");
         autoSelector.addOption("1 OneHatchRocket", "1 OneHatchRocket");

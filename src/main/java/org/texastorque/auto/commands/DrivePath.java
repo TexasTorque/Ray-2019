@@ -49,7 +49,7 @@ public class DrivePath extends Command {
 
     @Override
     protected void init() {
-        //feedback.resetDriveEncoders();
+        feedback.resetDriveEncoders();
     }
 
 	@Override
