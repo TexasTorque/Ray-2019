@@ -7,7 +7,7 @@ import org.texastorque.auto.commands.*;
 import jaci.pathfinder.*;
 import java.util.ArrayList;
 
-public class OneHatchRocket3 extends Sequence {
+public class OneHatchShip2 extends Sequence {
 
     @Override
     protected void init() {
@@ -15,10 +15,10 @@ public class OneHatchRocket3 extends Sequence {
         ArrayList<Command> block1 = new ArrayList<>();
         Waypoint[] points1 = new Waypoint[] {
             new Waypoint(0, 0, 0),
-            new Waypoint(15, -5, Pathfinder.d2r(30))
+            new Waypoint(10, 0, 0)
         };
-        block1.add(new DrivePath(0, points1, false));
-        block1.add(new RotarySet(0, 2));
+        block1.add(new DrivePath(0, points1, true));
+        block1.add(new RotarySet(0, 1));
 
         // 2
         ArrayList<Command> block2 = new ArrayList<>();
@@ -27,8 +27,8 @@ public class OneHatchRocket3 extends Sequence {
         // 3
         ArrayList<Command> block3 = new ArrayList<>();
         Waypoint[] points3 = new Waypoint[] {
-            new Waypoint(0, 0, Pathfinder.d2r(30)),
-            new Waypoint(3, 1.5, 0)
+            new Waypoint(0, 0, 0),
+            new Waypoint(5, 5, Pathfinder.d2r(120))
         };
         block3.add(new DrivePath(0, points3, false));
 
@@ -41,8 +41,8 @@ public class OneHatchRocket3 extends Sequence {
         block4.add(new DrivePath(0, points4, true));
 
         addBlock(block1);
-        addBlock(block2);
-        // addBlock(block3);
+        // addBlock(block2);
+        addBlock(block3);
         // addBlock(block4);
     }
 

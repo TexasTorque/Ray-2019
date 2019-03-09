@@ -25,7 +25,7 @@ public class DrivePath extends Command {
     public DrivePath(double delay, Waypoint[] points, boolean isForward) {
         super(delay);
 
-        // For reverse driving, Waypoints should be as if robot is driving forward
+        // For reverse driving, Waypoint coordinates should be as if robot is driving forward
         this.isForward = isForward;
 
         /**

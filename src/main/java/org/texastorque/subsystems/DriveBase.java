@@ -82,9 +82,6 @@ public class DriveBase extends Subsystem {
         else if (state == RobotState.VISION) {
             double currentOffset = feedback.getTargetOffset();
             double adjustment = visionPID.calculate(currentOffset);
-            // if (Math.abs(adjustment) < 0.1)
-            //     adjustment = 0;
-            System.out.println("Offset: " + currentOffset + " || Adjustment: " + adjustment);
 
             leftSpeed = 0.5 * input.getDBLeftSpeed() - adjustment;
             rightSpeed = 0.5 * input.getDBRightSpeed() + adjustment;

@@ -125,11 +125,11 @@ public class Input {
     }
 
     public void setLFSetpoint(int index) {
-        this.LF_setpoint = index;
+        LF_setpoint = index;
     }
 
     // ========== Rotary ==========
-    private final double[] RT_setpoints = {0, 45, 71, 88};
+    private final double[] RT_setpoints = {0, 45, 71, 89};
     private volatile int RT_setpoint = 0;
     private volatile double RT_offset = 0;
     
@@ -158,8 +158,12 @@ public class Input {
         return RT_setpoints[RT_setpoint] + RT_offset;
     }
 
-    public double getRTSetpoint(int i) {
-        return RT_setpoints[i] + RT_offset;
+    public double getRTSetpoint(int index) {
+        return RT_setpoints[index] + RT_offset;
+    }
+
+    public void setRTSetpoint(int index) {
+        RT_setpoint = index;
     }
 
     // ========== Intake ==========
@@ -200,6 +204,17 @@ public class Input {
         return IN_tuskEngaged;
     }
 
+    public void setINActive(boolean active) {
+        IN_active = active;
+    }
+
+    /**
+     * true = hatch intake, cargo outtake
+     * false = cargo intake, hatch outtake
+     */
+    public void setINHatchState(boolean state) {
+        IN_hatchState = state;
+    }
 
     //========== Climber ==========
     private volatile boolean CM_enabled = false;
