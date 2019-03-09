@@ -98,11 +98,11 @@ public class DriveBase extends Subsystem {
              
             if (!rotaryPos){
                 if (ultrasonicDist_L < 2 && ultrasonicDist_R < 2) {
-                    if (leftSpeed > 0.1){ 
-                        leftSpeed = 0.1;
+                    if (leftSpeed > 0.3){ 
+                        leftSpeed = 0.3;
                     } 
-                    if (rightSpeed > 0.1){
-                        rightSpeed = 0.1;
+                    if (rightSpeed > 0.3){
+                        rightSpeed = 0.3;
                     } 
                 } // set cap speed on motors to 0.1 at 24-ish inches - intake is 20 in and 4 inches past for safety
             } // if intake is down

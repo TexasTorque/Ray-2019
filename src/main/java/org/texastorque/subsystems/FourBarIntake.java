@@ -47,16 +47,16 @@ public class FourBarIntake extends Subsystem {
         if (state == RobotState.AUTO) {
             if (input.getINActive()) {
                 if (input.getHatchState()) {
-                    wheelSpeed = 0.5;
+                    wheelSpeed = 0.2;
                 } else {
-                    wheelSpeed = -0.5;
+                    wheelSpeed = -0.2;
                 }
             } 
             else {
                 if (input.getHatchState()) {
-                    wheelSpeed = 0.08;
+                    wheelSpeed = 0.05;
                 } else {
-                    wheelSpeed = -0.08;
+                    wheelSpeed = -0.05;
                 }
             }
         }
