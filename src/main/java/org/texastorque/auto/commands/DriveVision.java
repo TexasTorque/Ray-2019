@@ -11,11 +11,8 @@ public class DriveVision extends Command {
     public DriveVision(double delay) {
         super(delay);
 
-        visionPID = new ScheduledPID.Builder(0, -0.3, 0.3, 5)
-                .setRegions(-0.4, -0.2, 0.2, 0.4)
-                .setPGains(0.3, 0.5, 0.8, 0.5, 0.3)
-                //.setIGains(0.1, 0, 0, 0, 0.1)
-                //.setDGains(0, 0.02, 0, 0.02, 0)
+        visionPID = new ScheduledPID.Builder(0, 0.5, 1)
+                .setPGains(0.25)
                 .build();
 
         currentOffset = 0;
@@ -30,8 +27,12 @@ public class DriveVision extends Command {
         double adjustment = visionPID.calculate(currentOffset);
         System.out.println("Offset: " + currentOffset + " || Adjustment: " + adjustment);
 
-        double leftSpeed = 0.3 - adjustment;
-        double rightSpeed = 0.3 + adjustment;
+        double baseOutput = 0.3;
+        if (feedback.getULLeft() < 1.5 && feedback.getULRight() < 1.5) {
+            baseOutput = 0;
+        }
+        double leftSpeed = baseOutput - adjustment;
+        double rightSpeed = baseOutput + adjustment;
 
         input.setDBLeftSpeed(leftSpeed);
         input.setDBRightSpeed(rightSpeed);
@@ -40,8 +41,8 @@ public class DriveVision extends Command {
     @Override
     protected boolean endCondition() {
         return Math.abs(currentOffset) < 0.1 
-                && feedback.getULLeft() < 1 
-                && feedback.getULRight() < 1;
+                && feedback.getULLeft() < 1.5 
+                && feedback.getULRight() < 1.5;
     }
 
     @Override

@@ -41,7 +41,7 @@ public class DriveBase extends Subsystem {
         gearShift = new DoubleSolenoid(0, Ports.DB_SOLE_A, Ports.DB_SOLE_B);
 
         visionPID = new ScheduledPID.Builder(0, 0.5, 1)
-                .setPGains(0.5)
+                .setPGains(0.25)
                 // .setRegions(-0.4, -0.2, 0.2, 0.4)
                 // .setPGains(0.3, 0.5, 0.8, 0.5, 0.3)
                 // .setIGains(0.1, 0, 0, 0, 0.1)
@@ -59,7 +59,6 @@ public class DriveBase extends Subsystem {
     public void teleopInit() {
         leftSpeed = 0.0;
         rightSpeed = 0.0;
-        // feedback.gyroReset();
     }
 
     @Override

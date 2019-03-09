@@ -19,11 +19,7 @@ public class OneHatchRocket3 extends Sequence {
         block1.add(new DrivePath(0, points1, false));
 
         ArrayList<Command> block2 = new ArrayList<>();
-        Waypoint[] points2 = new Waypoint[] {
-            new Waypoint(0, 0, Pathfinder.d2r(30)),
-            new Waypoint(3, 1.5, Pathfinder.d2r(30))
-        };
-        block2.add(new DrivePath(0, points2, true));
+        block2.add(new DriveVision(0));
 
         ArrayList<Command> block3 = new ArrayList<>();
         Waypoint[] points3 = new Waypoint[] {
@@ -41,8 +37,8 @@ public class OneHatchRocket3 extends Sequence {
 
         addBlock(block1);
         addBlock(block2);
-        addBlock(block3);
-        addBlock(block4);
+        // addBlock(block3);
+        // addBlock(block4);
     }
 
 }

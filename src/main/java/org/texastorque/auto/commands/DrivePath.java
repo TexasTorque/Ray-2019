@@ -12,9 +12,10 @@ public class DrivePath extends Command {
     private DistanceFollower leftFollower;
     private DistanceFollower rightFollower;
     private boolean isForward;
-    // private int direction;
 
     /**
+     * Position is relative, heading angle is set to 0 in robotInit() and remains absolute
+     * 
      * Resources
      * https://www.chiefdelphi.com/t/pathfinder-coordinate-system/159870
      * https://www.chiefdelphi.com/t/problems-with-pathfinder-motion-profiling/163830

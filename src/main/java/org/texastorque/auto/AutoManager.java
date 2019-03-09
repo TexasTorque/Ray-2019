@@ -21,6 +21,8 @@ public class AutoManager {
         autoSequences.add(new BackupDrive());
         autoSequences.add(new OneHatchRocket1());
         autoSequences.add(new OneHatchRocket3());
+        autoSequences.add(new TestSequence());
+        
 
         System.out.println("Auto sequences loaded.");
 
@@ -35,7 +37,7 @@ public class AutoManager {
 
     public void chooseSequence() {
         String autoChoice = autoSelector.getSelected();
-        // autoChoice = "OneHatchRocket";
+        // autoChoice = "TestSequence";
 
         switch(autoChoice) {
             case "BackupDrive":
@@ -48,6 +50,10 @@ public class AutoManager {
 
             case "3 OneHatchRocket":
                 currentSequence = autoSequences.get(2);
+                break;
+
+            case "TestSequence":
+                currentSequence = autoSequences.get(3);
                 break;
         }
 

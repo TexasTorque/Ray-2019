@@ -73,7 +73,7 @@ public class Climber extends Subsystem {
             }
             else if (input.getCMRetract()) {
                 tomSpeed = -0.2;
-                rearSpeed = -0.4;
+                rearSpeed = -0.2;
             }
             else {
                 tomSpeed = 0;

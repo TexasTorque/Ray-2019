@@ -227,6 +227,8 @@ public class Feedback {
 
         SmartDashboard.putNumber("UL_leftDistance", UL_leftDistance);
         SmartDashboard.putNumber("UL_rightDistance", UL_rightDistance);
+
+        SmartDashboard.putNumber("DB_targetOffset", DB_targetOffset);
     }
 
     public static Feedback getInstance() {
