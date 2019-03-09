@@ -133,11 +133,8 @@ public class Input {
     private volatile int RT_setpoint = 0;
     private volatile double RT_offset = 0;
     private boolean elevated = true;
-    private double tempRotSpeed = 0.0;
-    private boolean tempRotBool = false;
     
     public void updateRotary() {
-        tempRotSpeed = 0.0;
         if (operator.getDPADDown()) {
             RT_setpoint = 3;
             elevated = false;
@@ -152,20 +149,13 @@ public class Input {
         }
         else if (operator.getDPADLeft()) {
             RT_setpoint = 0;
+            elevated = true;
         }
         else if (operator.getLeftYAxis() > 0.1) {
             RT_offset += 0.2;
         }
         else if (operator.getLeftYAxis() < -0.1) {
             RT_offset -= 0.2;
-        }
-        else if (driver.getDPADDown()) {
-            tempRotSpeed = 0.4;
-            tempRotBool = true;
-        }
-        else if (driver.getDPADUp()) {
-            tempRotSpeed = -0.4;
-            tempRotBool = true;
         }
     }
 
@@ -179,14 +169,6 @@ public class Input {
 
     public boolean getElevated(){
         return elevated;
-    }
-
-    public boolean getTempRotBool(){
-        return tempRotBool;
-    }
-
-    public double getTempRotSpeed() {
-        return tempRotSpeed;
     }
 
     public void setRTSetpoint(int setpoint){

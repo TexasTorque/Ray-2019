@@ -22,12 +22,12 @@ public class AutoManager {
         // addition of different sequences - one sequence per match - each sequence has multiple blocks in it 
         autoSequences.add(new BackupDrive());
         autoSequences.add(new OneHatchRocket());
-        autoSequences.add(new Baseline());
+        autoSequences.add(new TestStuff());
 
         System.out.println("Auto sequences loaded.");
 
         // options 
-        autoSelector.setDefaultOption("Baseline", "Baseline");
+        autoSelector.setDefaultOption("TestStuff", "TestStuff");
         autoSelector.addOption("OneHatchRocket", "OneHatchRocket");
         autoSelector.addOption("BackupDrive", "BackupDrive");
     }
@@ -39,7 +39,7 @@ public class AutoManager {
     public void chooseSequence() {
         String autoChoice = autoSelector.getSelected();
         
-        autoChoice = "Baseline";
+        autoChoice = "TestStuff";
 
         switch(autoChoice) { // menu for different autos 
             case "BackupDrive":
@@ -48,7 +48,7 @@ public class AutoManager {
             case "OneHatchRocket":
                 currentSequence = autoSequences.get(1);
                 break;
-            case "Baseline":
+            case "TestStuff":
                 currentSequence = autoSequences.get(2);
                 break;
         }

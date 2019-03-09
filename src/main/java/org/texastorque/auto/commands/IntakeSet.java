@@ -11,7 +11,7 @@ import org.texastorque.auto.Command;
 
 import edu.wpi.first.wpilibj.Timer;
 
-public class HatchSet extends Command{
+public class IntakeSet extends Command{
 
     private double startTime;
     private double time;
@@ -20,18 +20,15 @@ public class HatchSet extends Command{
     /**
      * 
      * modes
-     * 1 - hatch intake / cargo outtake - normal
-     * 2 - hatch outtake / cargo intake - normal
-     * 3 - hatch outtake - hp mode
-     * 5 - cargo hold base speed
-     * 
+     * true hatchstate = outtake cargo/intake hatch (floor) = horn hatch outtake
+     * false hatchstate = intake cargo/outtake hatch (floor) 
      */
 
-    public HatchSet(double delay, int time, boolean hatchState) {
+    public IntakeSet(double delay, double time, boolean hatchState) { 
         super(delay);
         this.time = time;
         this.hatchState = hatchState;
-    } // HatchSet
+    } // IntakeSet
 
     @Override
     protected void init() {
@@ -54,4 +51,4 @@ public class HatchSet extends Command{
         input.setINActive(false);
     } // end
         
-} // HatchSet
+} // IntakeSet

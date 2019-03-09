@@ -21,6 +21,7 @@ public class DrivePath extends Command {
      * https://www.chiefdelphi.com/t/tuning-pathfinder-pid-talon-motion-profiling-magic-etc/162516/4
      * https://www.thorlabs.com/tutorials.cfm?tabID=5dfca308-d07e-46c9-baa0-4defc5c40c3e
      */
+
     public DrivePath(double delay, Waypoint[] points, boolean isForward) {
         super(delay);
 
@@ -35,6 +36,7 @@ public class DrivePath extends Command {
          * Max Acceleration (ft/s/s)
          * Max Jerk (ft/s/s/s)
          */
+        
         Trajectory.Config config = new Trajectory.Config(Trajectory.FitMethod.HERMITE_CUBIC, Trajectory.Config.SAMPLES_LOW, 0.01, Constants.DB_LOW_MAX_SPEED, Constants.DB_LOW_MAX_ACCEL, Constants.DB_LOW_MAX_JERK);
         
         Trajectory path = Pathfinder.generate(points, config);
