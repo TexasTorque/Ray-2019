@@ -26,7 +26,7 @@ public class DriveVision extends Command {
         currentOffset = feedback.getTargetOffset();
         double adjustment = visionPID.calculate(currentOffset);
 
-        double baseOutput = 0.3;
+        double baseOutput = 0.5;
         if (feedback.getULLeft() < 1.5 && feedback.getULRight() < 1.5) {
             baseOutput = 0;
         }

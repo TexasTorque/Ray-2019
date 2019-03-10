@@ -31,8 +31,8 @@ public class Lift extends Subsystem {
 
         liftPID = new ScheduledPID.Builder(setpoint, -0.3, 0.8, 2)
                 .setRegions(0)
-                .setPGains(0.1, 1.0)
-                .setIGains(0, 0.5)
+                .setPGains(0.3, 1.0)
+                .setIGains(0.1, 0.1) //0, 0.5
                 //.setDGains(0.01)
                 .build();
     }
@@ -59,7 +59,11 @@ public class Lift extends Subsystem {
         }
 
         else if (state == RobotState.TELEOP) {
-            runLiftPID();
+            if (input.getLFManualMode()) {
+                speed = input.getLFManualOutput();
+            } else {
+                runLiftPID();
+            }
         }
 
         else if (state == RobotState.VISION) {

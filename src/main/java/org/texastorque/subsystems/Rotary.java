@@ -39,7 +39,6 @@ public class Rotary extends Subsystem {
 
     @Override
     public void teleopInit() {
-        setpoint = input.getLFSetpoint(2);
         speed = 0;
     }
 
@@ -57,10 +56,15 @@ public class Rotary extends Subsystem {
     @Override
     public void run(RobotState state) {
         if (state == RobotState.AUTO) {
+            runRotaryPID();
         }
 
         else if (state == RobotState.TELEOP) {
-            runRotaryPID();
+            if (input.getRTManualMode()) {
+                speed = input.getRTManualOutput();
+            } else {
+                runRotaryPID();
+            }
         }
 
         else if (state == RobotState.VISION) {

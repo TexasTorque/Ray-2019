@@ -1,34 +1,29 @@
 package org.texastorque.torquelib.util;
 
-import edu.wpi.first.wpilibj.Timer;
-
 public class TorqueToggle {
 
 	private boolean toggle;
-	private boolean lastCheck;
+	private boolean lastValue;
 
 	public TorqueToggle() {
 		toggle = false;
-		lastCheck = false;
+		lastValue = false;
 	}
 	
 	public TorqueToggle(boolean override) {
 		toggle = override;
 	}
 
-	public void calc(boolean current) {
-		// Checks for an edge in boolean state. We only want to perform an
-		// action once when we go from False to True
-		if (current != lastCheck) {
-			// If the value is true now, it is the first time it is true. Flip
-			// the toggle.
-			if (current) {
+	public void calc(boolean currentValue) {
+		// Checks for an edge in boolean state. We only want to perform an action once when we go from False to True
+		if (currentValue != lastValue) {
+			// If the value is true now, it is the first time it is true. Flip the toggle.
+			if (currentValue) {
 				toggle = !toggle;
-				System.out.println("IT FLIPPED");
 			}
-			// Keep track of the previous value. Does not need to be updated if
-			// lastCheck is already equal to current.
-			lastCheck = current;
+			
+			// Keep track of the previous value. Does not need to be updated iflastCheck is already equal to current.
+			lastValue = currentValue;
 		}
 	}
 

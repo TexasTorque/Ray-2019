@@ -1,15 +1,14 @@
 #!/bin/sh
-### TYPE: upload-java
-/bin/mount -o remount,rw / && /bin/mount -o remount,rw /boot
+### TYPE: builtin
 echo "Waiting 5 seconds..."
 sleep 5
-# exec env LD_LIBRARY_PATH=/usr/local/frc/lib java -jar uploaded.jar
 
-### kill python processes
-for pid in $(ps -ef | grep "python3" | awk '{print $2}'); do kill -9 $pid; done
+for pid in $(ps -ef | grep "python3" | awk '{print $2}')
+do
+	echo "Killing process: " $pid
+	kill -9 $pid
+done
+
 sleep 1
-exec ./vision.py
 
-### kill java processes
-# for pid in $(ps -ef | grep "java" | awk '{print $2}'); do kill -9 $pid; done
-# exec env LD_LIBRARY_PATH=/usr/local/frc/lib java -jar java-multiCameraServer-all.jar
+exec ./vision.py

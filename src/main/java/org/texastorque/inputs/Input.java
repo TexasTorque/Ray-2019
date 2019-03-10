@@ -2,14 +2,7 @@ package org.texastorque.inputs;
 
 import org.texastorque.inputs.State.RobotState;
 import org.texastorque.torquelib.util.GenericController;
-import org.texastorque.torquelib.component.TorqueEncoder;
-import org.texastorque.inputs.Feedback.*;
-
-/**
- * All forms of input, including driver/operator controllers and input from the code itself.
- * 
- * Setters should only be used by Commands. Subsystems should only use getters.
- */
+import org.texastorque.torquelib.util.TorqueToggle;
 
 /**
  * All forms of input, including driver/operator controllers and input from the code itself.
@@ -41,7 +34,9 @@ public class Input {
         updateClimber();
     }
 
+
     // =========== RobotState ==========
+
     public void updateState() {
         if (driver.getXButtonPressed()) {
             if (state.getRobotState() == RobotState.TELEOP) {
@@ -52,9 +47,10 @@ public class Input {
             }
         }
     }
-
     
+
     // ========== DriveBase ==========
+
     private volatile double DB_leftSpeed = 0;
     private volatile double DB_rightSpeed = 0;
     private volatile boolean DB_highGear = false;
@@ -93,26 +89,43 @@ public class Input {
 
 
     // ========== Lift ==========
-    private final double[] LF_setpoints = {0.0, 3.8, 5.0}; // {0.0, 2.5, 5.0};
+
+    private final double[] LF_setpoints = {0.0, 0.5, 3.0, 3.5, 4.5, 5.0}; // {0.0, 2.5, 5.0};
     private volatile int LF_setpoint = 0;
     private volatile int LF_modifier = 0;
     private volatile double LF_offset = 0;
+    private volatile TorqueToggle LF_manualMode = new TorqueToggle(false);
+    private volatile double LF_manualOutput = 0;
 
     public void updateLift() {
-        if (operator.getAButtonPressed()) {
-            LF_setpoint = 0;
+        LF_manualMode.calc(operator.getRightCenterButton());
+
+        if (!LF_manualMode.get()) {
+            if (operator.getDPADUp()) {
+                LF_modifier = 1;
+            }
+            else if (operator.getDPADRight() || operator.getDPADDown() || operator.getDPADLeft()) {
+                LF_modifier = 0;
+            }
+
+            if (operator.getAButtonPressed()) {
+                LF_setpoint = 0 + LF_modifier;
+            }
+            else if (operator.getBButtonPressed()) {
+                LF_setpoint = 2 + LF_modifier;
+            }
+            else if (operator.getYButtonPressed()) {
+                LF_setpoint = 4 + LF_modifier;
+            }
+            else if (operator.getRightYAxis() > 0.1) {
+                LF_offset -= 0.01;
+            }
+            else if (operator.getRightYAxis() < -0.1) {
+                LF_offset += 0.01;
+            }
         }
-        else if (operator.getBButtonPressed()) {
-            LF_setpoint = 1;
-        }
-        else if (operator.getYButtonPressed()) {
-            LF_setpoint = 2;
-        }
-        else if (operator.getRightYAxis() > 0.1) {
-            LF_offset -= 0.01;
-        }
-        else if (operator.getRightYAxis() < -0.1) {
-            LF_offset += 0.01;
+        else {
+            LF_manualOutput = -0.5 * operator.getRightYAxis();
         }
     }
 
@@ -124,33 +137,52 @@ public class Input {
         return LF_setpoints[index] + LF_offset;
     }
 
+    public boolean getLFManualMode() {
+        return LF_manualMode.get();
+    }
+
+    public double getLFManualOutput() {
+        return LF_manualOutput;
+    }
+
     public void setLFSetpoint(int index) {
         LF_setpoint = index;
     }
 
+
     // ========== Rotary ==========
-    private final double[] RT_setpoints = {0, 45, 71, 89};
+
+    private final double[] RT_setpoints = {0, 45, 71, 90};
     private volatile int RT_setpoint = 0;
     private volatile double RT_offset = 0;
+    private volatile TorqueToggle RT_manualMode = new TorqueToggle(false);
+    private volatile double RT_manualOutput = 0;
     
     public void updateRotary() {
-        if (operator.getDPADDown()) {
-            RT_setpoint = 3;
+        RT_manualMode.calc(operator.getLeftCenterButton());
+        
+        if (!RT_manualMode.get()) {
+            if (operator.getDPADDown()) {
+                RT_setpoint = 3;
+            }
+            else if (operator.getDPADRight()) {
+                RT_setpoint = 2;
+            }
+            else if (operator.getDPADUp()) {
+                RT_setpoint = 1;
+            }
+            else if (operator.getDPADLeft()) {
+                RT_setpoint = 0;
+            }
+            else if (operator.getLeftYAxis() > 0.1) {
+                RT_offset += 0.2;
+            }
+            else if (operator.getLeftYAxis() < -0.1) {
+                RT_offset -= 0.2;
+            }
         }
-        else if (operator.getDPADRight()) {
-            RT_setpoint = 2;
-        }
-        else if (operator.getDPADUp()) {
-            RT_setpoint = 1;
-        }
-        else if (operator.getDPADLeft()) {
-            RT_setpoint = 0;
-        }
-        else if (operator.getLeftYAxis() > 0.1) {
-            RT_offset += 0.2;
-        }
-        else if (operator.getLeftYAxis() < -0.1) {
-            RT_offset -= 0.2;
+        else {
+            RT_manualOutput = 0.5 * operator.getLeftYAxis();
         }
     }
 
@@ -162,16 +194,25 @@ public class Input {
         return RT_setpoints[index] + RT_offset;
     }
 
+    public boolean getRTManualMode() {
+        return RT_manualMode.get();
+    }
+
+    public double getRTManualOutput() {
+        return RT_manualOutput;
+    }
+
     public void setRTSetpoint(int index) {
         RT_setpoint = index;
     }
 
+
     // ========== Intake ==========
-    private volatile boolean IN_active;
-    private volatile boolean IN_hatchState;
+
+    private volatile boolean IN_active = false;
+    private volatile boolean IN_hatchState = false;
     private volatile boolean IN_tuskEngaged = true;
     
-    // right bumper = cargo intake/hatch outtake
     public void updateIntake() {
         IN_active = false;
 
@@ -182,7 +223,7 @@ public class Input {
         else if (driver.getRightTrigger()) {
             IN_active = true;
             IN_hatchState = false;
-        } //hatch outtake, cargo intake
+        } // hatch outtake, cargo intake
         
         if (driver.getAButtonPressed()) {
             IN_tuskEngaged = false;
@@ -216,22 +257,20 @@ public class Input {
         IN_hatchState = state;
     }
 
+
     //========== Climber ==========
-    private volatile boolean CM_enabled = false;
+
+    private volatile TorqueToggle CM_enabled = new TorqueToggle(false);
     private volatile boolean CM_retract = false;
-    private volatile boolean lastLeftCenter = false; //being held
 
     public volatile double CM_tomSpeed;
     public volatile double CM_rearSpeed;
     
     public void updateClimber() {
         CM_retract = false;
+        CM_enabled.calc(driver.getLeftCenterButton());
 
-        if (driver.getLeftCenterButton() && !lastLeftCenter) {
-            CM_enabled = !CM_enabled;
-            lastLeftCenter = true;
-        } else if (!driver.getLeftCenterButton()) {
-            lastLeftCenter = false;
+        if (!CM_enabled.get()) {
             if (driver.getRightCenterButton()) {
                 CM_retract = true;
             }
@@ -242,7 +281,7 @@ public class Input {
     }
 
     public boolean getCMEnabled() {
-        return CM_enabled;
+        return CM_enabled.get();
     }
 
     public boolean getCMRetract() {

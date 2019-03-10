@@ -10,6 +10,7 @@ import util
 
 from cscore import CameraServer, VideoSource, VideoMode
 from networktables import NetworkTablesInstance, NetworkTables
+import logging
 from datetime import datetime
 from random import randint
 
@@ -246,15 +247,18 @@ if __name__ == "__main__":
         sys.exit(1)
 
     # start NetworkTables
+    logging.basicConfig(level=logging.DEBUG)
+    
     ntinst = NetworkTablesInstance.getDefault()
+    targetTable = NetworkTables.getTable("TargetDetection")
 
     if server:
         print("Setting up NetworkTables server")
         ntinst.startServer()
     else:
         print("Setting up NetworkTables client for team {}".format(team))
-        #ntinst.startClientTeam(team)
         ntinst.initialize(server=ntServerIpAddress)
+        # ntinst.startClientTeam(team)
 
     # setup a cvSource
     cs = CameraServer.getInstance()
@@ -286,7 +290,6 @@ if __name__ == "__main__":
     kernel = np.ones((5,5),np.uint8)
 
     # Target params
-    targetTable = ntinst.getTable("TargetDetection")
     targetTable.putNumber("frame_width", frameWidth)
     targetTable.putNumber("frame_height", frameHeight)
     targetOutputStream = cs.putVideo("TargetDetection", frameWidth, frameHeight)
