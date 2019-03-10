@@ -14,7 +14,7 @@ public class DrivePath extends Command {
     private boolean isForward;
 
     /**
-     * Position is relative, heading angle is set to 0 in robotInit() and remains absolute
+     * Position is relative to initial Waypoint, heading angle is set to 0 in robotInit() and remains absolute
      * 
      * Resources
      * https://www.chiefdelphi.com/t/pathfinder-coordinate-system/159870
@@ -24,8 +24,6 @@ public class DrivePath extends Command {
      */
     public DrivePath(double delay, Waypoint[] points, boolean isForward) {
         super(delay);
-
-        // For reverse driving, Waypoint coordinates should be as if robot is driving forward
         this.isForward = isForward;
 
         /**
