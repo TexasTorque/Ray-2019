@@ -103,7 +103,6 @@ public class Climber extends Subsystem {
         rightTom.set(tomSpeed);
         rearA.set(rearSpeed);
         rearB.set(rearSpeed);
-
     }
 
     @Override

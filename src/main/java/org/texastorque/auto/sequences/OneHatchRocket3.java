@@ -41,7 +41,7 @@ public class OneHatchRocket3 extends Sequence {
 
         addBlock(block1);
         addBlock(block2);
-        // addBlock(block3);
+        addBlock(block3);
         // addBlock(block4);
     }
 

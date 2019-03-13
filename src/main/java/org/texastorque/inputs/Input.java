@@ -152,7 +152,7 @@ public class Input {
 
     // ========== Rotary ==========
 
-    private final double[] RT_setpoints = {0, 45, 71, 90};
+    private final double[] RT_setpoints = {0, 45, 72, 90};
     private volatile int RT_setpoint = 0;
     private volatile double RT_offset = 0;
     private volatile TorqueToggle RT_manualMode = new TorqueToggle(false);

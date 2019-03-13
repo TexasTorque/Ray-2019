@@ -6,6 +6,7 @@ import sys
 import os
 import cv2 as cv
 import numpy as np
+import time
 import util
 
 from cscore import CameraServer, VideoSource, VideoMode
@@ -234,7 +235,23 @@ def findTargetTop(hsv, minHSV, maxHSV, kernel):
             return (offset, frame)
 
     return (0, frame)
-    
+
+
+########## BUFFER OUTPUT ##########
+
+lastValue = 0
+updateTime = 0
+def bufferOutput(newOutput, bufferTime):
+    global lastValue, updateTime
+    if newOutput != 0:
+        lastValue = newOutput
+        updateTime = time.perf_counter()
+        
+    if time.perf_counter() - updateTime < bufferTime:
+        return lastValue
+    else:
+        return 0 
+
 
 ########## MAIN ##########
 
@@ -303,4 +320,4 @@ if __name__ == "__main__":
 
         targetOffset, targetFrame = findTargetTop(hsv, minTargetHSV, maxTargetHSV, kernel)
         targetOutputStream.putFrame(targetFrame)
-        targetTable.putNumber("target_offset", util.bufferOutput(targetOffset, 1))
+        targetTable.putNumber("target_offset", bufferOutput(targetOffset, 1))

@@ -29,10 +29,10 @@ public class Lift extends Subsystem {
         speed = 0;
         setpoint = input.getLFSetpoint(0);
 
-        liftPID = new ScheduledPID.Builder(setpoint, -0.3, 0.8, 2)
+        liftPID = new ScheduledPID.Builder(setpoint, -0.2, 1.0, 2)
                 .setRegions(0)
-                .setPGains(0.3, 1.0)
-                .setIGains(0.1, 0.1) //0, 0.5
+                .setPGains(0.2, 1.0)
+                //.setIGains(0.0, 0.5) //0, 0.5
                 //.setDGains(0.01)
                 .build();
     }
@@ -127,6 +127,7 @@ public class Lift extends Subsystem {
 
     @Override
     public void smartDashboard() {
+        SmartDashboard.putNumber("LF_setpoint", setpoint);
         SmartDashboard.putNumber("LF_output", speed);
     }
 
