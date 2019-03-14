@@ -1,0 +1,107 @@
+<xml version="1.0">
+<dashboard>
+	<widget field="LF_setpoint" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
+		<location x="124" y="112"/>
+	</widget>
+	<widget field="NT_targetOffset" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
+		<location x="0" y="283"/>
+	</widget>
+	<widget field="NT_isConnected" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
+		<location x="0" y="304"/>
+	</widget>
+	<widget field="CM_enabled" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
+		<location x="0" y="235"/>
+	</widget>
+	<widget field="UL_rightDistance" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
+		<location x="0" y="208"/>
+	</widget>
+	<widget field="UL_leftDistance" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
+		<location x="0" y="187"/>
+	</widget>
+	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.CameraServerViewer">
+		<location x="476" y="32"/>
+		<width>244</width>
+		<height>181</height>
+		<property name="Camera Choice" value=""/>
+	</static-widget>
+	<widget field="NX_roll" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
+		<location x="116" y="139"/>
+	</widget>
+	<widget field="DB_highGear" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
+		<location x="0" y="59"/>
+	</widget>
+	<widget field="DB_leftSpeed" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
+		<location x="0" y="11"/>
+	</widget>
+	<widget field="LF_position" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
+		<location x="0" y="91"/>
+	</widget>
+	<widget field="DB_rightDistance" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
+		<location x="144" y="32"/>
+	</widget>
+	<widget field="DB_leftDistance" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
+		<location x="144" y="11"/>
+	</widget>
+	<widget field="NX_yaw" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
+		<location x="0" y="160"/>
+	</widget>
+	<widget field="NX_pitch" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
+		<location x="0" y="139"/>
+	</widget>
+	<widget field="CM_atBottom" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
+		<location x="0" y="256"/>
+	</widget>
+	<widget field="LF_output" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
+		<location x="0" y="112"/>
+		<height>21</height>
+	</widget>
+	<widget field="RT_angle" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="142" y="91"/>
+		<property name="Editable" value="false"/>
+	</widget>
+	<widget field="DB_rightSpeed" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
+		<location x="0" y="32"/>
+	</widget>
+	<widget field="State" type="String" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
+		<location x="576" y="0"/>
+		<width>103</width>
+		<height>32</height>
+		<property name="Foreground" value="0.255.0.255"/>
+		<property name="Background" value="0.0.0.255"/>
+		<property name="Font Size" value="16"/>
+	</widget>
+	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.ConnectionIndicator">
+		<location x="688" y="0"/>
+		<width>30</width>
+		<height>32</height>
+	</static-widget>
+	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.MjpgStreamViewerImpl">
+		<location x="476" y="216"/>
+		<width>244</width>
+		<height>184</height>
+		<property name="MJPG Server URL" value="http://10.14.77.43:1182/stream.mjpg"/>
+	</static-widget>
+	<widget field="" type="String Chooser" class="edu.wpi.first.smartdashboard.gui.elements.Chooser">
+		<location x="304" y="0"/>
+	</widget>
+	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.CameraServerViewer">
+		<location x="476" y="32"/>
+		<width>244</width>
+		<height>181</height>
+		<property name="Camera Choice" value=""/>
+	</static-widget>
+	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.ConnectionIndicator">
+		<location x="688" y="0"/>
+		<width>30</width>
+		<height>32</height>
+	</static-widget>
+	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.MjpgStreamViewerImpl">
+		<location x="476" y="216"/>
+		<width>244</width>
+		<height>184</height>
+		<property name="MJPG Server URL" value="http://10.14.77.43:1182/stream.mjpg"/>
+	</static-widget>
+</dashboard>
+<live-window>
+</live-window>
+</xml>
