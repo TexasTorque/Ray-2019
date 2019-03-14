@@ -24,15 +24,14 @@ public class AutoManager {
         autoSequences.add(new OneHatchShipTeleop2());
         autoSequences.add(new OneHatchRocket3());
         autoSequences.add(new TestSequence());
-        
-
-        System.out.println("Auto sequences loaded.");
 
         autoSelector.setDefaultOption("BackupDrive", "BackupDrive");
         autoSelector.addOption("1 OneHatchRocket", "1 OneHatchRocket");
         autoSelector.addOption("2 OneHatchShip", "2 OneHatchShip");
         autoSelector.addOption("2 OneHatchShipTeleop", "2 OneHatchShipTeleop");
         autoSelector.addOption("3 OneHatchRocket", "3 OneHatchRocket");
+
+        System.out.println("Auto sequences loaded.");
     }
 
     public void displayChoices() {
