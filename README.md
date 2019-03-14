@@ -58,7 +58,7 @@ Listen up future programmers, I'm gonna tell you right now how to take over FRC:
 2. Integrate lidar with vision processing, and use it to handle live conditions on the field
 3. Run simulations of the game, use machine learning to find the best strategy, and generate paths
 4. Retire the driver and operator because the robot is now fully autonomous
-5. Be the 2025 championship alliance captain
+5. Be 2025 world champs
 
 ## Contributors
 Mentors: William Vo, Jacob Lubecki

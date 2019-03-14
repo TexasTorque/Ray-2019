@@ -37,6 +37,8 @@ public class Input {
 
     // =========== RobotState ==========
 
+    private volatile boolean endFakeTeleop = false;
+
     public void updateState() {
         if (driver.getXButtonPressed()) {
             if (state.getRobotState() == RobotState.TELEOP) {
@@ -46,8 +48,17 @@ public class Input {
                 state.setRobotState(RobotState.TELEOP);
             }
         }
+
+        endFakeTeleop = false;
+        if (driver.getYButtonPressed()) {
+            endFakeTeleop = true;
+        }
     }
-    
+
+    public boolean getEndFakeTeleop() {
+        return endFakeTeleop;
+    }
+
 
     // ========== DriveBase ==========
 

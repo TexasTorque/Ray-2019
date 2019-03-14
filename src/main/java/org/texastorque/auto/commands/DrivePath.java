@@ -64,8 +64,8 @@ public class DrivePath extends Command {
             input.setDBRightSpeed(rightFollower.calculate(feedback.getDBRightDistance()) - turn);
         }
         else {
-            input.setDBLeftSpeed(-rightFollower.calculate(-feedback.getDBLeftDistance()) - turn);
-            input.setDBRightSpeed(-leftFollower.calculate(-feedback.getDBRightDistance()) + turn);
+            input.setDBLeftSpeed(-rightFollower.calculate(-feedback.getDBLeftDistance()) + turn);
+            input.setDBRightSpeed(-leftFollower.calculate(-feedback.getDBRightDistance()) - turn);
         }
 	}
 

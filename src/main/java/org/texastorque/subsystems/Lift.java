@@ -29,9 +29,9 @@ public class Lift extends Subsystem {
         speed = 0;
         setpoint = input.getLFSetpoint(0);
 
-        liftPID = new ScheduledPID.Builder(setpoint, -0.2, 1.0, 2)
+        liftPID = new ScheduledPID.Builder(setpoint, -0.2, 0.8, 2)
                 .setRegions(0)
-                .setPGains(0.2, 1.0)
+                .setPGains(0.2, 0.8)
                 //.setIGains(0.0, 0.5) //0, 0.5
                 //.setDGains(0.01)
                 .build();

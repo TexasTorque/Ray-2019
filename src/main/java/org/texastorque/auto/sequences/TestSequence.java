@@ -12,7 +12,7 @@ public class TestSequence extends Sequence {
     @Override
     protected void init() {
         ArrayList<Command> block1 = new ArrayList<>();
-        block1.add(new DriveVision(0));
+        block1.add(new DriveTurn(0, 90));
 
         addBlock(block1);
     }

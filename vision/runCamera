@@ -9,6 +9,4 @@ do
 	kill -9 $pid
 done
 
-sleep 1
-
 exec ./vision.py
