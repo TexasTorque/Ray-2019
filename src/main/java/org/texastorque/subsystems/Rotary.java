@@ -61,7 +61,11 @@ public class Rotary extends Subsystem {
         }
 
         else if (state == RobotState.TELEOP) {
-            runRotaryPID();
+            if (input.getRTEncoderDead()){
+                speed = input.getRTSpeed();
+            } else {
+                runRotaryPID();
+            }
         }
 
         else if (state == RobotState.VISION) {

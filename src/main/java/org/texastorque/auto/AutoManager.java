@@ -20,9 +20,11 @@ public class AutoManager {
         autoSequences = new ArrayList<Sequence>();
         
         // addition of different sequences - one sequence per match - each sequence has multiple blocks in it 
-        autoSequences.add(new BackupDrive());
-        autoSequences.add(new OneHatchRocket());
         autoSequences.add(new TestStuff());
+        autoSequences.add(new OneHatchRocket());
+        autoSequences.add(new BackupDrive());
+        autoSequences.add(new OneHatchRocket1());
+        autoSequences.add(new OneHatchRocket3());
 
         System.out.println("Auto sequences loaded.");
 
@@ -30,6 +32,9 @@ public class AutoManager {
         autoSelector.setDefaultOption("TestStuff", "TestStuff");
         autoSelector.addOption("OneHatchRocket", "OneHatchRocket");
         autoSelector.addOption("BackupDrive", "BackupDrive");
+        autoSelector.addOption("OneHatchRocket1", "OneHatchRocket1");
+        autoSelector.addOption("OneHatchRocket3", "OneHatchRocket3");
+        
     }
 
     public void displayChoices() {
@@ -39,17 +44,23 @@ public class AutoManager {
     public void chooseSequence() {
         String autoChoice = autoSelector.getSelected();
         
-        autoChoice = "TestStuff";
+        //autoChoice = "OneHatchRocket3";
 
         switch(autoChoice) { // menu for different autos 
-            case "BackupDrive":
+            case "TestStuff":
                 currentSequence = autoSequences.get(0);
                 break;
             case "OneHatchRocket":
                 currentSequence = autoSequences.get(1);
                 break;
-            case "TestStuff":
+            case "BackupDrive":
                 currentSequence = autoSequences.get(2);
+                break;
+            case "OneHatchRocket1":
+                currentSequence = autoSequences.get(3);
+                break;
+            case "OneHatchRocket3":
+                currentSequence = autoSequences.get(4);
                 break;
         }
 

@@ -2,8 +2,7 @@ package org.texastorque.inputs;
 
 import org.texastorque.inputs.State.RobotState;
 import org.texastorque.torquelib.util.GenericController;
-import org.texastorque.torquelib.component.TorqueEncoder;
-import org.texastorque.inputs.Feedback.*;
+import org.texastorque.torquelib.util.TorqueToggle;
 
 /**
  * All forms of input, including driver/operator controllers and input from the code itself.
@@ -16,6 +15,7 @@ import org.texastorque.inputs.Feedback.*;
  * 
  * Setters should only be used by Commands. Subsystems should only use getters.
  */
+
 public class Input {
 
     private static volatile Input instance;
@@ -23,13 +23,16 @@ public class Input {
     private volatile State state;
 	private GenericController driver;
     private  GenericController operator;
-    // private  GenericController tester;
+    private TorqueToggle LF_encoderState;
+    private TorqueToggle RT_encoderState;
     
     private Input() {
         state = State.getInstance();
 		driver = new GenericController(0, .1);
         operator = new GenericController(1, .1);
-        // tester = new GenericController(2, .1);
+
+        LF_encoderState = new TorqueToggle();
+        RT_encoderState = new TorqueToggle();
     }
     
     public void updateControllers() {
@@ -93,12 +96,19 @@ public class Input {
 
 
     // ========== Lift ==========
-    private final double[] LF_setpoints = {0.0, 3.8, 5.0}; // {0.0, 2.5, 5.0};
+    private final double[] LF_setpoints = {0.0, 2.7, 5.0}; // {0.0, 2.5, 5.0};
     private volatile int LF_setpoint = 0;
     private volatile int LF_modifier = 0;
     private volatile double LF_offset = 0;
 
+    private volatile boolean LF_encoderDead = false;
+    private volatile double LF_speed = 0.0;
+
     public void updateLift() {
+        LF_encoderState.calc(operator.getRightCenterButton());
+        LF_encoderDead = LF_encoderState.get();
+        LF_speed = 0;
+        
         if (operator.getAButtonPressed()) {
             LF_setpoint = 0;
         }
@@ -109,12 +119,22 @@ public class Input {
             LF_setpoint = 2;
         }
         else if (operator.getRightYAxis() > 0.1) {
-            LF_offset -= 0.01;
+            if (LF_encoderDead) {
+                LF_speed = -0.3;
+            } 
+            else {
+                LF_offset -= 0.01;
+            }
         }
         else if (operator.getRightYAxis() < -0.1) {
-            LF_offset += 0.01;
+            if (LF_encoderDead) {
+                LF_speed = 0.3;
+            } 
+            else {
+                LF_offset += 0.01;
+            }
         }
-    }
+    } // updateLift
 
     public double getLFSetpoint() {
         return LF_setpoints[LF_setpoint] + LF_offset;
@@ -122,6 +142,14 @@ public class Input {
 
     public double getLFSetpoint(int index) {
         return LF_setpoints[index] + LF_offset;
+    }
+
+    public double getLFSpeed() {
+        return LF_speed;
+    }
+
+    public boolean getLFEncoderDead(){
+        return LF_encoderDead;
     }
 
     public void setLFSetpoint(int index) {
@@ -133,8 +161,14 @@ public class Input {
     private volatile int RT_setpoint = 0;
     private volatile double RT_offset = 0;
     private boolean elevated = true;
+
+    private volatile boolean RT_encoderDead = false;
+    private volatile double RT_speed;
     
     public void updateRotary() {
+        RT_encoderState.calc(operator.getLeftCenterButton());
+        RT_encoderDead = RT_encoderState.get();
+        RT_speed = -.06; // to keep it up against gravity
         if (operator.getDPADDown()) {
             RT_setpoint = 3;
             elevated = false;
@@ -152,10 +186,20 @@ public class Input {
             elevated = true;
         }
         else if (operator.getLeftYAxis() > 0.1) {
-            RT_offset += 0.2;
+            if (RT_encoderDead) {
+                RT_speed = 0.1;
+            } 
+            else {
+                RT_offset += 0.2;
+            }
         }
         else if (operator.getLeftYAxis() < -0.1) {
-            RT_offset -= 0.2;
+            if (RT_encoderDead) {
+                RT_speed = -0.3;
+            }
+            else {
+                RT_offset -= 0.2;
+            }
         }
     }
 
@@ -169,6 +213,14 @@ public class Input {
 
     public boolean getElevated(){
         return elevated;
+    }
+
+    public double getRTSpeed() {
+        return RT_speed;
+    }
+
+    public boolean getRTEncoderDead(){
+        return RT_encoderDead;
     }
 
     public void setRTSetpoint(int setpoint){

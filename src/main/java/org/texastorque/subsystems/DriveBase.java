@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.Relay;
 
 public class DriveBase extends Subsystem {
 
@@ -42,6 +43,8 @@ public class DriveBase extends Subsystem {
     private double shiftUpSpeed = 11;
     private double shiftDownSpeed = 9;
 
+    private Relay lightRing;
+
     private DriveBase() {
         leftFore = new TorqueMotor(new VictorSP(Ports.DB_LEFT_FORE_MOTOR), !clockwise);
         leftMid = new TorqueMotor(new VictorSP(Ports.DB_LEFT_MID_MOTOR), !clockwise);
@@ -52,6 +55,8 @@ public class DriveBase extends Subsystem {
         rightRear = new TorqueMotor(new VictorSP(Ports.DB_RIGHT_REAR_MOTOR), clockwise);
         
         gearShift = new DoubleSolenoid(0, Ports.DB_SOLE_A, Ports.DB_SOLE_B);
+
+        lightRing = new Relay(Ports.LR_RELAY);
 
         visionPID = new ScheduledPID.Builder(0, 0.5, 1)
                 .setPGains(0.5)
@@ -86,6 +91,7 @@ public class DriveBase extends Subsystem {
         if (state == RobotState.AUTO) {
             leftSpeed = input.getDBLeftSpeed();
             rightSpeed = input.getDBRightSpeed();
+            lightRing.set(Relay.Value.kOff);
         }
 
         else if (state == RobotState.TELEOP) {
@@ -95,7 +101,7 @@ public class DriveBase extends Subsystem {
             rotaryPos = input.getElevated();
             ultrasonicDist_L = feedback.getULLeft();
             ultrasonicDist_R = feedback.getULRight();
-             
+
             if (!rotaryPos){
                 if (ultrasonicDist_L < 2 && ultrasonicDist_R < 2) {
                     if (leftSpeed > 0.3){ 
@@ -107,6 +113,7 @@ public class DriveBase extends Subsystem {
                 } // set cap speed on motors to 0.1 at 24-ish inches - intake is 20 in and 4 inches past for safety
             } // if intake is down
 
+            lightRing.set(Relay.Value.kOff);
         } // TELEOP
 
         else if (state == RobotState.VISION) {
@@ -123,6 +130,8 @@ public class DriveBase extends Subsystem {
 
             ultrasonicDist_L = feedback.getULLeft();
             ultrasonicDist_R = feedback.getULRight();
+
+            lightRing.set(Relay.Value.kForward);
 
         } // VISION
 
@@ -186,6 +195,18 @@ public class DriveBase extends Subsystem {
     @Override
     public void smartDashboard() {
         SmartDashboard.putBoolean("DB_highGear", highGear);
+    }
+
+    public void ledChange(RobotState state) {
+        if (state == RobotState.AUTO) {
+            // set auto color
+        }
+        else if (state == RobotState.TELEOP) {
+            // set teleop color
+        }
+        else if (state == RobotState.VISION) {
+            // set vision color 
+        }
     }
     
     public static DriveBase getInstance() {
