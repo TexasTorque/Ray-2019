@@ -41,6 +41,7 @@ public class Rotary extends Subsystem {
     @Override
     public void teleopInit() {
         speed = 0;
+        setpoint = input.getRTSetpoint(0);
     }
 
     @Override

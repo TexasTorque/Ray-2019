@@ -32,9 +32,10 @@ public class Robot extends TorqueIterative {
 		feedback.resetNavX();
 		feedback.resetDriveEncoders();
 
-		UsbCamera camera = new UsbCamera("Fisheye", 0);
-		camera.setResolution(320, 240);
-		CameraServer.getInstance().startAutomaticCapture(camera);
+		// UsbCamera camera = new UsbCamera("Fisheye", 0);
+		// camera.setResolution(320, 240);
+		// CameraServer.getInstance().startAutomaticCapture(camera);
+		CameraServer.getInstance().startAutomaticCapture(0);
 	}
 
 	private void initSubsystems() {
