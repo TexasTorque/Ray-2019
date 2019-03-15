@@ -15,8 +15,8 @@ public class Input {
 
     private volatile State state;
 	private GenericController driver;
-    private  GenericController operator;
-    // private  GenericController tester;
+    private GenericController operator;
+    // private GenericController tester;
     
     private Input() {
         state = State.getInstance();

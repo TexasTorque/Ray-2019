@@ -5,6 +5,7 @@ import org.texastorque.torquelib.component.TorqueMotor;
 import org.texastorque.torquelib.controlLoop.ScheduledPID;
 
 import edu.wpi.first.wpilibj.VictorSP;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Rotary extends Subsystem {
 
@@ -111,7 +112,10 @@ public class Rotary extends Subsystem {
     public void teleopContinuous() {}
 
     @Override
-    public void smartDashboard() {}
+    public void smartDashboard() {
+        SmartDashboard.putNumber("RT_setpoint", setpoint);
+        SmartDashboard.putNumber("RT_output", speed);
+    }
 
     public static Rotary getInstance() {
         if (instance == null) {
