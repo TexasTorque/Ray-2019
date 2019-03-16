@@ -58,9 +58,7 @@ public class Feedback {
         UL_right = new AnalogInput(Ports.UL_RIGHT);
         
         NT_instance = NetworkTableInstance.getDefault();
-        // NT_instance.setServer("10.14.77.2");
         NT_target = NT_instance.getTable("TargetDetection");
-        NT_instance.startClientTeam(1477);
     }
 
     public void update() {

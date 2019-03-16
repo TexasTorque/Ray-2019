@@ -19,6 +19,7 @@ public class OneHatchShipTeleop2 extends Sequence {
         };
         block1.add(new DrivePath(0, points1, true));
         block1.add(new RotarySet(0, 2));
+        block1.add(new TomInit(0));
 
         // 2
         ArrayList<Command> block2 = new ArrayList<>();

@@ -40,7 +40,7 @@ public class AutoManager {
 
     public void chooseSequence() {
         String autoChoice = autoSelector.getSelected();
-        autoChoice = "2 OneHatchShipTeleop";
+        autoChoice = "BackupDrive";
 
         switch(autoChoice) {
             case "BackupDrive":

@@ -24,7 +24,7 @@ public class Rotary extends Subsystem {
         rotary = new TorqueMotor(new VictorSP(Ports.RT_MOTOR), !clockwise);
 
         speed = 0;
-        setpoint = input.getRTSetpoint(0);
+        setpoint = input.calcRTSetpoint(0);
 
         this.rotaryPID = new ScheduledPID.Builder(setpoint, -0.6, 0.5, 1)
                 .setPGains(0.02)
@@ -41,7 +41,7 @@ public class Rotary extends Subsystem {
     @Override
     public void teleopInit() {
         speed = 0;
-        setpoint = input.getRTSetpoint(0);
+        setpoint = input.calcRTSetpoint(0);
     }
 
     @Override
@@ -81,7 +81,7 @@ public class Rotary extends Subsystem {
     }
 
     private void runRotaryPID() {
-        setpoint = input.getRTSetpoint();
+        setpoint = input.calcRTSetpoint();
         currentPos = feedback.getRTPosition();
         if (setpoint != prevSetpoint) {
             rotaryPID.changeSetpoint(setpoint);
@@ -92,7 +92,7 @@ public class Rotary extends Subsystem {
     }
 
     private void runRotaryPID(int position) {
-        setpoint = input.getRTSetpoint(position);
+        setpoint = input.calcRTSetpoint(position);
         currentPos = feedback.getRTPosition();
         if (setpoint != prevSetpoint) {
             rotaryPID.changeSetpoint(setpoint);

@@ -4,8 +4,10 @@ import org.texastorque.inputs.State.RobotState;
 import org.texastorque.constants.Ports;
 import org.texastorque.torquelib.component.TorqueMotor;
 import org.texastorque.torquelib.controlLoop.ScheduledPID;
+import org.texastorque.util.Integrator;
 
 import edu.wpi.first.wpilibj.VictorSP;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Lift extends Subsystem {
@@ -27,7 +29,7 @@ public class Lift extends Subsystem {
         pulleyB = new TorqueMotor(new VictorSP(Ports.LF_MOTOR_B), clockwise);
 
         speed = 0;
-        setpoint = input.getLFSetpoint(0);
+        setpoint = input.calcLFSetpoint(0);
 
         liftPID = new ScheduledPID.Builder(setpoint, -0.2, 0.7, 2)
                 .setRegions(0)
@@ -78,7 +80,7 @@ public class Lift extends Subsystem {
     }
 
     private void runLiftPID() {
-        setpoint = input.getLFSetpoint();
+        setpoint = input.calcLFSetpoint();
         currentPos = feedback.getLFPosition();
         if (setpoint != prevSetpoint) {
             liftPID.changeSetpoint(setpoint);
@@ -89,7 +91,7 @@ public class Lift extends Subsystem {
     }
 
     private void runLiftPID(int position) {
-        setpoint = input.getLFSetpoint(position);
+        setpoint = input.calcLFSetpoint(position);
         currentPos = feedback.getLFPosition();
         if (setpoint != prevSetpoint) {
             liftPID.changeSetpoint(setpoint);
@@ -100,18 +102,30 @@ public class Lift extends Subsystem {
     }
 
     private double addBaseOutput(double speed) {
-        if (feedback.getLFPosition() < input.getLFSetpoint(1)) {
+        if (feedback.getLFPosition() < input.calcLFSetpoint(1)) {
             return speed + 0.05;
         }
-        else if (feedback.getLFPosition() < input.getLFSetpoint(2)) {
+        else if (feedback.getLFPosition() < input.calcLFSetpoint(2)) {
             return speed + 0.08;
         }
         return speed;
     }
 
+    private double startTime = Timer.getFPGATimestamp();
+    private double stallTime = 5.0;
+
     @Override
     protected void output() {
         // speed = addBaseOutput(speed);
+
+        // Check if motor is stalling
+        // if (Math.abs(speed) < 0.4) {
+        //     startTime = Timer.getFPGATimestamp();
+        // }
+        // if (Timer.getFPGATimestamp() - startTime > stallTime) {
+        //     speed = 0;
+        // }
+
         pulleyA.set(speed);
         pulleyB.set(speed);
     }

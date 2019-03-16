@@ -39,14 +39,13 @@ public class Climber extends Subsystem {
     public void autoInit() {
         tomSpeed = 0;
         rearSpeed = 0;
+        rearPID.changeSetpoint(feedback.getPitch());
     }
 
     @Override
     public void teleopInit() {
         tomSpeed = 0;
         rearSpeed = 0;
-
-        rearPID.changeSetpoint(feedback.getPitch());
     }
 
     @Override
@@ -58,7 +57,7 @@ public class Climber extends Subsystem {
     @Override
     public void run(RobotState state) {
         if (state == RobotState.AUTO) {
-            tomSpeed = 0;
+            tomSpeed = input.getCMTomSpeed();
             rearSpeed = 0;
         }
 
@@ -74,8 +73,8 @@ public class Climber extends Subsystem {
                 }
             }
             else if (input.getCMRetract()) {
-                tomSpeed = -0.4;
-                rearSpeed = 0.2;
+                tomSpeed = 0;
+                rearSpeed = 0.3;
             }
             else {
                 tomSpeed = input.getCMTomSpeed();

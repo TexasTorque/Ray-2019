@@ -16,13 +16,13 @@ public class Input {
     private volatile State state;
 	private GenericController driver;
     private GenericController operator;
-    private GenericController tester;
+    // private GenericController tester;
     
     private Input() {
         state = State.getInstance();
 		driver = new GenericController(0, .1);
         operator = new GenericController(1, .1);
-        tester = new GenericController(2, .1);
+        // tester = new GenericController(2, .1);
     }
     
     public void updateControllers() {
@@ -101,9 +101,9 @@ public class Input {
 
     // ========== Lift ==========
 
-    private final double[] LF_setpoints = {0.0, 1.5, 2.5, 4.0, 4.5, 5.0}; // {0.0, 2.5, 5.0};
+    private final double[] LF_setpoints = {0.0, 1.5, 2.8, 4.0, 4.5, 5.0}; // {0.0, 2.5, 5.0};
     private volatile int LF_setpoint = 0;
-    private volatile int LF_modifier = 0;
+    private volatile int LF_modifier = 0; // problem?
     private volatile double LF_offset = 0;
     private volatile TorqueToggle LF_manualMode = new TorqueToggle(false);
     private volatile double LF_manualOutput = 0;
@@ -114,9 +114,11 @@ public class Input {
         if (!LF_manualMode.get()) {
             if (operator.getDPADUp()) {
                 LF_modifier = 1;
+                System.out.println("LF_modifier = 1");
             }
             else if (operator.getDPADRight() || operator.getDPADDown() || operator.getDPADLeft()) {
                 LF_modifier = 0;
+                System.out.println("LF_modifier = 0");
             }
 
             if (operator.getAButtonPressed()) {
@@ -129,10 +131,14 @@ public class Input {
                 LF_setpoint = 4 + LF_modifier;
             }
             else if (operator.getRightYAxis() > 0.1) {
-                LF_offset -= 0.005;
+                if (calcLFSetpoint() > -0.1) {
+                    LF_offset -= 0.005;
+                }
             }
             else if (operator.getRightYAxis() < -0.1) {
-                LF_offset += 0.005;
+                if (calcLFSetpoint() < 5.1) {
+                    LF_offset += 0.005;
+                }
             }
         }
         else {
@@ -140,11 +146,11 @@ public class Input {
         }
     }
 
-    public double getLFSetpoint() {
+    public double calcLFSetpoint() {
         return LF_setpoints[LF_setpoint] + LF_offset;
     }
 
-    public double getLFSetpoint(int index) {
+    public double calcLFSetpoint(int index) {
         return LF_setpoints[index] + LF_offset;
     }
 
@@ -163,7 +169,7 @@ public class Input {
 
     // ========== Rotary ==========
 
-    private final double[] RT_setpoints = {0, 45, 80, 95};
+    private final double[] RT_setpoints = {0, 45, 74, 93};
     private volatile int RT_setpoint = 0;
     private volatile double RT_offset = 0;
     private volatile TorqueToggle RT_manualMode = new TorqueToggle(false);
@@ -186,10 +192,14 @@ public class Input {
                 RT_setpoint = 0;
             }
             else if (operator.getLeftYAxis() > 0.1) {
-                RT_offset += 0.2;
+                if (calcRTSetpoint() < 105) {
+                    RT_offset += 0.1;
+                }
             }
             else if (operator.getLeftYAxis() < -0.1) {
-                RT_offset -= 0.2;
+                if (calcRTSetpoint() > -5) {
+                    RT_offset -= 0.1;
+                }
             }
         }
         else {
@@ -197,11 +207,11 @@ public class Input {
         }
     }
 
-    public double getRTSetpoint() {
+    public double calcRTSetpoint() {
         return RT_setpoints[RT_setpoint] + RT_offset;
     }
 
-    public double getRTSetpoint(int index) {
+    public double calcRTSetpoint(int index) {
         return RT_setpoints[index] + RT_offset;
     }
 
@@ -309,6 +319,10 @@ public class Input {
 
     public double getCMTomSpeed() {
         return CM_tomSpeed;
+    }
+
+    public void setCMTomSpeed(double speed) {
+        CM_tomSpeed = speed;
     }
 
     
