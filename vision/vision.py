@@ -176,7 +176,7 @@ def findTargetTop(hsv, minHSV, maxHSV, kernel):
         areas = {i: cv.contourArea(cnt) for i, cnt in enumerate(contours)}
         areas = util.clamp(areas, 100, 16000)
         if not areas:
-            return (0, frame)
+            return (False, 0, frame)
 
         # Construct rectangular boxes around each contour and store their coordinates in a dictionary.
         boxes = {}
@@ -209,7 +209,7 @@ def findTargetTop(hsv, minHSV, maxHSV, kernel):
             else:
                 continue
         if not targets:
-            return (0, frame)
+            return (False, 0, frame)
 
         # Calculate average width of targets. Separate list of targets by left or right targets.
         approxWidth /= len(boxes)
@@ -226,15 +226,15 @@ def findTargetTop(hsv, minHSV, maxHSV, kernel):
         # Calculate center of vision target by drawing diagonals
         centers = list(filter(lambda c : c != 0, [util.midpoint(left[1], right[1]) for left, right in targetPairs]))
         if centers:
-            target = min(centers, key=lambda m : util.distance(m, frameCenter))
+            target = min(centers, key=lambda m : abs(m[0] - frameCenter[0]))
             cv.circle(frame, target, 2, (0, 255, 0), -1)
             cv.putText(frame, "X", (target[0]+3, target[1]+3), cv.FONT_HERSHEY_PLAIN, 1, (0, 255, 0))
 
             # (+) if target is to the right, (-) if target is to the left
-            offset = 2*(target[0]-frameCenter[0]) / frameWidth
-            return (offset, frame)
+            offset = 2 * (target[0] - frameCenter[0]) / frameWidth
+            return (True, offset, frame)
 
-    return (0, frame)
+    return (False, 0, frame)
 
 
 ########## BUFFER OUTPUT ##########
@@ -267,15 +267,16 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     
     ntinst = NetworkTablesInstance.getDefault()
-    targetTable = NetworkTables.getTable("TargetDetection")
 
     if server:
         print("Setting up NetworkTables server")
         ntinst.startServer()
     else:
         print("Setting up NetworkTables client for team {}".format(team))
-        ntinst.initialize(server=ntServerIpAddress)
+        # ntinst.initialize(server=ntServerIpAddress)
         # ntinst.startClientTeam(team)
+        NetworkTables.initialize(server=ntServerIpAddress)
+        targetTable = NetworkTables.getTable("TargetDetection")
 
     # setup a cvSource
     cs = CameraServer.getInstance()
@@ -285,8 +286,6 @@ if __name__ == "__main__":
 
     # VideoMode.PixelFormat.kMJPEG, kBGR, kGray, kRGB565, kUnknown, kYUYV
     camera.setVideoMode(VideoMode.PixelFormat.kYUYV, width, height, fps)
-    # camera.setResolution(width, height)
-    # camera.setFPS(10)
 
     # Load camera properties config
     camera.setConfigJson(json.dumps(config))
@@ -318,6 +317,7 @@ if __name__ == "__main__":
         frame = cv.resize(frame, (frameWidth, frameHeight))
         hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
 
-        targetOffset, targetFrame = findTargetTop(hsv, minTargetHSV, maxTargetHSV, kernel)
+        targetExists, targetOffset, targetFrame = findTargetTop(hsv, minTargetHSV, maxTargetHSV, kernel)
         targetOutputStream.putFrame(targetFrame)
+        targetTable.putBoolean("target_exists", targetExists)
         targetTable.putNumber("target_offset", bufferOutput(targetOffset, 1))

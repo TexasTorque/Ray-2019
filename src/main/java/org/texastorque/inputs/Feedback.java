@@ -201,9 +201,11 @@ public class Feedback {
     // ===== RPi feedback from NetworkTables =====
 
     private double NT_targetOffset;
+    private boolean NT_targetExists;
 
     public void updateNetworkTables() {
         NT_targetOffset = NT_target.getEntry("target_offset").getDouble(0);
+        NT_targetExists = NT_target.getEntry("target_exists").getBoolean(false);
     }
 
     public double getTargetOffset() {
@@ -229,6 +231,7 @@ public class Feedback {
         SmartDashboard.putNumber("UL_rightDistance", UL_rightDistance);
 
         SmartDashboard.putNumber("NT_targetOffset", NT_targetOffset);
+        SmartDashboard.putBoolean("NT_targetExists", NT_targetExists);
         SmartDashboard.putBoolean("NT_isConnected", NT_instance.isConnected());
     }
 

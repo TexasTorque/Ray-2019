@@ -1,12 +1,5 @@
 #!/bin/sh
-### TYPE: builtin
 echo "Waiting 5 seconds..."
 sleep 5
-
-for pid in $(ps -ef | grep "python3" | awk '{print $2}')
-do
-	echo "Killing process: " $pid
-	kill -9 $pid
-done
-
+export PYTHONUNBUFFERED=1
 exec ./vision.py
