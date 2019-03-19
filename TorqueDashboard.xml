@@ -1,5 +1,10 @@
 <xml version="1.0">
 <dashboard>
+	<widget field="NT_targetExists" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
+		<location x="0" y="288"/>
+		<width>128</width>
+		<height>32</height>
+	</widget>
 	<widget field="RT_output" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
 		<location x="144" y="107"/>
 	</widget>
@@ -14,11 +19,11 @@
 		<location x="144" y="80"/>
 	</widget>
 	<widget field="NT_targetOffset" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
-		<location x="0" y="283"/>
+		<location x="0" y="320"/>
 		<property name="Background" value="153.255.204.255"/>
 	</widget>
 	<widget field="NT_isConnected" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
-		<location x="0" y="304"/>
+		<location x="0" y="347"/>
 	</widget>
 	<widget field="CM_enabled" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
 		<location x="0" y="187"/>

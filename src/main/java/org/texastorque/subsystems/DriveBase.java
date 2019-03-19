@@ -8,6 +8,7 @@ import org.texastorque.torquelib.controlLoop.ScheduledPID;
 import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DriveBase extends Subsystem {
@@ -21,6 +22,7 @@ public class DriveBase extends Subsystem {
     private TorqueMotor rightMid;
     private TorqueMotor rightRear;
     private DoubleSolenoid gearShift;
+    private Relay lightRing;
     
     private final ScheduledPID visionPID;
     private double leftSpeed = 0.0;
@@ -39,6 +41,8 @@ public class DriveBase extends Subsystem {
         rightRear = new TorqueMotor(new VictorSP(Ports.DB_RIGHT_REAR_MOTOR), clockwise);
         
         gearShift = new DoubleSolenoid(0, Ports.DB_SOLE_A, Ports.DB_SOLE_B);
+
+        lightRing = new Relay(Ports.LR_RELAY);
 
         visionPID = new ScheduledPID.Builder(0, 0.5, 1)
                 .setPGains(0.25)
@@ -70,16 +74,22 @@ public class DriveBase extends Subsystem {
     @Override
     public void run(RobotState state) {
         if (state == RobotState.AUTO) {
+            lightRing.set(Relay.Value.kForward);
+
             leftSpeed = input.getDBLeftSpeed();
             rightSpeed = input.getDBRightSpeed();
         }
 
         else if (state == RobotState.TELEOP) {
+            lightRing.set(Relay.Value.kOff);
+
             leftSpeed = input.getDBLeftSpeed();
             rightSpeed = input.getDBRightSpeed();
         }
 
         else if (state == RobotState.VISION) {
+            lightRing.set(Relay.Value.kForward);
+
             double currentOffset = feedback.getTargetOffset();
             double adjustment = visionPID.calculate(currentOffset);
 

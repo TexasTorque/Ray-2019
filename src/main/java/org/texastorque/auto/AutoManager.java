@@ -31,6 +31,7 @@ public class AutoManager {
         autoSelector.addOption("2 OneHatchShipTeleop", "2 OneHatchShipTeleop");
         autoSelector.addOption("3 OneHatchRocket", "3 OneHatchRocket");
 
+        SmartDashboard.putData(autoSelector);
         System.out.println("Auto sequences loaded.");
     }
 
