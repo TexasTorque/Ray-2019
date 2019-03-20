@@ -4,7 +4,6 @@ import org.texastorque.inputs.State.RobotState;
 import org.texastorque.constants.Ports;
 import org.texastorque.torquelib.component.TorqueMotor;
 import org.texastorque.torquelib.controlLoop.ScheduledPID;
-import org.texastorque.util.Integrator;
 
 import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.Timer;
@@ -33,7 +32,7 @@ public class Lift extends Subsystem {
 
         liftPID = new ScheduledPID.Builder(setpoint, -0.2, 0.7, 2)
                 .setRegions(0)
-                .setPGains(0.2, 0.7)
+                .setPGains(0.5, 1.0)
                 //.setIGains(0.0, 0.5) //0, 0.5
                 //.setDGains(0.01)
                 .build();
@@ -112,19 +111,22 @@ public class Lift extends Subsystem {
     }
 
     private double startTime = Timer.getFPGATimestamp();
-    private double stallTime = 5.0;
+    private double stallTime = 4.0;
+    private boolean isStalling = false;
 
     @Override
     protected void output() {
         // speed = addBaseOutput(speed);
 
         // Check if motor is stalling
-        // if (Math.abs(speed) < 0.4) {
-        //     startTime = Timer.getFPGATimestamp();
-        // }
-        // if (Timer.getFPGATimestamp() - startTime > stallTime) {
-        //     speed = 0;
-        // }
+        if (Math.abs(speed) < 0.3) {
+            isStalling = false;
+            startTime = Timer.getFPGATimestamp();
+        }
+        if (Timer.getFPGATimestamp() - startTime > stallTime) {
+            isStalling = true;
+            // speed = 0
+        }
 
         pulleyA.set(speed);
         pulleyB.set(speed);
@@ -143,6 +145,7 @@ public class Lift extends Subsystem {
     public void smartDashboard() {
         SmartDashboard.putNumber("LF_setpoint", setpoint);
         SmartDashboard.putNumber("LF_output", speed);
+        SmartDashboard.putBoolean("LF_stall", isStalling);
     }
 
     public static Lift getInstance() {

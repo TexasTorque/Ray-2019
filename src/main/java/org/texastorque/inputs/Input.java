@@ -114,21 +114,19 @@ public class Input {
         if (!LF_manualMode.get()) {
             if (operator.getDPADUp()) {
                 LF_modifier = 1;
-                System.out.println("LF_modifier set to 1, actually " + LF_modifier);
             }
             else if (operator.getDPADRight() || operator.getDPADDown() || operator.getDPADLeft()) {
                 LF_modifier = 0;
-                System.out.println("LF_modifier set to 0, actually " + LF_modifier);
             }
 
             if (operator.getAButtonPressed()) {
-                LF_setpoint = 0 + LF_modifier;
+                LF_setpoint = 0;
             }
             else if (operator.getBButtonPressed()) {
-                LF_setpoint = 2 + LF_modifier;
+                LF_setpoint = 2;
             }
             else if (operator.getYButtonPressed()) {
-                LF_setpoint = 4 + LF_modifier;
+                LF_setpoint = 4;
             }
             else if (operator.getRightYAxis() > 0.1) {
                 if (calcLFSetpoint() > -0.1) {
@@ -147,8 +145,7 @@ public class Input {
     }
 
     public double calcLFSetpoint() {
-        System.out.println(LF_setpoint);
-        return LF_setpoints[LF_setpoint] + LF_offset;
+        return LF_setpoints[LF_setpoint + LF_modifier] + LF_offset;
     }
 
     public double calcLFSetpoint(int index) {
