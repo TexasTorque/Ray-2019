@@ -30,7 +30,7 @@ public class HatchIntakeSet extends Command {
     @Override
     protected void init() {
         startTime = Timer.getFPGATimestamp();
-        input.setINTuskEngaged(hatchState);
+        input.setINHatchState(hatchState);
     } // init
 
 	@Override

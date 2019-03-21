@@ -8,6 +8,7 @@ import org.texastorque.torquelib.controlLoop.ScheduledPID;
 import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Relay;
 
@@ -59,7 +60,7 @@ public class DriveBase extends Subsystem {
         lightRing = new Relay(Ports.LR_RELAY);
 
         visionPID = new ScheduledPID.Builder(0, 0.5, 1)
-                .setPGains(0.5)
+                .setPGains(0.25)
                 // .setRegions(-0.4, -0.2, 0.2, 0.4)
                 // .setPGains(0.3, 0.5, 0.8, 0.5, 0.3)
                 // .setIGains(0.1, 0, 0, 0, 0.1)
@@ -77,10 +78,8 @@ public class DriveBase extends Subsystem {
     public void teleopInit() {
         leftSpeed = 0.0;
         rightSpeed = 0.0;
-        feedback.resetNavX();
     }
 
-    @Override
     public void disabledInit() {
         leftSpeed = 0.0;
         rightSpeed = 0.0;
@@ -89,12 +88,16 @@ public class DriveBase extends Subsystem {
     @Override
     public void run(RobotState state) {
         if (state == RobotState.AUTO) {
+            lightRing.set(Relay.Value.kForward);
+
             leftSpeed = input.getDBLeftSpeed();
             rightSpeed = input.getDBRightSpeed();
             lightRing.set(Relay.Value.kOff);
         }
 
         else if (state == RobotState.TELEOP) {
+            lightRing.set(Relay.Value.kOff);
+
             leftSpeed = input.getDBLeftSpeed();
             rightSpeed = input.getDBRightSpeed();
 
@@ -117,11 +120,10 @@ public class DriveBase extends Subsystem {
         } // TELEOP
 
         else if (state == RobotState.VISION) {
+            lightRing.set(Relay.Value.kForward);
+
             double currentOffset = feedback.getTargetOffset();
             double adjustment = visionPID.calculate(currentOffset);
-            // if (Math.abs(adjustment) < 0.1)
-            //     adjustment = 0;
-            System.out.println("Offset: " + currentOffset + " || Adjustment: " + adjustment);
 
             leftSpeed = 0.5 * input.getDBLeftSpeed() - adjustment;
             rightSpeed = 0.5 * input.getDBRightSpeed() + adjustment;

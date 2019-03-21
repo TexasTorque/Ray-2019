@@ -6,6 +6,8 @@ public abstract class Command {
 
     protected Input input = Input.getInstance();
     protected Feedback feedback = Feedback.getInstance();
+    protected State state = State.getInstance();
+
     private double delay; // Seconds
     private boolean started;
     private boolean ended;

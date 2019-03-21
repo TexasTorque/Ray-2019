@@ -12,9 +12,10 @@ public class DrivePath extends Command {
     private DistanceFollower leftFollower;
     private DistanceFollower rightFollower;
     private boolean isForward;
-    // private int direction;
 
     /**
+     * Position is relative to initial Waypoint, heading angle is set to 0 in robotInit() and remains absolute
+     * 
      * Resources
      * https://www.chiefdelphi.com/t/pathfinder-coordinate-system/159870
      * https://www.chiefdelphi.com/t/problems-with-pathfinder-motion-profiling/163830
@@ -24,8 +25,6 @@ public class DrivePath extends Command {
 
     public DrivePath(double delay, Waypoint[] points, boolean isForward) {
         super(delay);
-
-        // For reverse driving, Waypoints should be as if robot is driving forward
         this.isForward = isForward;
 
         /**
@@ -67,8 +66,8 @@ public class DrivePath extends Command {
             input.setDBRightSpeed(rightFollower.calculate(feedback.getDBRightDistance()) - turn);
         }
         else {
-            input.setDBLeftSpeed(-rightFollower.calculate(-feedback.getDBLeftDistance()) - turn);
-            input.setDBRightSpeed(-leftFollower.calculate(-feedback.getDBRightDistance()) + turn);
+            input.setDBLeftSpeed(-rightFollower.calculate(-feedback.getDBLeftDistance()) + turn);
+            input.setDBRightSpeed(-leftFollower.calculate(-feedback.getDBRightDistance()) - turn);
         }
 	}
 

@@ -53,15 +53,12 @@ TorqueLib includes the TorqueIterative robot base class that is used for Ray. It
 ## Addendum
 
 ### 5-year plan to take over FRC
-Listen up future programmers, I'm gonna tell you right now how Texas Torque will take over FRC:
-1. Implement lidar, which would allow the robot to map the whole field
-2. Integrate lidar with camera vision processing
-3. With lidar + vision, the robot should now be able to generate drive base motion profiles to drive to anywhere it can see
-4. Run simulations of the year's game and use machine learning to develop the best strategy
-5. Retire the driver and operator because the robot is now fully autonomous
-6. World champs 2025 as alliance captain
-
-Okay yeah that was kind of a joke, but hey, there's no harm in trying... -Daniel
+Listen up future programmers, I'm gonna tell you right now how to take over FRC:
+1. Implement lidar, which would let the robot map the whole field
+2. Integrate lidar with vision processing, and use it to handle live conditions on the field
+3. Run simulations of the game, use machine learning to find the best strategy, and generate paths
+4. Retire the driver and operator because the robot is now fully autonomous
+5. Be 2025 world champs
 
 ## Contributors
 Mentors: William Vo, Jacob Lubecki

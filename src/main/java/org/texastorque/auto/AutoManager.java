@@ -24,17 +24,19 @@ public class AutoManager {
         autoSequences.add(new OneHatchRocket());
         autoSequences.add(new BackupDrive());
         autoSequences.add(new OneHatchRocket1());
+        autoSequences.add(new OneHatchShip2());
+        autoSequences.add(new OneHatchShipTeleop2());
         autoSequences.add(new OneHatchRocket3());
+        autoSequences.add(new TestSequence());
 
+        autoSelector.setDefaultOption("BackupDrive", "BackupDrive");
+        autoSelector.addOption("1 OneHatchRocket", "1 OneHatchRocket");
+        autoSelector.addOption("2 OneHatchShip", "2 OneHatchShip");
+        autoSelector.addOption("2 OneHatchShipTeleop", "2 OneHatchShipTeleop");
+        autoSelector.addOption("3 OneHatchRocket", "3 OneHatchRocket");
+
+        SmartDashboard.putData(autoSelector);
         System.out.println("Auto sequences loaded.");
-
-        // options 
-        autoSelector.setDefaultOption("TestStuff", "TestStuff");
-        autoSelector.addOption("OneHatchRocket", "OneHatchRocket");
-        autoSelector.addOption("BackupDrive", "BackupDrive");
-        autoSelector.addOption("OneHatchRocket1", "OneHatchRocket1");
-        autoSelector.addOption("OneHatchRocket3", "OneHatchRocket3");
-        
     }
 
     public void displayChoices() {
@@ -43,8 +45,7 @@ public class AutoManager {
 
     public void chooseSequence() {
         String autoChoice = autoSelector.getSelected();
-        
-        //autoChoice = "OneHatchRocket3";
+        // autoChoice = "BackupDrive";
 
         switch(autoChoice) { // menu for different autos 
             case "TestStuff":
@@ -53,14 +54,21 @@ public class AutoManager {
             case "OneHatchRocket":
                 currentSequence = autoSequences.get(1);
                 break;
-            case "BackupDrive":
+
+            case "2 OneHatchShip":
                 currentSequence = autoSequences.get(2);
                 break;
-            case "OneHatchRocket1":
+
+            case "2 OneHatchShipTeleop":
                 currentSequence = autoSequences.get(3);
                 break;
-            case "OneHatchRocket3":
+
+            case "3 OneHatchRocket":
                 currentSequence = autoSequences.get(4);
+                break;
+
+            case "TestSequence":
+                currentSequence = autoSequences.get(5);
                 break;
         }
 

@@ -7,6 +7,7 @@ import org.texastorque.inputs.State.RobotState;
 
 import org.texastorque.torquelib.base.TorqueIterative;
 
+import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.cameraserver.CameraServer;
 import java.util.ArrayList;
 
@@ -22,14 +23,17 @@ public class Robot extends TorqueIterative {
 	private State state = State.getInstance();
 	private Input input = Input.getInstance();
 	private Feedback feedback = Feedback.getInstance();
-	private AutoManager autoManager = AutoManager.getInstance();
+	private AutoManager autoManager;
 
 	public void robotInit() {
 		initSubsystems();
-		CameraServer.getInstance().startAutomaticCapture(0);
-		autoManager.displayChoices();
 		feedback.resetNavX();
 		feedback.resetDriveEncoders();
+		autoManager = AutoManager.getInstance();
+
+		UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
+		camera.setResolution(320, 240);
+		camera.setFPS(12);
 	}
 
 	private void initSubsystems() {

@@ -6,10 +6,12 @@ import sys
 import os
 import cv2 as cv
 import numpy as np
+import time
 import util
 
 from cscore import CameraServer, VideoSource, VideoMode
 from networktables import NetworkTablesInstance, NetworkTables
+import logging
 from datetime import datetime
 from random import randint
 
@@ -51,8 +53,8 @@ server = False
 cameraConfigs = []
 width = 320
 height = 240
-fps = 30
-processingScale = 1
+fps = 20
+processingScale = 1.414
 frameWidth = int(width / processingScale)
 frameHeight = int(height / processingScale)
 frameCenter = (int(frameWidth/2), int(frameHeight/2))
@@ -174,7 +176,7 @@ def findTargetTop(hsv, minHSV, maxHSV, kernel):
         areas = {i: cv.contourArea(cnt) for i, cnt in enumerate(contours)}
         areas = util.clamp(areas, 100, 16000)
         if not areas:
-            return (0, frame)
+            return (False, 0, frame)
 
         # Construct rectangular boxes around each contour and store their coordinates in a dictionary.
         boxes = {}
@@ -192,22 +194,25 @@ def findTargetTop(hsv, minHSV, maxHSV, kernel):
                 box = sorted(box, key=lambda b : b[1])
                 top1 = box[0]
                 top2 = box[1]
+                bottom = box[3]
 
-                cv.drawContours(frame, [np.int0(boxes[i])], 0, (0, 255, 0), 2)
-                cv.circle(frame, (top1[0], top1[1]), 2, (255, 0, 0), -1)
-                cv.circle(frame, (top2[0], top2[1]), 2, (0, 0, 255), -1)
-                approxWidth += util.distance(top1, top2)
+                if (util.inRange(util.distance(top2, bottom) / util.distance(top1, top2), 2, 4)):
+                    cv.drawContours(frame, [np.int0(boxes[i])], 0, (0, 255, 0), 2)
+                    cv.circle(frame, (top1[0], top1[1]), 2, (255, 0, 0), -1)
+                    cv.circle(frame, (top2[0], top2[1]), 2, (0, 0, 255), -1)
+                    cv.circle(frame, (bottom[0], bottom[1]), 2, (0, 0, 255), -1)
+                    approxWidth += util.distance(top1, top2)
 
-                if top1[0] < top2[0]:
-                    targets[i] = ('L', top2)
-                elif top1[0] > top2[0]:
-                    targets[i] = ('R', top2)
-                else:
-                    targets[i] = ('X')
+                    if top1[0] < top2[0]:
+                        targets[i] = ('L', top2, bottom)
+                    elif top1[0] > top2[0]:
+                        targets[i] = ('R', top2, bottom)
+                    else:
+                        targets[i] = ('X')
             else:
                 continue
         if not targets:
-            return (0, frame)
+            return (False, 0, frame)
 
         # Calculate average width of targets. Separate list of targets by left or right targets.
         approxWidth /= len(boxes)
@@ -218,22 +223,38 @@ def findTargetTop(hsv, minHSV, maxHSV, kernel):
         # Find pairs of left and right targets that pair to form a valid vision target
         for i, left in leftTargets:
             for j, right in rightTargets:
-                if left[1][0] < right[1][0] and util.approx(util.distance(left[1], right[1]), approxWidth*4, error=0.2) and util.inRange(abs(left[1][1]-right[1][1]), 0, 20):
+                if left[1][0] < right[1][0] and util.approx(util.distance(left[1], right[1]), approxWidth*4, error=0.2) and util.inRange(abs(left[1][1]-right[1][1]) / frameHeight, 0, 0.2):
                     targetPairs.append((left, right))
 
         # Calculate center of vision target by drawing diagonals
-        centers = list(filter(lambda c : c != 0, [util.midpoint(left[1], right[1]) for left, right in targetPairs]))
+        centers = list(filter(lambda c : c != 0, [util.centerPoint(left[1], left[2], right[1], right[2]) for left, right in targetPairs]))
         if centers:
-            target = min(centers, key=lambda m : util.distance(m, frameCenter))
+            target = min(centers, key=lambda m : abs(m[0] - frameCenter[0]))
             cv.circle(frame, target, 2, (0, 255, 0), -1)
-            cv.putText(frame, "X", (target[0]+3, target[1]+3), cv.FONT_HERSHEY_PLAIN, 1, (0, 255, 0))
+            cv.putText(frame, 'X', (target[0]+3, target[1]+3), cv.FONT_HERSHEY_PLAIN, 1, (0, 255, 0))
 
             # (+) if target is to the right, (-) if target is to the left
-            offset = 2*(target[0]-frameCenter[0]) / frameWidth
-            return (offset, frame)
+            offset = 2 * (target[0] - frameCenter[0]) / frameWidth
+            return (True, offset, frame)
 
-    return (0, frame)
-    
+    return (False, 0, frame)
+
+
+########## BUFFER OUTPUT ##########
+
+lastValue = 0
+updateTime = 0
+def bufferOutput(newOutput, bufferTime):
+    global lastValue, updateTime
+    if newOutput != 0:
+        lastValue = newOutput
+        updateTime = time.perf_counter()
+        
+    if time.perf_counter() - updateTime < bufferTime:
+        return lastValue
+    else:
+        return 0 
+
 
 ########## MAIN ##########
 
@@ -246,6 +267,8 @@ if __name__ == "__main__":
         sys.exit(1)
 
     # start NetworkTables
+    logging.basicConfig(level=logging.DEBUG)
+    
     ntinst = NetworkTablesInstance.getDefault()
 
     if server:
@@ -253,8 +276,10 @@ if __name__ == "__main__":
         ntinst.startServer()
     else:
         print("Setting up NetworkTables client for team {}".format(team))
-        #ntinst.startClientTeam(team)
-        ntinst.initialize(server=ntServerIpAddress)
+        # ntinst.initialize(server=ntServerIpAddress)
+        # ntinst.startClientTeam(team)
+        NetworkTables.initialize(server=ntServerIpAddress)
+        targetTable = NetworkTables.getTable("TargetDetection")
 
     # setup a cvSource
     cs = CameraServer.getInstance()
@@ -264,8 +289,6 @@ if __name__ == "__main__":
 
     # VideoMode.PixelFormat.kMJPEG, kBGR, kGray, kRGB565, kUnknown, kYUYV
     camera.setVideoMode(VideoMode.PixelFormat.kYUYV, width, height, fps)
-    # camera.setResolution(width, height)
-    # camera.setFPS(10)
 
     # Load camera properties config
     camera.setConfigJson(json.dumps(config))
@@ -286,7 +309,6 @@ if __name__ == "__main__":
     kernel = np.ones((5,5),np.uint8)
 
     # Target params
-    targetTable = ntinst.getTable("TargetDetection")
     targetTable.putNumber("frame_width", frameWidth)
     targetTable.putNumber("frame_height", frameHeight)
     targetOutputStream = cs.putVideo("TargetDetection", frameWidth, frameHeight)
@@ -298,6 +320,7 @@ if __name__ == "__main__":
         frame = cv.resize(frame, (frameWidth, frameHeight))
         hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
 
-        targetOffset, targetFrame = findTargetTop(hsv, minTargetHSV, maxTargetHSV, kernel)
+        targetExists, targetOffset, targetFrame = findTargetTop(hsv, minTargetHSV, maxTargetHSV, kernel)
         targetOutputStream.putFrame(targetFrame)
-        targetTable.putNumber("target_offset", util.bufferOutput(targetOffset, 1))
+        targetTable.putBoolean("target_exists", targetExists)
+        targetTable.putNumber("target_offset", bufferOutput(targetOffset, 1))
