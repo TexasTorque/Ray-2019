@@ -83,7 +83,22 @@ public class FourBarIntake extends Subsystem {
         }
 
         else if (state == RobotState.VISION) {
-            wheelSpeed = 0;
+            if (input.getINActive()) {
+                if (input.getHatchState()) {
+                    wheelSpeed = 0.5;
+                } else {
+                    wheelSpeed = -0.5;
+                }
+            } 
+            else {
+                if (input.getHatchState()) {
+                    wheelSpeed = 0.08;
+                } else {
+                    wheelSpeed = -0.08;
+                }
+            }
+
+            tuskEngaged = input.getINTuskEngaged();
         }
 
         else if (state == RobotState.LINE) {
@@ -98,9 +113,9 @@ public class FourBarIntake extends Subsystem {
         intakeWheels.set(wheelSpeed);
 
         if (tuskEngaged) {
-            hatchTusk.set(Value.kReverse);
-        } else {
             hatchTusk.set(Value.kForward);
+        } else {
+            hatchTusk.set(Value.kReverse);
         }
     }
 

@@ -54,7 +54,7 @@ cameraConfigs = []
 width = 320
 height = 240
 fps = 20
-processingScale = 1.5
+processingScale = 1.414
 frameWidth = int(width / processingScale)
 frameHeight = int(height / processingScale)
 frameCenter = (int(frameWidth/2), int(frameHeight/2))
@@ -194,18 +194,21 @@ def findTargetTop(hsv, minHSV, maxHSV, kernel):
                 box = sorted(box, key=lambda b : b[1])
                 top1 = box[0]
                 top2 = box[1]
+                bottom = box[3]
 
-                cv.drawContours(frame, [np.int0(boxes[i])], 0, (0, 255, 0), 2)
-                cv.circle(frame, (top1[0], top1[1]), 2, (255, 0, 0), -1)
-                cv.circle(frame, (top2[0], top2[1]), 2, (0, 0, 255), -1)
-                approxWidth += util.distance(top1, top2)
+                if (util.inRange(util.distance(top2, bottom) / util.distance(top1, top2), 2, 4)):
+                    cv.drawContours(frame, [np.int0(boxes[i])], 0, (0, 255, 0), 2)
+                    cv.circle(frame, (top1[0], top1[1]), 2, (255, 0, 0), -1)
+                    cv.circle(frame, (top2[0], top2[1]), 2, (0, 0, 255), -1)
+                    cv.circle(frame, (bottom[0], bottom[1]), 2, (0, 0, 255), -1)
+                    approxWidth += util.distance(top1, top2)
 
-                if top1[0] < top2[0]:
-                    targets[i] = ('L', top2)
-                elif top1[0] > top2[0]:
-                    targets[i] = ('R', top2)
-                else:
-                    targets[i] = ('X')
+                    if top1[0] < top2[0]:
+                        targets[i] = ('L', top2, bottom)
+                    elif top1[0] > top2[0]:
+                        targets[i] = ('R', top2, bottom)
+                    else:
+                        targets[i] = ('X')
             else:
                 continue
         if not targets:
@@ -220,15 +223,15 @@ def findTargetTop(hsv, minHSV, maxHSV, kernel):
         # Find pairs of left and right targets that pair to form a valid vision target
         for i, left in leftTargets:
             for j, right in rightTargets:
-                if left[1][0] < right[1][0] and util.approx(util.distance(left[1], right[1]), approxWidth*4, error=0.2) and util.inRange(abs(left[1][1]-right[1][1]), 0, 20):
+                if left[1][0] < right[1][0] and util.approx(util.distance(left[1], right[1]), approxWidth*4, error=0.2) and util.inRange(abs(left[1][1]-right[1][1]) / frameHeight, 0, 0.2):
                     targetPairs.append((left, right))
 
         # Calculate center of vision target by drawing diagonals
-        centers = list(filter(lambda c : c != 0, [util.midpoint(left[1], right[1]) for left, right in targetPairs]))
+        centers = list(filter(lambda c : c != 0, [util.centerPoint(left[1], left[2], right[1], right[2]) for left, right in targetPairs]))
         if centers:
             target = min(centers, key=lambda m : abs(m[0] - frameCenter[0]))
             cv.circle(frame, target, 2, (0, 255, 0), -1)
-            cv.putText(frame, "X", (target[0]+3, target[1]+3), cv.FONT_HERSHEY_PLAIN, 1, (0, 255, 0))
+            cv.putText(frame, 'X', (target[0]+3, target[1]+3), cv.FONT_HERSHEY_PLAIN, 1, (0, 255, 0))
 
             # (+) if target is to the right, (-) if target is to the left
             offset = 2 * (target[0] - frameCenter[0]) / frameWidth

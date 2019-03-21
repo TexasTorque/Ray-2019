@@ -101,7 +101,7 @@ public class Input {
 
     // ========== Lift ==========
 
-    private final double[] LF_setpoints = {0.0, 1.5, 2.8, 4.0, 4.5, 5.0}; // {0.0, 2.5, 5.0};
+    private final double[] LF_setpoints = {0.0, 1.0, 2.4, 3.5, 4.8, 5.3}; // {0.0, 2.5, 5.0};
     private volatile int LF_setpoint = 0;
     private volatile int LF_modifier = 0; // problem?
     private volatile double LF_offset = 0;
@@ -129,12 +129,12 @@ public class Input {
                 LF_setpoint = 4;
             }
             else if (operator.getRightYAxis() > 0.1) {
-                if (calcLFSetpoint() > -0.1) {
+                if (calcLFSetpoint() > -0.3) {
                     LF_offset -= 0.005;
                 }
             }
             else if (operator.getRightYAxis() < -0.1) {
-                if (calcLFSetpoint() < 5.1) {
+                if (calcLFSetpoint() < 5.3) {
                     LF_offset += 0.005;
                 }
             }
@@ -167,7 +167,7 @@ public class Input {
 
     // ========== Rotary ==========
 
-    private final double[] RT_setpoints = {0, 45, 74, 93};
+    private final double[] RT_setpoints = {0, 45, 74, 96};
     private volatile int RT_setpoint = 0;
     private volatile double RT_offset = 0;
     private volatile TorqueToggle RT_manualMode = new TorqueToggle(false);
@@ -230,7 +230,7 @@ public class Input {
 
     private volatile boolean IN_active = false;
     private volatile boolean IN_hatchState = false;
-    private volatile boolean IN_tuskEngaged = true;
+    private volatile boolean IN_tuskEngaged = false;
     
     public void updateIntake() {
         IN_active = false;
@@ -245,11 +245,8 @@ public class Input {
         } // hatch outtake, cargo intake
         
         if (driver.getAButtonPressed()) {
-            IN_tuskEngaged = false;
+            IN_tuskEngaged = !IN_tuskEngaged;
         } 
-        else if (driver.getAButtonReleased()) {
-            IN_tuskEngaged = true;
-        }
     }
 
     public boolean getINActive() {
