@@ -148,6 +148,10 @@ public class Input {
         return RT_setpoints[RT_setpoint] + RT_offset;
     }
 
+    public void setRTSetpoint(int n){
+        RT_setpoint = n;
+    }
+
     public double getRTSetpoint(int i) {
         return RT_setpoints[i] + RT_offset;
     }
@@ -178,12 +182,24 @@ public class Input {
         }
     }
 
+    public void setINActive(boolean a){
+        IN_active = a;
+    }
+
     public boolean getINActive() {
         return IN_active;
     }
 
+    public void setINHatchEngaged(boolean a){
+        IN_hatchState = a;
+    }
+
     public boolean getHatchState() {
         return IN_hatchState;
+    }
+
+    public void setINTuskEngaged(boolean a){
+        IN_tuskEngaged = a;
     }
 
     public boolean getINTuskEngaged() {

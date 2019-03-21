@@ -83,22 +83,14 @@ public class Rotary extends Subsystem {
     }
 
     private void runRotaryPID() {
-        // setpoint = input.getRTSetpoint();
-        // currentPos = feedback.getRTPosition();
-        // if (setpoint != prevSetpoint) {
-        //     rotaryPID.changeSetpoint(setpoint);
-        //     prevSetpoint = setpoint;
-        // }
+        setpoint = input.getRTSetpoint();
+        currentPos = feedback.getRTPosition();
+        if (setpoint != prevSetpoint) {
+            rotaryPID.changeSetpoint(setpoint);
+            prevSetpoint = setpoint;
+        }
 
-        // speed = rotaryPID.calculate(currentPos);
-        speed =0;
-        rotaryTestF = input.getRTForward();
-        rotaryTestB = input.getRTBackward();
-        if (rotaryTestF) 
-            speed = .3;
-        else if (rotaryTestB)
-            speed = -.3;
- 
+        speed = rotaryPID.calculate(currentPos);
     }
 
     private void runRotaryPID(int position) {

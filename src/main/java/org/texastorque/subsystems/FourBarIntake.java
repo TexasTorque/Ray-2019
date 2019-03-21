@@ -45,6 +45,22 @@ public class FourBarIntake extends Subsystem {
     @Override
     public void run(RobotState state) {
         if (state == RobotState.AUTO) {
+            if (input.getINActive()) {
+                if (input.getHatchState()) {
+                    wheelSpeed = 0.5;
+                } else {
+                    wheelSpeed = -0.5;
+                }
+            } 
+            else {
+                if (input.getHatchState()) {
+                    wheelSpeed = 0.08;
+                } else {
+                    wheelSpeed = -0.08;
+                }
+            }
+
+            tuskEngaged = input.getINTuskEngaged();
         }
 
         else if (state == RobotState.TELEOP) {
