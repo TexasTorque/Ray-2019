@@ -244,11 +244,11 @@ public class Input {
             IN_hatchState = false;
         } // hatch outtake, cargo intake
         
-        if (driver.getAButtonPressed()) {
-            IN_tuskEngaged = false;
-        } 
-        else if (driver.getAButtonReleased()) {
+        if (driver.getAButton()) {
             IN_tuskEngaged = true;
+        } 
+        if(driver.getAButtonReleased()){
+            IN_tuskEngaged = false;
         }
     }
 

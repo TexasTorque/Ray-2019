@@ -31,6 +31,8 @@ public class Feedback {
     private final TorqueEncoder DB_rightEncoder;
     private final TorqueEncoder LF_encoder;
     private final TorqueEncoder RT_encoder;
+    private final DigitalInput LN_Right;
+    private final DigitalInput LN_Left;
 
     private final AHRS NX_gyro;
 
@@ -59,6 +61,10 @@ public class Feedback {
         
         NT_instance = NetworkTableInstance.getDefault();
         NT_target = NT_instance.getTable("TargetDetection");
+
+        LN_Right = new DigitalInput(Ports.LN_RIGHT);
+        LN_Left = new DigitalInput(Ports.LN_LEFT);
+
     }
 
     public void update() {
@@ -196,6 +202,16 @@ public class Feedback {
 
     public double getULRight() {
         return UL_rightDistance;
+    }
+
+
+    //===========Line Sensors============
+    public boolean getLineLeft(){
+        return LN_Left.get();
+    }
+
+    public boolean getLineRight(){
+        return LN_Right.get();
     }
 
     // ===== RPi feedback from NetworkTables =====
