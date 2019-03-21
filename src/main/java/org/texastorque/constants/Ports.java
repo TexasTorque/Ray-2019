@@ -54,4 +54,6 @@ public class Ports {
     public static final int UL_RIGHT = 1;
 
     public static final int IN_SWITCH = 0;
+
+    public static final int LR_RELAY = 0; // needs to be in one of the relay ports (0-3)
 }

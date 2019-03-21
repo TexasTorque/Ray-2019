@@ -221,7 +221,7 @@ public final class GenericController extends Joystick {
 	}
 	
 	public synchronized boolean getDPADLeft() {
-		return getPOV() == 315;
+		return getPOV() == 270;
 	}
 
 	public synchronized void setLeftRumble(boolean on) {

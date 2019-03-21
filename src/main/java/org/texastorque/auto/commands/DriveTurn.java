@@ -2,38 +2,64 @@ package org.texastorque.auto.commands;
 
 import org.texastorque.auto.Command;
 import org.texastorque.torquelib.controlLoop.ScheduledPID;
+import jaci.pathfinder.Pathfinder;
 
 public class DriveTurn extends Command {
 
-    private ScheduledPID drivePID;
-    private double angle;
+    private ScheduledPID turnPID;
+    private double targetAngle;
+    private boolean clockwise;
+
+    private double currentYaw;
+    private double speed;
     
     public DriveTurn(double delay, double angle) {
         super(delay);
-        this.angle = angle;
-        drivePID = new ScheduledPID.Builder(angle, 0.5)
-                .setPGains(0.8)
-                .setDGains(0.1)
+        angle = Pathfinder.boundHalfDegrees(angle);
+        clockwise = Math.abs(angle - feedback.getYaw()) < 180 ? true : false;
+        targetAngle = clockwise ? angle : reflectAngle(angle);
+
+        turnPID = new ScheduledPID.Builder(targetAngle, 0.8)
+                .setPGains(0.1)
                 .build();
+    }
+
+    private double reflectAngle(double angle) {
+        if (angle < 0) {
+            return -180 - angle;
+        }
+        else {
+            return 180 - angle;
+        }
     }
 
     @Override
     protected void init() {
         feedback.resetDriveEncoders();
-        feedback.resetNavX();
     }
 
     @Override
     protected void continuous() {
-        double speed = 0;
+        currentYaw = feedback.getYaw();
 
-        input.setDBLeftSpeed(speed);
-        input.setDBRightSpeed(speed);
+        if (clockwise) {
+            speed = turnPID.calculate(currentYaw);
+
+            input.setDBLeftSpeed(speed);
+            input.setDBRightSpeed(-speed);
+        }
+        else {
+            currentYaw = reflectAngle(currentYaw);
+            speed = turnPID.calculate(currentYaw);
+
+            input.setDBLeftSpeed(-speed);
+            input.setDBRightSpeed(speed);
+        }
     }
 
     @Override
     protected boolean endCondition() {
-        return false;
+        return Math.abs(targetAngle - currentYaw) < 3.0 && Math.abs(speed) < 0.1;
     }
 
     @Override

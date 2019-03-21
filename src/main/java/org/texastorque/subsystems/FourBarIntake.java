@@ -22,7 +22,7 @@ public class FourBarIntake extends Subsystem {
     private boolean clockwise = true;
 
     private FourBarIntake() {
-        intakeWheels = new TorqueMotor(new VictorSP(Ports.IN_MOTOR), clockwise);
+        intakeWheels = new TorqueMotor(new VictorSP(Ports.IN_MOTOR), !clockwise);
 
         hatchTusk = new DoubleSolenoid(0, Ports.IN_HATCH_SOLE_A, Ports.IN_HATCH_SOLE_B);
     }
@@ -47,16 +47,16 @@ public class FourBarIntake extends Subsystem {
         if (state == RobotState.AUTO) {
             if (input.getINActive()) {
                 if (input.getHatchState()) {
-                    wheelSpeed = 0.5;
+                    wheelSpeed = 1.0;
                 } else {
-                    wheelSpeed = -0.5;
+                    wheelSpeed = -1.0;
                 }
             } 
             else {
                 if (input.getHatchState()) {
-                    wheelSpeed = 0.08;
+                    wheelSpeed = 0.15;
                 } else {
-                    wheelSpeed = -0.08;
+                    wheelSpeed = -0.15;
                 }
             }
 

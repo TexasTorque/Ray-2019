@@ -52,32 +52,3 @@ def approx(num1, num2, error=0.05):
 
 def inRange(num, lower, upper):
     return num >= lower and num <= upper
-
-'''
-pastOutputs = [0] * 10
-lastNonzero = 0
-def bufferOutput(newOutput):
-    global pastOutputs, lastNonzero
-
-    if newOutput != 0:
-        lastNonzero = newOutput
-    pastOutputs[1:-1] = pastOutputs[0:-2]
-    pastOutputs[0] = newOutput
-
-    if all([p == 0 for p in pastOutputs]):
-        return 0
-    else:
-        return lastNonzero
-'''
-
-lastValue = 0
-updateTime = 0
-def bufferOutput(newOutput, bufferTime):
-    global lastValue, updateTime
-    if newOutput != 0:
-        lastValue = newOutput
-        updateTime = time.perf_counter()
-    if time.perf_counter() - updateTime < bufferTime:
-        return lastValue
-    else:
-        return 0
