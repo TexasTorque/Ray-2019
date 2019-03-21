@@ -11,7 +11,7 @@ import org.texastorque.auto.Command;
 
 import edu.wpi.first.wpilibj.Timer;
 
-public class IntakeSet extends Command{
+public class WheelsIntakeSet extends Command{
 
     private double startTime;
     private double time;
@@ -24,7 +24,7 @@ public class IntakeSet extends Command{
      * false hatchstate = intake cargo/outtake hatch (floor) 
      */
 
-    public IntakeSet(double delay, double time, boolean hatchState) { 
+    public WheelsIntakeSet(double delay, double time, boolean hatchState) { 
         super(delay);
         this.time = time;
         this.hatchState = hatchState;

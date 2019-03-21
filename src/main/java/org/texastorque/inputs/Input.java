@@ -1,5 +1,11 @@
 package org.texastorque.inputs;
 
+// temp stuff
+// import java.awt.event.KeyEvent;
+// import java.awt.event.KeyListener;
+// import javax.swing.JFrame;
+// import javax.swing.JTextField;
+
 import org.texastorque.inputs.State.RobotState;
 import org.texastorque.torquelib.util.GenericController;
 import org.texastorque.torquelib.util.TorqueToggle;
@@ -16,10 +22,10 @@ import org.texastorque.torquelib.util.TorqueToggle;
  * Setters should only be used by Commands. Subsystems should only use getters.
  */
 
-public class Input {
+public class Input{
 
     private static volatile Input instance;
-
+    
     private volatile State state;
 	private GenericController driver;
     private  GenericController operator;
@@ -55,7 +61,6 @@ public class Input {
             }
         }
     }
-
     
     // ========== DriveBase ==========
     private volatile double DB_leftSpeed = 0;
