@@ -101,7 +101,6 @@ public class DriveBase extends Subsystem {
         }
 
         else if (state == RobotState.LINE) {
-            // Read feedback for NetworkTables input, calculate output
             // leftSpeed = 0.5 * input.getDBLeftSpeed();
             // rightSpeed = 0.5 * input.getDBRightSpeed();
 
@@ -121,6 +120,7 @@ public class DriveBase extends Subsystem {
                 leftSpeed = 0;
                 rightSpeed = 0;
             }
+            // Good work Jacob
         }
         
         setGears(state);
