@@ -36,6 +36,9 @@ public class Feedback {
 
     private final DigitalInput CM_switch;
 
+    private final AnalogInput LN_leftSensor;
+    private final AnalogInput LN_rightSensor;
+
     private final AnalogInput UL_left;
     private final AnalogInput UL_right;
 
@@ -54,6 +57,9 @@ public class Feedback {
 
         CM_switch = new DigitalInput(Ports.CM_SWITCH);
 
+        LN_leftSensor = new AnalogInput(Ports.LN_LEFT);
+        LN_rightSensor = new AnalogInput(Ports.LN_RIGHT);
+
         UL_left = new AnalogInput(Ports.UL_LEFT);
         UL_right = new AnalogInput(Ports.UL_RIGHT);
         
@@ -65,6 +71,7 @@ public class Feedback {
         updateEncoders();
         updateNavX();
         updateSwitch();
+        updateLineSensors();
         updateUltrasonics();
         updateNetworkTables();
     }
@@ -178,6 +185,25 @@ public class Feedback {
         return CM_atBottom;
     }
 
+
+    // ========== Line Sensor ==========
+
+    private boolean LN_left;
+    private boolean LN_right;
+
+    public void updateLineSensors() {
+        LN_left = LN_leftSensor.getValue() > 100;
+        LN_right = LN_rightSensor.getValue() > 100;
+    }
+
+    public boolean getLNLeft() {
+        return LN_left;
+    }
+
+    public boolean getLNRight() {
+        return LN_right;
+    }
+
    
     // ========= Ultrasonic sensors ========
 
@@ -226,6 +252,9 @@ public class Feedback {
         SmartDashboard.putNumber("NX_roll", NX_roll);
 
         SmartDashboard.putBoolean("CM_atBottom", CM_atBottom);
+
+        SmartDashboard.putBoolean("LN_left", LN_left);
+        SmartDashboard.putBoolean("LN_right", LN_right);
 
         SmartDashboard.putNumber("UL_leftDistance", UL_leftDistance);
         SmartDashboard.putNumber("UL_rightDistance", UL_rightDistance);

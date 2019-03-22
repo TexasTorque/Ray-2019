@@ -48,6 +48,14 @@ public class Input {
                 state.setRobotState(RobotState.TELEOP);
             }
         }
+        else if (driver.getBButtonPressed()) {
+            if (state.getRobotState() == RobotState.TELEOP) {
+                state.setRobotState(RobotState.LINE);
+            }
+            else {
+                state.setRobotState(RobotState.TELEOP);
+            }
+        }
 
         endFakeTeleop = false;
         if (driver.getYButtonPressed()) {

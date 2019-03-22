@@ -1,5 +1,15 @@
 <xml version="1.0">
 <dashboard>
+	<widget field="LN_right" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
+		<location x="64" y="368"/>
+		<height>32</height>
+		<property name="Color to show when false" value="0.0.0.255"/>
+	</widget>
+	<widget field="LN_left" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
+		<location x="0" y="368"/>
+		<height>32</height>
+		<property name="Color to show when false" value="0.0.0.255"/>
+	</widget>
 	<widget field="RT_stall" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
 		<location x="144" y="128"/>
 		<width>80</width>
@@ -19,11 +29,13 @@
 		<location x="480" y="0"/>
 		<width>96</width>
 		<height>32</height>
+		<property name="Color to show when false" value="0.0.0.255"/>
 	</widget>
 	<widget field="NT_targetExists" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
 		<location x="608" y="0"/>
 		<width>128</width>
 		<height>32</height>
+		<property name="Color to show when false" value="0.0.0.255"/>
 	</widget>
 	<widget field="LF_setpoint" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
 		<location x="0" y="80"/>
@@ -121,4 +133,6 @@
 </dashboard>
 <live-window>
 </live-window>
+	<hidden field="left number"/>
+	<hidden field="right number"/>
 </xml>

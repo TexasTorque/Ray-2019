@@ -45,7 +45,7 @@ public class DriveBase extends Subsystem {
         lightRing = new Relay(Ports.LR_RELAY);
 
         visionPID = new ScheduledPID.Builder(0, 0.5, 1)
-                .setPGains(0.25)
+                .setPGains(0.22)
                 // .setRegions(-0.4, -0.2, 0.2, 0.4)
                 // .setPGains(0.3, 0.5, 0.8, 0.5, 0.3)
                 // .setIGains(0.1, 0, 0, 0, 0.1)
@@ -102,6 +102,25 @@ public class DriveBase extends Subsystem {
 
         else if (state == RobotState.LINE) {
             // Read feedback for NetworkTables input, calculate output
+            // leftSpeed = 0.5 * input.getDBLeftSpeed();
+            // rightSpeed = 0.5 * input.getDBRightSpeed();
+
+            if (feedback.getLNLeft()) {
+                // leftSpeed -= 0.4;
+                // rightSpeed += 0.4;
+                leftSpeed = -0.1;
+                rightSpeed = 0.1;
+            }
+            else if (feedback.getLNRight()) {
+                // leftSpeed += 0.4;
+                // rightSpeed -= 0.4;
+                leftSpeed = 0.1;
+                rightSpeed = -0.1;
+            }
+            else {
+                leftSpeed = 0;
+                rightSpeed = 0;
+            }
         }
         
         setGears(state);
