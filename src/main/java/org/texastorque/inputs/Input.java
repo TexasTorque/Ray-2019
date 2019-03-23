@@ -137,12 +137,12 @@ public class Input {
                 LF_setpoint = 4;
             }
             else if (operator.getRightYAxis() > 0.1) {
-                if (calcLFSetpoint() > -0.3) {
+                if (LF_offset > -1) {
                     LF_offset -= 0.005;
                 }
             }
             else if (operator.getRightYAxis() < -0.1) {
-                if (calcLFSetpoint() < 5.3) {
+                if (LF_offset < 1) {
                     LF_offset += 0.005;
                 }
             }
@@ -198,12 +198,12 @@ public class Input {
                 RT_setpoint = 0;
             }
             else if (operator.getLeftYAxis() > 0.1) {
-                if (calcRTSetpoint() < 105) {
+                if (RT_offset < 20) {
                     RT_offset += 0.1;
                 }
             }
             else if (operator.getLeftYAxis() < -0.1) {
-                if (calcRTSetpoint() > -5) {
+                if (RT_offset > -20) {
                     RT_offset -= 0.1;
                 }
             }

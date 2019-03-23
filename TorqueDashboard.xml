@@ -133,6 +133,4 @@
 </dashboard>
 <live-window>
 </live-window>
-	<hidden field="left number"/>
-	<hidden field="right number"/>
 </xml>
