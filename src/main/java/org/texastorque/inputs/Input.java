@@ -109,9 +109,9 @@ public class Input {
 
     // ========== Lift ==========
 
-    private final double[] LF_setpoints = {0.0, 1.0, 2.4, 3.5, 4.8, 5.3}; // {0.0, 2.5, 5.0};
+    private final double[] LF_setpoints = {0.0, 1.0, 2.4, 3.5, 4.8, 5.3, 2.2}; 
     private volatile int LF_setpoint = 0;
-    private volatile int LF_modifier = 0; // problem?
+    private volatile int LF_modifier = 0;
     private volatile double LF_offset = 0;
     private volatile TorqueToggle LF_manualMode = new TorqueToggle(false);
     private volatile double LF_manualOutput = 0;
@@ -135,6 +135,10 @@ public class Input {
             }
             else if (operator.getYButtonPressed()) {
                 LF_setpoint = 4;
+            }
+            else if (operator.getXButton()) { //HP station cargo
+                LF_setpoint = 6;
+                LF_modifier = 0;
             }
             else if (operator.getRightYAxis() > 0.1) {
                 if (LF_offset > -1) {
@@ -169,13 +173,14 @@ public class Input {
     }
 
     public void setLFSetpoint(int index) {
-        LF_setpoint = index;
+        LF_modifier = index % 2;
+        LF_setpoint = index - LF_modifier;
     }
 
 
     // ========== Rotary ==========
 
-    private final double[] RT_setpoints = {0, 45, 74, 96};
+    private final double[] RT_setpoints = {0, 45, 74, 95, 55};
     private volatile int RT_setpoint = 0;
     private volatile double RT_offset = 0;
     private volatile TorqueToggle RT_manualMode = new TorqueToggle(false);
@@ -196,6 +201,9 @@ public class Input {
             }
             else if (operator.getDPADLeft()) {
                 RT_setpoint = 0;
+            }
+            else if (operator.getXButton()) { // HP station cargo
+                RT_setpoint = 4;
             }
             else if (operator.getLeftYAxis() > 0.1) {
                 if (RT_offset < 20) {
@@ -238,7 +246,7 @@ public class Input {
 
     private volatile boolean IN_active = false;
     private volatile boolean IN_hatchState = false;
-    private volatile boolean IN_tuskEngaged = false;
+    private volatile boolean IN_fangEngaged = true;
     
     public void updateIntake() {
         IN_active = false;
@@ -253,7 +261,7 @@ public class Input {
         } // hatch outtake, cargo intake
         
         if (driver.getAButtonPressed()) {
-            IN_tuskEngaged = !IN_tuskEngaged;
+            IN_fangEngaged = !IN_fangEngaged;
         } 
     }
 
@@ -265,8 +273,12 @@ public class Input {
         return IN_hatchState;
     }
 
-    public boolean getINTuskEngaged() {
-        return IN_tuskEngaged;
+    public boolean getINFangEngaged() {
+        return IN_fangEngaged;
+    }
+
+    public void setINFangEngaged(boolean engaged) {
+        IN_fangEngaged = engaged;
     }
 
     public void setINActive(boolean active) {

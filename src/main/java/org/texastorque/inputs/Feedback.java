@@ -45,7 +45,8 @@ public class Feedback {
     // NetworkTables
     private NetworkTableInstance NT_instance;
     private NetworkTable NT_target;
-    
+    private NetworkTableEntry NT_offsetEntry;
+    private NetworkTableEntry NT_existsEntry;
 
     private Feedback() {
         DB_leftEncoder = new TorqueEncoder(Ports.DB_LEFT_ENCODER_A, Ports.DB_LEFT_ENCODER_B, clockwise, EncodingType.k4X);
@@ -65,6 +66,8 @@ public class Feedback {
         
         NT_instance = NetworkTableInstance.getDefault();
         NT_target = NT_instance.getTable("TargetDetection");
+        NT_offsetEntry = NT_target.getEntry("target_offset");
+        NT_existsEntry = NT_target.getEntry("target_exists");
     }
 
     public void update() {
@@ -230,8 +233,8 @@ public class Feedback {
     private boolean NT_targetExists;
 
     public void updateNetworkTables() {
-        NT_targetOffset = NT_target.getEntry("target_offset").getDouble(0);
-        NT_targetExists = NT_target.getEntry("target_exists").getBoolean(false);
+        NT_targetOffset = NT_offsetEntry.getDouble(0);
+        NT_targetExists = NT_existsEntry.getBoolean(false);
     }
 
     public double getTargetOffset() {

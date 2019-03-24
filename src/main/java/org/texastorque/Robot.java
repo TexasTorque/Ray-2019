@@ -33,7 +33,7 @@ public class Robot extends TorqueIterative {
 
 		UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
 		camera.setResolution(320, 240);
-		camera.setFPS(12);
+		camera.setFPS(10);
 	}
 
 	private void initSubsystems() {

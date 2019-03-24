@@ -270,16 +270,16 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     
     ntinst = NetworkTablesInstance.getDefault()
+    targetTable = NetworkTables.getTable("TargetDetection")
 
     if server:
         print("Setting up NetworkTables server")
         ntinst.startServer()
     else:
         print("Setting up NetworkTables client for team {}".format(team))
+        # NetworkTables.initialize(server=ntServerIpAddress)
         # ntinst.initialize(server=ntServerIpAddress)
-        # ntinst.startClientTeam(team)
-        NetworkTables.initialize(server=ntServerIpAddress)
-        targetTable = NetworkTables.getTable("TargetDetection")
+        ntinst.startClientTeam(team)
 
     # setup a cvSource
     cs = CameraServer.getInstance()
@@ -324,3 +324,5 @@ if __name__ == "__main__":
         targetOutputStream.putFrame(targetFrame)
         targetTable.putBoolean("target_exists", targetExists)
         targetTable.putNumber("target_offset", bufferOutput(targetOffset, 1))
+        
+        ntinst.flush()

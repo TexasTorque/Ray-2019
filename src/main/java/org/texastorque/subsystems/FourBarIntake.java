@@ -14,17 +14,17 @@ public class FourBarIntake extends Subsystem {
     private static volatile FourBarIntake instance;
     
     private TorqueMotor intakeWheels;
-    private DoubleSolenoid hatchTusk;
+    private DoubleSolenoid hatchFang;
 
     private double wheelSpeed;
-    private boolean tuskEngaged;
+    private boolean fangEngaged;
 
     private boolean clockwise = true;
 
     private FourBarIntake() {
         intakeWheels = new TorqueMotor(new VictorSP(Ports.IN_MOTOR), !clockwise);
 
-        hatchTusk = new DoubleSolenoid(0, Ports.IN_HATCH_SOLE_A, Ports.IN_HATCH_SOLE_B);
+        hatchFang = new DoubleSolenoid(0, Ports.IN_HATCH_SOLE_A, Ports.IN_HATCH_SOLE_B);
     }
 
     @Override
@@ -60,7 +60,7 @@ public class FourBarIntake extends Subsystem {
                 }
             }
 
-            tuskEngaged = input.getINTuskEngaged();
+            fangEngaged = input.getINFangEngaged();
         }
 
         else if (state == RobotState.TELEOP) {
@@ -79,7 +79,7 @@ public class FourBarIntake extends Subsystem {
                 }
             }
 
-            tuskEngaged = input.getINTuskEngaged();
+            fangEngaged = input.getINFangEngaged();
         }
 
         else if (state == RobotState.VISION) {
@@ -98,7 +98,7 @@ public class FourBarIntake extends Subsystem {
                 }
             }
 
-            tuskEngaged = input.getINTuskEngaged();
+            fangEngaged = input.getINFangEngaged();
         }
 
         else if (state == RobotState.LINE) {
@@ -112,10 +112,10 @@ public class FourBarIntake extends Subsystem {
     public void output() {
         intakeWheels.set(wheelSpeed);
 
-        if (tuskEngaged) {
-            hatchTusk.set(Value.kForward);
+        if (fangEngaged) {
+            hatchFang.set(Value.kForward);
         } else {
-            hatchTusk.set(Value.kReverse);
+            hatchFang.set(Value.kReverse);
         }
     }
 
