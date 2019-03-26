@@ -44,9 +44,9 @@ public class Feedback {
 
     // NetworkTables
     private NetworkTableInstance NT_instance;
-    private NetworkTable NT_target;
     private NetworkTableEntry NT_offsetEntry;
     private NetworkTableEntry NT_existsEntry;
+    
 
     private Feedback() {
         DB_leftEncoder = new TorqueEncoder(Ports.DB_LEFT_ENCODER_A, Ports.DB_LEFT_ENCODER_B, clockwise, EncodingType.k4X);
@@ -63,11 +63,11 @@ public class Feedback {
 
         UL_left = new AnalogInput(Ports.UL_LEFT);
         UL_right = new AnalogInput(Ports.UL_RIGHT);
-        
+
         NT_instance = NetworkTableInstance.getDefault();
-        NT_target = NT_instance.getTable("TargetDetection");
-        NT_offsetEntry = NT_target.getEntry("target_offset");
-        NT_existsEntry = NT_target.getEntry("target_exists");
+        NT_instance.startClientTeam(1477);
+        NT_offsetEntry = NT_instance.getTable("TargetDetection").getEntry("target_offset");
+        NT_existsEntry = NT_instance.getTable("TargetDetection").getEntry("target_exists");
     }
 
     public void update() {
@@ -240,6 +240,7 @@ public class Feedback {
     public double getTargetOffset() {
         return NT_targetOffset;
     }
+    
 
     public void smartDashboard() {
         SmartDashboard.putString("State", State.getInstance().getRobotState().toString());
@@ -264,7 +265,7 @@ public class Feedback {
 
         SmartDashboard.putNumber("NT_targetOffset", NT_targetOffset);
         SmartDashboard.putBoolean("NT_targetExists", NT_targetExists);
-        SmartDashboard.putBoolean("NT_isConnected", NT_instance.isConnected());
+        SmartDashboard.putString("NT_connections", NT_instance.getConnections().toString());
     }
 
     public static Feedback getInstance() {

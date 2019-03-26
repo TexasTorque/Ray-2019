@@ -119,7 +119,7 @@
 		<location x="928" y="48"/>
 		<width>432</width>
 		<height>320</height>
-		<property name="MJPG Server URL" value="http://10.14.77.43:1182/stream.mjpg"/>
+		<property name="MJPG Server URL" value="http://frcvision.local:1182/stream.mjpg"/>
 	</static-widget>
 	<widget field="" type="String Chooser" class="edu.wpi.first.smartdashboard.gui.elements.Chooser">
 		<location x="288" y="64"/>

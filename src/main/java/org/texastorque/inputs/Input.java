@@ -109,7 +109,7 @@ public class Input {
 
     // ========== Lift ==========
 
-    private final double[] LF_setpoints = {0.0, 1.0, 2.4, 3.5, 4.8, 5.3, 2.2}; 
+    private final double[] LF_setpoints = {0.0, 1.0, 2.6, 3.5, 5.0, 5.5, 2.2}; 
     private volatile int LF_setpoint = 0;
     private volatile int LF_modifier = 0;
     private volatile double LF_offset = 0;
@@ -180,7 +180,7 @@ public class Input {
 
     // ========== Rotary ==========
 
-    private final double[] RT_setpoints = {0, 45, 74, 95, 55};
+    private final double[] RT_setpoints = {0, 43, 74, 95, 50};
     private volatile int RT_setpoint = 0;
     private volatile double RT_offset = 0;
     private volatile TorqueToggle RT_manualMode = new TorqueToggle(false);
