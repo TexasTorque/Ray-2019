@@ -6,6 +6,7 @@ import org.texastorque.torquelib.component.TorqueMotor;
 import org.texastorque.torquelib.controlLoop.ScheduledPID;
 
 import edu.wpi.first.wpilibj.VictorSP;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Lift extends Subsystem {
@@ -27,12 +28,12 @@ public class Lift extends Subsystem {
         pulleyB = new TorqueMotor(new VictorSP(Ports.LF_MOTOR_B), clockwise);
 
         speed = 0;
-        setpoint = input.getLFSetpoint(0);
+        setpoint = input.calcLFSetpoint(0);
 
-        liftPID = new ScheduledPID.Builder(setpoint, -0.3, 0.8, 2)
+        liftPID = new ScheduledPID.Builder(setpoint, -0.2, 0.8, 2)
                 .setRegions(0)
-                .setPGains(0.1, 1.0)
-                .setIGains(0, 0.5)
+                .setPGains(0.6, 1.0)
+                //.setIGains(0.0, 0.5) //0, 0.5
                 //.setDGains(0.01)
                 .build();
     }
@@ -59,11 +60,19 @@ public class Lift extends Subsystem {
         }
 
         else if (state == RobotState.TELEOP) {
-            runLiftPID();
+            if (input.getLFManualMode()) {
+                speed = input.getLFManualOutput();
+            } else {
+                runLiftPID();
+            }
         }
 
         else if (state == RobotState.VISION) {
-            runLiftPID(0);
+            if (input.getLFManualMode()) {
+                speed = input.getLFManualOutput();
+            } else {
+                runLiftPID(0);
+            }
         }
 
         else if (state == RobotState.LINE) {
@@ -74,7 +83,7 @@ public class Lift extends Subsystem {
     }
 
     private void runLiftPID() {
-        setpoint = input.getLFSetpoint();
+        setpoint = input.calcLFSetpoint();
         currentPos = feedback.getLFPosition();
         if (setpoint != prevSetpoint) {
             liftPID.changeSetpoint(setpoint);
@@ -85,7 +94,7 @@ public class Lift extends Subsystem {
     }
 
     private void runLiftPID(int position) {
-        setpoint = input.getLFSetpoint(position);
+        setpoint = input.calcLFSetpoint(position);
         currentPos = feedback.getLFPosition();
         if (setpoint != prevSetpoint) {
             liftPID.changeSetpoint(setpoint);
@@ -96,18 +105,33 @@ public class Lift extends Subsystem {
     }
 
     private double addBaseOutput(double speed) {
-        if (feedback.getLFPosition() < input.getLFSetpoint(1)) {
+        if (feedback.getLFPosition() < input.calcLFSetpoint(1)) {
             return speed + 0.05;
         }
-        else if (feedback.getLFPosition() < input.getLFSetpoint(2)) {
+        else if (feedback.getLFPosition() < input.calcLFSetpoint(2)) {
             return speed + 0.08;
         }
         return speed;
     }
 
+    private double startTime = Timer.getFPGATimestamp();
+    private double stallTime = 5.0;
+    private boolean isStalling = false;
+
     @Override
     protected void output() {
         // speed = addBaseOutput(speed);
+
+        // Check if motor is stalling
+        if (Math.abs(speed) < 0.3) {
+            isStalling = false;
+            startTime = Timer.getFPGATimestamp();
+        }
+        if (Timer.getFPGATimestamp() - startTime > stallTime) {
+            isStalling = true;
+            // speed = 0
+        }
+
         pulleyA.set(speed);
         pulleyB.set(speed);
     }
@@ -123,7 +147,9 @@ public class Lift extends Subsystem {
 
     @Override
     public void smartDashboard() {
+        SmartDashboard.putNumber("LF_setpoint", setpoint);
         SmartDashboard.putNumber("LF_output", speed);
+        SmartDashboard.putBoolean("LF_stall", isStalling);
     }
 
     public static Lift getInstance() {
