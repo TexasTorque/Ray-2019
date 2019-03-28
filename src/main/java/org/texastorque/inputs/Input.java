@@ -246,7 +246,7 @@ public class Input {
 
     private volatile boolean IN_active = false;
     private volatile boolean IN_hatchState = false;
-    private volatile boolean IN_fangEngaged = true;
+    private volatile boolean IN_clawEngaged = true;
     
     public void updateIntake() {
         IN_active = false;
@@ -261,7 +261,7 @@ public class Input {
         } // hatch outtake, cargo intake
         
         if (driver.getAButtonPressed()) {
-            IN_fangEngaged = !IN_fangEngaged;
+            IN_clawEngaged = !IN_clawEngaged;
         } 
     }
 
@@ -273,12 +273,12 @@ public class Input {
         return IN_hatchState;
     }
 
-    public boolean getINFangEngaged() {
-        return IN_fangEngaged;
+    public boolean getINClawEngaged() {
+        return IN_clawEngaged;
     }
 
-    public void setINFangEngaged(boolean engaged) {
-        IN_fangEngaged = engaged;
+    public void setINClawEngaged(boolean engaged) {
+        IN_clawEngaged = engaged;
     }
 
     public void setINActive(boolean active) {

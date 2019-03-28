@@ -1,7 +1,7 @@
 package org.texastorque.subsystems;
 
 import org.texastorque.inputs.State.RobotState;
-import org.texastorque.constants.Ports;
+import org.texastorque.constants.*;
 import org.texastorque.torquelib.component.TorqueMotor;
 import org.texastorque.torquelib.controlLoop.ScheduledPID;
 
@@ -45,7 +45,7 @@ public class DriveBase extends Subsystem {
         lightRing = new Relay(Ports.LR_RELAY);
 
         visionPID = new ScheduledPID.Builder(0, 0.5, 1)
-                .setPGains(0.25)
+                .setPGains(0.5 / Constants.CAMERA_ANGLE_X)
                 // .setRegions(-0.4, -0.2, 0.2, 0.4)
                 // .setPGains(0.3, 0.5, 0.8, 0.5, 0.3)
                 // .setIGains(0.1, 0, 0, 0, 0.1)

@@ -23,13 +23,12 @@ public class Robot extends TorqueIterative {
 	private State state = State.getInstance();
 	private Input input = Input.getInstance();
 	private Feedback feedback = Feedback.getInstance();
-	private AutoManager autoManager;
+	private AutoManager autoManager = AutoManager.getInstance();
 
 	public void robotInit() {
 		initSubsystems();
 		feedback.resetNavX();
 		feedback.resetDriveEncoders();
-		autoManager = AutoManager.getInstance();
 
 		UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
 		camera.setResolution(320, 240);

@@ -1,4 +1,20 @@
-#!/bin/sh
-echo "Waiting 5 seconds..."
-sleep 5
+#!/bin/bash
+echo "Killing processes..."
+for pid in $(ps -ef | grep -v "[zZ]" | grep "python3" | awk '{print $2}')
+do
+	echo "PID: $pid"
+	kill $pid
+
+done
+sleep 1
+
+echo "Starting 10 second countdown..."
+for i in {10..0..-1}
+do
+	sleep 1
+	echo "$i"
+done
+sleep 1
+
+echo "Launching vision..."
 exec ./vision.py

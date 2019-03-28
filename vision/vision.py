@@ -2,6 +2,7 @@
 
 import json
 import time
+import math
 import sys
 import os
 import threading
@@ -52,7 +53,8 @@ cameraConfigs = []
 width = 320
 height = 240
 fps = 20
-processingScale = 1.4
+frameAngleX = 60
+processingScale = 1.25
 frameWidth = int(width / processingScale)
 frameHeight = int(height / processingScale)
 frameCenter = (int(frameWidth/2), int(frameHeight/2))
@@ -229,9 +231,11 @@ def findTargetCenter(hsv, minHSV, maxHSV, kernel):
             cv.circle(frame, target, 2, (0, 255, 0), -1)
             cv.putText(frame, 'X', (target[0]+3, target[1]+3), cv.FONT_HERSHEY_PLAIN, 1, (0, 255, 0))
 
-            # (+) if target is to the right, (-) if target is to the left
-            offset = 2 * (target[0] - frameCenter[0]) / frameWidth
-            return (True, offset, frame)
+            # (+) if crosshair is to the left of target, (-) if crosshair is to the right
+            # Ratio is [-1, 1], angle is [-frameAngleX/2, frameAngleX/2]
+            offsetRatio = 2 * (target[0] - frameCenter[0]) / frameWidth
+            offsetAngle = math.degrees(math.atan(offsetRatio * math.tan(math.radians(frameAngleX/2))))
+            return (True, offsetAngle, frame)
 
     return (False, 0, frame)
 
@@ -260,7 +264,7 @@ class OutputBuffer:
 ########## MAIN ##########
 
 def main():
-    # logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.DEBUG)
 
     if len(sys.argv) >= 2:
         configFile = sys.argv[1]
@@ -320,13 +324,13 @@ def main():
     existsEntry = targetTable.getEntry("target_exists")
     offsetEntry = targetTable.getEntry("target_offset")
     
-    minTargetHSV = np.array([70, 70, 40])
+    minTargetHSV = np.array([70, 60, 40])
     maxTargetHSV = np.array([80, 255, 255])
     kernel = np.ones((5,5),np.uint8)
     buffer = OutputBuffer(1, 5)
 
     while 1:
-        timestamp, frame = cvSink.grabFrame(img)
+        _, frame = cvSink.grabFrame(img)
         frame = cv.resize(frame, (frameWidth, frameHeight))
         hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
 
@@ -334,7 +338,6 @@ def main():
         targetOutputStream.putFrame(targetFrame)
         existsEntry.setBoolean(targetExists)
         offsetEntry.setDouble(buffer.calculate(targetOffset))
-        # targetTable.putNumber("target_offset", bufferOutput(targetOffset, 1))
         ntinst.flush()
 
 if __name__ == "__main__":

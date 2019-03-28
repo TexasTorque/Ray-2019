@@ -14,17 +14,17 @@ public class FourBarIntake extends Subsystem {
     private static volatile FourBarIntake instance;
     
     private TorqueMotor intakeWheels;
-    private DoubleSolenoid hatchFang;
+    private DoubleSolenoid hatchClaw;
 
     private double wheelSpeed;
-    private boolean fangEngaged;
+    private boolean clawEngaged;
 
     private boolean clockwise = true;
 
     private FourBarIntake() {
         intakeWheels = new TorqueMotor(new VictorSP(Ports.IN_MOTOR), !clockwise);
 
-        hatchFang = new DoubleSolenoid(0, Ports.IN_HATCH_SOLE_A, Ports.IN_HATCH_SOLE_B);
+        hatchClaw = new DoubleSolenoid(0, Ports.IN_HATCH_SOLE_A, Ports.IN_HATCH_SOLE_B);
     }
 
     @Override
@@ -60,7 +60,7 @@ public class FourBarIntake extends Subsystem {
                 }
             }
 
-            fangEngaged = input.getINFangEngaged();
+            clawEngaged = input.getINClawEngaged();
         }
 
         else if (state == RobotState.TELEOP) {
@@ -79,7 +79,7 @@ public class FourBarIntake extends Subsystem {
                 }
             }
 
-            fangEngaged = input.getINFangEngaged();
+            clawEngaged = input.getINClawEngaged();
         }
 
         else if (state == RobotState.VISION) {
@@ -98,7 +98,7 @@ public class FourBarIntake extends Subsystem {
                 }
             }
 
-            fangEngaged = input.getINFangEngaged();
+            clawEngaged = input.getINClawEngaged();
         }
 
         else if (state == RobotState.LINE) {
@@ -112,10 +112,10 @@ public class FourBarIntake extends Subsystem {
     public void output() {
         intakeWheels.set(wheelSpeed);
 
-        if (fangEngaged) {
-            hatchFang.set(Value.kForward);
+        if (clawEngaged) {
+            hatchClaw.set(Value.kForward);
         } else {
-            hatchFang.set(Value.kReverse);
+            hatchClaw.set(Value.kReverse);
         }
     }
 

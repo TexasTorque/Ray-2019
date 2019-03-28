@@ -65,7 +65,6 @@ public class Feedback {
         UL_right = new AnalogInput(Ports.UL_RIGHT);
 
         NT_instance = NetworkTableInstance.getDefault();
-        NT_instance.startClientTeam(1477);
         NT_offsetEntry = NT_instance.getTable("TargetDetection").getEntry("target_offset");
         NT_existsEntry = NT_instance.getTable("TargetDetection").getEntry("target_exists");
     }
@@ -265,7 +264,6 @@ public class Feedback {
 
         SmartDashboard.putNumber("NT_targetOffset", NT_targetOffset);
         SmartDashboard.putBoolean("NT_targetExists", NT_targetExists);
-        SmartDashboard.putString("NT_connections", NT_instance.getConnections().toString());
     }
 
     public static Feedback getInstance() {
