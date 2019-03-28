@@ -149,7 +149,12 @@ public class ScheduledPID {
 		if (!isSafeToOutput()) {
 			timer.reset();
 			integrator.reset();
-			return (this.safetyCheck == null ? 0 : safetyCheck.getSafetyModeOutput());
+
+			if (this.safetyCheck == null) {
+				return 0;
+			}
+
+			return safetyCheck.getSafetyModeOutput(this.setpoint, processVar);
 		}
 
 		startTimerIfNeeded();
@@ -255,6 +260,6 @@ public class ScheduledPID {
 	
 	public interface SafetyCheck {
 		public boolean isSafe();
-		public double getSafetyModeOutput();
+		public double getSafetyModeOutput(double setpoint, double process);
 	}
 }

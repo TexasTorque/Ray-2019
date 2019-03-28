@@ -46,12 +46,13 @@ public class Ports {
 
     public static final int CM_SWITCH = 8;
 
-    // public static final int LN_LEFT = 9;
-    // public static final int LN_MID = 8;
-    // public static final int LN_RIGHT = 7;
+    public static final int LN_LEFT = 3;
+    public static final int LN_RIGHT = 2;
 
     public static final int UL_LEFT = 0;
     public static final int UL_RIGHT = 1;
 
     public static final int IN_SWITCH = 0;
+
+    public static final int LR_RELAY = 0; // needs to be in one of the relay ports (0-3)
 }

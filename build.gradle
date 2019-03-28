@@ -1,10 +1,10 @@
 plugins {
     id "java"
 <<<<<<< HEAD
-    id "edu.wpi.first.GradleRIO" version "2019.2.1"
+    id "edu.wpi.first.GradleRIO" version "2019.4.1"
     // id "com.snobot.simulator.plugin.SnobotSimulatorPlugin" version "2019-0.2.0" apply false
 =======
-    id "edu.wpi.first.GradleRIO" version "2019.1.1"
+    id "edu.wpi.first.GradleRIO" version "2019.4.1"
 >>>>>>> 9528ff828cf3057b2dc5ba1f1a1266202f7e7e91
 }
 

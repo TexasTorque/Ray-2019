@@ -21,7 +21,7 @@ public class LiftSet extends Command {
 
     @Override
     protected boolean endCondition() {
-        return Math.abs(feedback.getLFPosition() - input.getLFSetpoint(setpointIndex)) < 0.2;
+        return Math.abs(feedback.getLFPosition() - input.calcLFSetpoint(setpointIndex)) < 0.3;
     }
 
     @Override

@@ -14,17 +14,17 @@ public class FourBarIntake extends Subsystem {
     private static volatile FourBarIntake instance;
     
     private TorqueMotor intakeWheels;
-    private DoubleSolenoid hatchTusk;
+    private DoubleSolenoid hatchClaw;
 
     private double wheelSpeed;
-    private boolean tuskEngaged;
+    private boolean clawEngaged;
 
     private boolean clockwise = true;
 
     private FourBarIntake() {
-        intakeWheels = new TorqueMotor(new VictorSP(Ports.IN_MOTOR), clockwise);
+        intakeWheels = new TorqueMotor(new VictorSP(Ports.IN_MOTOR), !clockwise);
 
-        hatchTusk = new DoubleSolenoid(0, Ports.IN_HATCH_SOLE_A, Ports.IN_HATCH_SOLE_B);
+        hatchClaw = new DoubleSolenoid(0, Ports.IN_HATCH_SOLE_A, Ports.IN_HATCH_SOLE_B);
     }
 
     @Override
@@ -45,6 +45,22 @@ public class FourBarIntake extends Subsystem {
     @Override
     public void run(RobotState state) {
         if (state == RobotState.AUTO) {
+            if (input.getINActive()) {
+                if (input.getHatchState()) {
+                    wheelSpeed = 1.0;
+                } else {
+                    wheelSpeed = -1.0;
+                }
+            } 
+            else {
+                if (input.getHatchState()) {
+                    wheelSpeed = 0.15;
+                } else {
+                    wheelSpeed = -0.15;
+                }
+            }
+
+            clawEngaged = input.getINClawEngaged();
         }
 
         else if (state == RobotState.TELEOP) {
@@ -63,11 +79,26 @@ public class FourBarIntake extends Subsystem {
                 }
             }
 
-            tuskEngaged = input.getINTuskEngaged();
+            clawEngaged = input.getINClawEngaged();
         }
 
         else if (state == RobotState.VISION) {
-            wheelSpeed = 0;
+            if (input.getINActive()) {
+                if (input.getHatchState()) {
+                    wheelSpeed = 0.5;
+                } else {
+                    wheelSpeed = -0.5;
+                }
+            } 
+            else {
+                if (input.getHatchState()) {
+                    wheelSpeed = 0.08;
+                } else {
+                    wheelSpeed = -0.08;
+                }
+            }
+
+            clawEngaged = input.getINClawEngaged();
         }
 
         else if (state == RobotState.LINE) {
@@ -81,10 +112,10 @@ public class FourBarIntake extends Subsystem {
     public void output() {
         intakeWheels.set(wheelSpeed);
 
-        if (tuskEngaged) {
-            hatchTusk.set(Value.kReverse);
+        if (clawEngaged) {
+            hatchClaw.set(Value.kForward);
         } else {
-            hatchTusk.set(Value.kForward);
+            hatchClaw.set(Value.kReverse);
         }
     }
 

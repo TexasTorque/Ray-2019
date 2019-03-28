@@ -23,7 +23,7 @@ public class DriveBase extends Subsystem {
     private TorqueMotor rightRear;
     private DoubleSolenoid gearShift;
     private Relay lightRing;
-    private final optimalDistance;
+    private final int optimalDistance;
     
     private final ScheduledPID visionPID;
     private final ScheduledPID distancePID;
@@ -56,7 +56,7 @@ public class DriveBase extends Subsystem {
 
         distancePID = new ScheduledPID.Builder(optimalDistance, 0.5)
                 .setPGains(0.8)
-                .build()
+                .build();
     }
 
     @Override
@@ -99,8 +99,8 @@ public class DriveBase extends Subsystem {
             double currentOffset = feedback.getTargetOffset();
             double adjustment = visionPID.calculate(currentOffset);
 
-            leftSpeed = distancePID.calculate(feedback.getULLeft() + feedback.getULRight()) / 2) * input.getDBLeftSpeed() - adjustment;
-            rightSpeed = distancePID.calculate(feedback.getULLeft() + feedback.getULRight()) / 2) * input.getDBRightSpeed() + adjustment;
+            leftSpeed = distancePID.calculate((feedback.getULLeft() + feedback.getULRight()) / 2) * input.getDBLeftSpeed() - adjustment;
+            rightSpeed = distancePID.calculate((feedback.getULLeft() + feedback.getULRight()) / 2) * input.getDBRightSpeed() + adjustment;
 
             // leftSpeed = input.getDBLeftSpeed() * (0.5 - adjustment);
             // rightSpeed = input.getDBRightSpeed() * (adjustment + 0.5);

@@ -2,14 +2,16 @@
 
 import json
 import time
+import math
 import sys
 import os
+import threading
+import logging
 import cv2 as cv
 import numpy as np
 import util
-
 from cscore import CameraServer, VideoSource, VideoMode
-from networktables import NetworkTablesInstance, NetworkTables
+from networktables import NetworkTables, NetworkTablesInstance
 from datetime import datetime
 from random import randint
 
@@ -47,23 +49,21 @@ class CameraConfig:
 
 team = 1477
 ntServerIpAddress = "10.14.77.2"
-server = False
 cameraConfigs = []
 width = 320
 height = 240
-fps = 30
-processingScale = 1
+fps = 20
+frameAngleX = 60
+processingScale = 1.25
 frameWidth = int(width / processingScale)
 frameHeight = int(height / processingScale)
 frameCenter = (int(frameWidth/2), int(frameHeight/2))
-xOffset = int(width / 2)
-yOffset = 240
-showAllReturnedObjects = False
+frameArea = frameWidth * frameHeight
 
 config = {"properties":[
     {"name":"connect_verbose","value":1},
     {"name":"raw_brightness","value":100},
-    {"name":"brightness","value":0}, 
+    {"name":"brightness","value":10}, 
     {"name":"raw_contrast","value":0},
     {"name":"contrast","value":50},
     {"name":"raw_saturation","value":0},
@@ -158,7 +158,7 @@ def startCamera(config):
 
 ########## VISION LOGIC ##########
 
-def findTargetTop(hsv, minHSV, maxHSV, kernel):
+def findTargetCenter(hsv, minHSV, maxHSV, kernel):
     mask = cv.inRange(hsv, minHSV, maxHSV)
     mask = cv.morphologyEx(mask, cv.MORPH_CLOSE, kernel)
 
@@ -172,9 +172,9 @@ def findTargetTop(hsv, minHSV, maxHSV, kernel):
     if contours:
         # Construct dictionary that maps indices to contour areas, then discard areas that are too small or too big.
         areas = {i: cv.contourArea(cnt) for i, cnt in enumerate(contours)}
-        areas = util.clamp(areas, 100, 16000)
+        areas = util.clamp(areas, frameArea / 800, frameArea / 4)
         if not areas:
-            return (0, frame)
+            return (False, 0, frame)
 
         # Construct rectangular boxes around each contour and store their coordinates in a dictionary.
         boxes = {}
@@ -192,22 +192,25 @@ def findTargetTop(hsv, minHSV, maxHSV, kernel):
                 box = sorted(box, key=lambda b : b[1])
                 top1 = box[0]
                 top2 = box[1]
+                bottom = box[3]
 
-                cv.drawContours(frame, [np.int0(boxes[i])], 0, (0, 255, 0), 2)
-                cv.circle(frame, (top1[0], top1[1]), 2, (255, 0, 0), -1)
-                cv.circle(frame, (top2[0], top2[1]), 2, (0, 0, 255), -1)
-                approxWidth += util.distance(top1, top2)
+                if (util.inRange(util.distance(top2, bottom) / util.distance(top1, top2), 2, 6)):
+                    cv.drawContours(frame, [np.int0(boxes[i])], 0, (0, 255, 0), 2)
+                    cv.circle(frame, (top1[0], top1[1]), 2, (255, 0, 0), -1)
+                    cv.circle(frame, (top2[0], top2[1]), 2, (0, 0, 255), -1)
+                    cv.circle(frame, (bottom[0], bottom[1]), 2, (0, 0, 255), -1)
+                    approxWidth += util.distance(top1, top2)
 
-                if top1[0] < top2[0]:
-                    targets[i] = ('L', top2)
-                elif top1[0] > top2[0]:
-                    targets[i] = ('R', top2)
-                else:
-                    targets[i] = ('X')
+                    if top1[0] < top2[0]:
+                        targets[i] = ('L', top2, bottom)
+                    elif top1[0] > top2[0]:
+                        targets[i] = ('R', top2, bottom)
+                    else:
+                        targets[i] = ('X')
             else:
                 continue
         if not targets:
-            return (0, frame)
+            return (False, 0, frame)
 
         # Calculate average width of targets. Separate list of targets by left or right targets.
         approxWidth /= len(boxes)
@@ -218,26 +221,51 @@ def findTargetTop(hsv, minHSV, maxHSV, kernel):
         # Find pairs of left and right targets that pair to form a valid vision target
         for i, left in leftTargets:
             for j, right in rightTargets:
-                if left[1][0] < right[1][0] and util.approx(util.distance(left[1], right[1]), approxWidth*4, error=0.2) and util.inRange(abs(left[1][1]-right[1][1]), 0, 20):
+                if left[1][0] < right[1][0] and util.approx(util.distance(left[1], right[1]), approxWidth*4, error=0.2) and util.inRange(abs(left[1][1]-right[1][1]) / frameHeight, 0, 0.2):
                     targetPairs.append((left, right))
 
         # Calculate center of vision target by drawing diagonals
-        centers = list(filter(lambda c : c != 0, [util.midpoint(left[1], right[1]) for left, right in targetPairs]))
+        centers = list(filter(lambda c : c != 0, [util.centerPoint(left[1], left[2], right[1], right[2]) for left, right in targetPairs]))
         if centers:
-            target = min(centers, key=lambda m : util.distance(m, frameCenter))
+            target = min(centers, key=lambda m : abs(m[0] - frameCenter[0]))
             cv.circle(frame, target, 2, (0, 255, 0), -1)
-            cv.putText(frame, "X", (target[0]+3, target[1]+3), cv.FONT_HERSHEY_PLAIN, 1, (0, 255, 0))
+            cv.putText(frame, 'X', (target[0]+3, target[1]+3), cv.FONT_HERSHEY_PLAIN, 1, (0, 255, 0))
 
-            # (+) if target is to the right, (-) if target is to the left
-            offset = 2*(target[0]-frameCenter[0]) / frameWidth
-            return (offset, frame)
+            # (+) if crosshair is to the left of target, (-) if crosshair is to the right
+            # Ratio is [-1, 1], angle is [-frameAngleX/2, frameAngleX/2]
+            offsetRatio = 2 * (target[0] - frameCenter[0]) / frameWidth
+            offsetAngle = math.degrees(math.atan(offsetRatio * math.tan(math.radians(frameAngleX/2))))
+            return (True, offsetAngle, frame)
 
-    return (0, frame)
-    
+    return (False, 0, frame)
+
+
+########## BUFFER OUTPUT ##########
+
+class OutputBuffer:
+    lastValue = 0
+    updateTime = time.perf_counter()
+
+    def __init__(self, bufferTime, digits):
+        self.bufferTime = bufferTime
+        self.digits = digits
+
+    def calculate(self, newOutput):
+        if newOutput != 0:
+            self.lastValue = round(newOutput, self.digits)
+            self.updateTime = time.perf_counter()
+
+        if time.perf_counter() - self.updateTime < self.bufferTime:
+            return self.lastValue
+        else:
+            return 0
+
 
 ########## MAIN ##########
 
-if __name__ == "__main__":
+def main():
+    logging.basicConfig(level=logging.DEBUG)
+
     if len(sys.argv) >= 2:
         configFile = sys.argv[1]
 
@@ -246,15 +274,26 @@ if __name__ == "__main__":
         sys.exit(1)
 
     # start NetworkTables
-    ntinst = NetworkTablesInstance.getDefault()
+    condition = threading.Condition()
+    notified = [False]
 
-    if server:
-        print("Setting up NetworkTables server")
-        ntinst.startServer()
-    else:
-        print("Setting up NetworkTables client for team {}".format(team))
-        #ntinst.startClientTeam(team)
-        ntinst.initialize(server=ntServerIpAddress)
+    def connectionListener(connected, info):
+        print(info, '; Connected=%s' % connected)
+        with condition:
+            notified[0] = True
+            condition.notify()
+
+    NetworkTables.initialize(server=ntServerIpAddress)
+    NetworkTables.addConnectionListener(connectionListener, immediateNotify=True)
+
+    with condition:
+        print("NetworkTables initialized at {}, waiting...".format(ntServerIpAddress))
+        if not notified[0]:
+            condition.wait()
+
+    print("NetworkTables connected to {}".format(ntServerIpAddress))
+    ntinst = NetworkTablesInstance.getDefault()
+    targetTable = ntinst.getTable("TargetDetection")
 
     # setup a cvSource
     cs = CameraServer.getInstance()
@@ -264,8 +303,6 @@ if __name__ == "__main__":
 
     # VideoMode.PixelFormat.kMJPEG, kBGR, kGray, kRGB565, kUnknown, kYUYV
     camera.setVideoMode(VideoMode.PixelFormat.kYUYV, width, height, fps)
-    # camera.setResolution(width, height)
-    # camera.setFPS(10)
 
     # Load camera properties config
     camera.setConfigJson(json.dumps(config))
@@ -279,25 +316,29 @@ if __name__ == "__main__":
     # Preallocate a numpy empty array
     img = np.zeros(shape=(frameHeight, frameWidth, 3), dtype=np.uint8)
 
-    # (Optional) setup a CvSource. This will send images back to the Dashboard
-    # Useful to see output from any image processing
-    # outputStream = cs.putVideo("NameOfStream", frameWidth, frameHeight) 
+    # (Optional) setup a CvSource. This will send images back to the Dashboard, useful to see output from any image processing 
+    targetOutputStream = cs.putVideo("TargetStream", frameWidth, frameHeight)
 
-    kernel = np.ones((5,5),np.uint8)
-
-    # Target params
-    targetTable = ntinst.getTable("TargetDetection")
-    targetTable.putNumber("frame_width", frameWidth)
-    targetTable.putNumber("frame_height", frameHeight)
-    targetOutputStream = cs.putVideo("TargetDetection", frameWidth, frameHeight)
-    minTargetHSV = np.array([70, 70, 40])
+    targetTable.getEntry("frame_width").setDouble(frameWidth)
+    targetTable.getEntry("frame_height").setDouble(frameHeight)
+    existsEntry = targetTable.getEntry("target_exists")
+    offsetEntry = targetTable.getEntry("target_offset")
+    
+    minTargetHSV = np.array([70, 60, 40])
     maxTargetHSV = np.array([80, 255, 255])
+    kernel = np.ones((5,5),np.uint8)
+    buffer = OutputBuffer(1, 5)
 
     while 1:
-        time2, frame = cvSink.grabFrame(img)
+        _, frame = cvSink.grabFrame(img)
         frame = cv.resize(frame, (frameWidth, frameHeight))
         hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
 
-        targetOffset, targetFrame = findTargetTop(hsv, minTargetHSV, maxTargetHSV, kernel)
+        targetExists, targetOffset, targetFrame = findTargetCenter(hsv, minTargetHSV, maxTargetHSV, kernel)
         targetOutputStream.putFrame(targetFrame)
-        targetTable.putNumber("target_offset", util.bufferOutput(targetOffset, 1))
+        existsEntry.setBoolean(targetExists)
+        offsetEntry.setDouble(buffer.calculate(targetOffset))
+        ntinst.flush()
+
+if __name__ == "__main__":
+    main()
