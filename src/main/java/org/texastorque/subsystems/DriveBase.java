@@ -1,5 +1,6 @@
 package org.texastorque.subsystems;
 
+import org.texastorque.inputs.Feedback;
 import org.texastorque.inputs.State.RobotState;
 import org.texastorque.constants.Ports;
 import org.texastorque.torquelib.component.TorqueMotor;
@@ -60,7 +61,7 @@ public class DriveBase extends Subsystem {
         lightRing = new Relay(Ports.LR_RELAY);
 
         visionPID = new ScheduledPID.Builder(0, 0.5, 1)
-                .setPGains(0.25)
+                .setPGains(0.0083)
                 // .setRegions(-0.4, -0.2, 0.2, 0.4)
                 // .setPGains(0.3, 0.5, 0.8, 0.5, 0.3)
                 // .setIGains(0.1, 0, 0, 0, 0.1)
@@ -122,7 +123,11 @@ public class DriveBase extends Subsystem {
         else if (state == RobotState.VISION) {
             lightRing.set(Relay.Value.kForward);
 
-            double currentOffset = feedback.getTargetOffset();
+            double currentOffset = feedback.getAdjustX();
+            // leftSpeed = 0.5 * input.getDBLeftSpeed() + currentOffset;
+            // rightSpeed = 0.5 * input.getDBRightSpeed() - currentOffset;
+            
+            // double currentOffset = feedback.getTargetOffset();
             double adjustment = visionPID.calculate(currentOffset);
 
             leftSpeed = 0.5 * input.getDBLeftSpeed() - adjustment;
@@ -134,7 +139,6 @@ public class DriveBase extends Subsystem {
             ultrasonicDist_R = feedback.getULRight();
 
             lightRing.set(Relay.Value.kForward);
-
         } // VISION
 
         else if (state == RobotState.LINE) {

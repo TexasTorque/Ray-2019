@@ -11,6 +11,11 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.AnalogInput;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
+
 /**
  * Retrieve values from all sensors and NetworkTables
  */
@@ -42,7 +47,12 @@ public class Feedback {
     // NetworkTables
     private NetworkTableInstance NT_instance;
     private NetworkTable NT_target;
-    
+
+    private NetworkTable table;
+
+    NetworkTableEntry tx;
+    NetworkTableEntry ty;
+    NetworkTableEntry ta;
 
     private Feedback() {
         DB_leftEncoder = new TorqueEncoder(Ports.DB_LEFT_ENCODER_A, Ports.DB_LEFT_ENCODER_B, clockwise, EncodingType.k4X);
@@ -59,6 +69,11 @@ public class Feedback {
         
         NT_instance = NetworkTableInstance.getDefault();
         NT_target = NT_instance.getTable("TargetDetection");
+        
+        table = NetworkTableInstance.getDefault().getTable("limelight");
+        tx = table.getEntry("tx");
+        ty = table.getEntry("ty");
+        ta = table.getEntry("ta");
     }
 
     public void update() {
@@ -220,13 +235,40 @@ public class Feedback {
     private double NT_targetOffset;
     private boolean NT_targetExists;
 
-    public void updateNetworkTables() {
-        NT_targetOffset = NT_target.getEntry("target_offset").getDouble(0);
-        NT_targetExists = NT_target.getEntry("target_exists").getBoolean(false);
-    }
+    // public void updateNetworkTables() {
+    //     NT_targetOffset = NT_target.getEntry("target_offset").getDouble(0);
+    //     NT_targetExists = NT_target.getEntry("target_exists").getBoolean(false);
+    // }
 
     public double getTargetOffset() {
         return NT_targetOffset;
+    }
+
+    // ===== Limelight feedback from NetworkTables ====
+    double x = 0.0;
+    double y = 0.0;
+    double area = 0.0;
+
+    public void updateNetworkTables() {
+        x = tx.getDouble(0.0);
+        y = ty.getDouble(0.0);
+        area = ta.getDouble(0.0);    
+    }
+
+    public double getAdjustX() {
+        return x;
+    }
+    
+    public double getAdjustY() {
+        return y;
+    }
+
+    public void setLimeLight(boolean isOn) {
+        if (isOn) {
+            table.getEntry("ledMode").setNumber(3);
+        } else {
+            table.getEntry("ledMode").setNumber(1);
+        }
     }
 
     public void smartDashboard() {
@@ -250,6 +292,10 @@ public class Feedback {
         SmartDashboard.putNumber("NT_targetOffset", NT_targetOffset);
         SmartDashboard.putBoolean("NT_targetExists", NT_targetExists);
         SmartDashboard.putBoolean("NT_isConnected", NT_instance.isConnected());
+
+        SmartDashboard.putNumber("LimelightX", x);
+        SmartDashboard.putNumber("LimelightY", y);
+        SmartDashboard.putNumber("LimelightArea", area);
     }
 
     public static Feedback getInstance() {

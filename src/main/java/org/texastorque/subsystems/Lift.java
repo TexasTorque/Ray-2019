@@ -61,13 +61,8 @@ public class Lift extends Subsystem {
         }
 
         else if (state == RobotState.TELEOP) {
-<<<<<<< HEAD
-            if (input.getLFEncoderDead()) {
-                speed = input.getLFSpeed();
-=======
             if (input.getLFManualMode()) {
                 speed = input.getLFManualOutput();
->>>>>>> 15fc656f6ddac6280767f529909d1ec1b1c78db1
             } else {
                 runLiftPID();
             }
