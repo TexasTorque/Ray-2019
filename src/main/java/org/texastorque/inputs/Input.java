@@ -2,12 +2,9 @@ package org.texastorque.inputs;
 
 import org.texastorque.inputs.State.RobotState;
 import org.texastorque.torquelib.util.GenericController;
-<<<<<<< HEAD
 import org.texastorque.torquelib.component.TorqueEncoder;
 import org.texastorque.inputs.Feedback.*;
-=======
 import org.texastorque.torquelib.util.TorqueToggle;
->>>>>>> 6f4b344192cc026a8bc6beee7ce2fb9979ef33e5
 
 /**
  * All forms of input, including driver/operator controllers and input from the code itself.
@@ -122,7 +119,6 @@ public class Input {
     private volatile double LF_manualOutput = 0;
 
     public void updateLift() {
-<<<<<<< HEAD
         if (operator.getAButtonPressed()) {
             LF_setpoint = 0;
         }
@@ -134,7 +130,6 @@ public class Input {
         }
         else if (Math.abs(operator.getRightYAxis()) > 0.1) {
             LF_offset -= operator.getRightYAxis() / 200;
-=======
         LF_manualMode.calc(operator.getRightCenterButton());
 
         if (!LF_manualMode.get()) {
@@ -171,8 +166,8 @@ public class Input {
         }
         else {
             LF_manualOutput = -0.5 * operator.getRightYAxis();
->>>>>>> 6f4b344192cc026a8bc6beee7ce2fb9979ef33e5
         }
+      }
     }
 
     public double calcLFSetpoint() {
@@ -260,13 +255,6 @@ public class Input {
         RT_setpoint = index;
     }
 
-<<<<<<< HEAD
-    public void setRTSetpoint(int setPoint) {
-        RT_setpoint = setPoint;
-    }
-=======
->>>>>>> 6f4b344192cc026a8bc6beee7ce2fb9979ef33e5
-
     // ========== Intake ==========
 
     private volatile boolean IN_active = false;
@@ -318,17 +306,10 @@ public class Input {
         IN_hatchState = state;
     }
 
-    public void setINActive(boolean IN_active) {
-        this.IN_active = IN_active;
-    }
-
     public void setHatchState(boolean IN_hatchState){
         this.IN_hatchState = IN_hatchState;
     }
 
-    public void setINTuskEngaged(boolean IN_tuskEngaged) {
-        this.IN_tuskEngaged = IN_tuskEngaged;
-    }
 
     //========== Climber ==========
 

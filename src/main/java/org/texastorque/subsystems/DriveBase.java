@@ -23,8 +23,8 @@ public class DriveBase extends Subsystem {
     private TorqueMotor rightRear;
     private DoubleSolenoid gearShift;
     private Relay lightRing;
-    private final int optimalDistance;
-    
+
+    private final double optimalDistance = 0.5;
     private final ScheduledPID visionPID;
     private final ScheduledPID distancePID;
     private double leftSpeed = 0.0;
@@ -91,6 +91,13 @@ public class DriveBase extends Subsystem {
 
             leftSpeed = input.getDBLeftSpeed();
             rightSpeed = input.getDBRightSpeed();
+
+            if (!input.getCMEnabled()) {
+                if (feedback.getPitch() > 10) {
+                    leftSpeed = -0.25;
+                    rightSpeed = -0.25;
+                }
+            }
         }
 
         else if (state == RobotState.VISION) {
