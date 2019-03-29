@@ -85,6 +85,15 @@ public class DriveBase extends Subsystem {
 
             leftSpeed = input.getDBLeftSpeed();
             rightSpeed = input.getDBRightSpeed();
+
+            if (input.calcLFSetpoint() > 4.0) {
+                leftSpeed *= 0.5;
+                rightSpeed *= 0.5;
+            }
+            else if (input.calcLFSetpoint() > 2.0) {
+                leftSpeed *= 0.8;
+                rightSpeed *= 0.8;
+            }
         }
 
         else if (state == RobotState.VISION) {
@@ -107,18 +116,18 @@ public class DriveBase extends Subsystem {
             if (feedback.getLNLeft()) {
                 // leftSpeed -= 0.4;
                 // rightSpeed += 0.4;
-                leftSpeed = -0.1;
-                rightSpeed = 0.1;
+                leftSpeed = 0;
+                rightSpeed = 0.2;
             }
             else if (feedback.getLNRight()) {
                 // leftSpeed += 0.4;
                 // rightSpeed -= 0.4;
-                leftSpeed = 0.1;
-                rightSpeed = -0.1;
+                leftSpeed = 0.2;
+                rightSpeed = 0;
             }
             else {
-                leftSpeed = 0;
-                rightSpeed = 0;
+                leftSpeed = 0.2;
+                rightSpeed = 0.2;
             }
             // Good work Jacob
         }

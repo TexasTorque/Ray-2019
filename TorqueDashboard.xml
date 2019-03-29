@@ -1,12 +1,12 @@
 <xml version="1.0">
 <dashboard>
 	<widget field="LN_right" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
-		<location x="64" y="368"/>
+		<location x="64" y="352"/>
 		<height>32</height>
 		<property name="Color to show when false" value="0.0.0.255"/>
 	</widget>
 	<widget field="LN_left" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
-		<location x="0" y="368"/>
+		<location x="0" y="352"/>
 		<height>32</height>
 		<property name="Color to show when false" value="0.0.0.255"/>
 	</widget>
@@ -50,9 +50,6 @@
 	<widget field="NT_targetOffset" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
 		<location x="0" y="315"/>
 		<property name="Background" value="153.255.204.255"/>
-	</widget>
-	<widget field="NT_isConnected" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
-		<location x="0" y="336"/>
 	</widget>
 	<widget field="CM_enabled" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
 		<location x="0" y="155"/>
@@ -133,4 +130,5 @@
 </dashboard>
 <live-window>
 </live-window>
+	<hidden field="NT_isConnected"/>
 </xml>
