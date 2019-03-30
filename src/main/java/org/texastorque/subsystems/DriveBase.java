@@ -2,7 +2,7 @@ package org.texastorque.subsystems;
 
 import org.texastorque.inputs.Feedback;
 import org.texastorque.inputs.State.RobotState;
-import org.texastorque.constants.Ports;
+import org.texastorque.constants.*;
 import org.texastorque.torquelib.component.TorqueMotor;
 import org.texastorque.torquelib.controlLoop.ScheduledPID;
 
@@ -61,7 +61,7 @@ public class DriveBase extends Subsystem {
         lightRing = new Relay(Ports.LR_RELAY);
 
         visionPID = new ScheduledPID.Builder(0, 0.5, 1)
-                .setPGains(0.0083)
+                .setPGains(0.5 / Constants.CAMERA_ANGLE_X)
                 // .setRegions(-0.4, -0.2, 0.2, 0.4)
                 // .setPGains(0.3, 0.5, 0.8, 0.5, 0.3)
                 // .setIGains(0.1, 0, 0, 0, 0.1)
@@ -97,6 +97,7 @@ public class DriveBase extends Subsystem {
         }
 
         else if (state == RobotState.TELEOP) {
+            // raspberry pi
             lightRing.set(Relay.Value.kOff);
 
             leftSpeed = input.getDBLeftSpeed();
@@ -117,32 +118,49 @@ public class DriveBase extends Subsystem {
                 } // set cap speed on motors to 0.1 at 24-ish inches - intake is 20 in and 4 inches past for safety
             } // if intake is down
 
+            // raspberry pi
             lightRing.set(Relay.Value.kOff);
         } // TELEOP
 
         else if (state == RobotState.VISION) {
+            // raspberry pi
             lightRing.set(Relay.Value.kForward);
 
-            double currentOffset = feedback.getAdjustX();
-            // leftSpeed = 0.5 * input.getDBLeftSpeed() + currentOffset;
-            // rightSpeed = 0.5 * input.getDBRightSpeed() - currentOffset;
-            
-            // double currentOffset = feedback.getTargetOffset();
+            double currentOffset = feedback.getTargetOffset();
+
             double adjustment = visionPID.calculate(currentOffset);
 
             leftSpeed = 0.5 * input.getDBLeftSpeed() - adjustment;
             rightSpeed = 0.5 * input.getDBRightSpeed() + adjustment;
-            // leftSpeed = input.getDBLeftSpeed() * (0.5 - adjusstment);
-            // rightSpeed = input.getDBRightSpeed() * (adjustment + 0.5);
 
             ultrasonicDist_L = feedback.getULLeft();
             ultrasonicDist_R = feedback.getULRight();
 
+            // raspberry pi
             lightRing.set(Relay.Value.kForward);
         } // VISION
 
         else if (state == RobotState.LINE) {
-            // Read feedback for NetworkTables input, calculate output
+            // leftSpeed = 0.5 * input.getDBLeftSpeed();
+            // rightSpeed = 0.5 * input.getDBRightSpeed();
+
+            if (feedback.getLNLeft()) {
+                // leftSpeed -= 0.4;
+                // rightSpeed += 0.4;
+                leftSpeed = 0;
+                rightSpeed = 0.2;
+            }
+            else if (feedback.getLNRight()) {
+                // leftSpeed += 0.4;
+                // rightSpeed -= 0.4;
+                leftSpeed = 0.2;
+                rightSpeed = 0;
+            }
+            else {
+                leftSpeed = 0.2;
+                rightSpeed = 0.2;
+            }
+            // Good work Jacob
         }
         
         setGears(state);
@@ -170,9 +188,7 @@ public class DriveBase extends Subsystem {
         return highGear;
     }
 
-    /**
-     * auto transmission
-     */
+    // Potential auto gear shift?
     private void setGears(RobotState state) {
         shiftOkay = (feedback.getLFPosition() < 0.5);
         if (state == RobotState.TELEOP) {

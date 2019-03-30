@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.Timer;
 public class TomInit extends Command {
 
     private double startTime;
-    private double time = 0.2;
+    private double time = 0.23;
     
     public TomInit(double delay) {
         super(delay);

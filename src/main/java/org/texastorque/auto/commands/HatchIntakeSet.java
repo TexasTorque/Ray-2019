@@ -39,7 +39,7 @@ public class HatchIntakeSet extends Command {
 
 	@Override
 	protected boolean endCondition() {
-      return (input.getINTuskEngaged() == hatchState);
+      return (input.getINClawEngaged() == hatchState);
     } // endCondition
 
 	@Override

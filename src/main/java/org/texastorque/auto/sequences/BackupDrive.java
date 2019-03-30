@@ -12,6 +12,7 @@ public class BackupDrive extends Sequence {
     protected void init() {
         ArrayList<Command> block1 = new ArrayList<>();
         block1.add(new TomInit(0));
+        // block1.add(new FangSet(0, true));
         block1.add(new DriveTime(0, 2, 0.5));
         block1.add(new LiftSet(0, 0));
 

@@ -41,18 +41,22 @@ public class Feedback {
 
     private final DigitalInput CM_switch;
 
+    private final AnalogInput LN_leftSensor;
+    private final AnalogInput LN_rightSensor;
+
     private final AnalogInput UL_left;
     private final AnalogInput UL_right;
 
     // NetworkTables
     private NetworkTableInstance NT_instance;
     private NetworkTable NT_target;
-
     private NetworkTable table;
 
     NetworkTableEntry tx;
-    NetworkTableEntry ty;
-    NetworkTableEntry ta;
+
+    private NetworkTableEntry NT_offsetEntry;
+    private NetworkTableEntry NT_existsEntry;
+    
 
     private Feedback() {
         DB_leftEncoder = new TorqueEncoder(Ports.DB_LEFT_ENCODER_A, Ports.DB_LEFT_ENCODER_B, clockwise, EncodingType.k4X);
@@ -64,22 +68,27 @@ public class Feedback {
 
         CM_switch = new DigitalInput(Ports.CM_SWITCH);
 
+        LN_leftSensor = new AnalogInput(Ports.LN_LEFT);
+        LN_rightSensor = new AnalogInput(Ports.LN_RIGHT);
+
         UL_left = new AnalogInput(Ports.UL_LEFT);
         UL_right = new AnalogInput(Ports.UL_RIGHT);
-        
+
         NT_instance = NetworkTableInstance.getDefault();
         NT_target = NT_instance.getTable("TargetDetection");
         
         table = NetworkTableInstance.getDefault().getTable("limelight");
         tx = table.getEntry("tx");
-        ty = table.getEntry("ty");
-        ta = table.getEntry("ta");
+        
+        NT_offsetEntry = NT_instance.getTable("TargetDetection").getEntry("target_offset");
+        NT_existsEntry = NT_instance.getTable("TargetDetection").getEntry("target_exists");
     }
 
     public void update() {
         updateEncoders();
         updateNavX();
         updateSwitch();
+        updateLineSensors();
         updateUltrasonics();
         updateNetworkTables();
     }
@@ -210,6 +219,25 @@ public class Feedback {
         return CM_atBottom;
     }
 
+
+    // ========== Line Sensor ==========
+
+    private boolean LN_left;
+    private boolean LN_right;
+
+    public void updateLineSensors() {
+        LN_left = LN_leftSensor.getValue() > 100;
+        LN_right = LN_rightSensor.getValue() > 100;
+    }
+
+    public boolean getLNLeft() {
+        return LN_left;
+    }
+
+    public boolean getLNRight() {
+        return LN_right;
+    }
+
    
     // ========= Ultrasonic sensors ========
 
@@ -230,45 +258,23 @@ public class Feedback {
     }
 
 
-    // ===== RPi feedback from NetworkTables =====
+    // ===== RPi/Limelight feedback from NetworkTables =====
 
     private double NT_targetOffset;
     private boolean NT_targetExists;
 
-    // public void updateNetworkTables() {
-    //     NT_targetOffset = NT_target.getEntry("target_offset").getDouble(0);
-    //     NT_targetExists = NT_target.getEntry("target_exists").getBoolean(false);
-    // }
+    public void updateNetworkTables() {
+        // raspberry pi
+        NT_targetOffset = NT_offsetEntry.getDouble(0);
+        NT_targetExists = NT_existsEntry.getBoolean(false);
+
+        // limelight
+        // NT_targetOffset = tx.getDouble(0.0);
+        // NT_targetExists = tx.getBoolean(false);
+    }
 
     public double getTargetOffset() {
         return NT_targetOffset;
-    }
-
-    // ===== Limelight feedback from NetworkTables ====
-    double x = 0.0;
-    double y = 0.0;
-    double area = 0.0;
-
-    public void updateNetworkTables() {
-        x = tx.getDouble(0.0);
-        y = ty.getDouble(0.0);
-        area = ta.getDouble(0.0);    
-    }
-
-    public double getAdjustX() {
-        return x;
-    }
-    
-    public double getAdjustY() {
-        return y;
-    }
-
-    public void setLimeLight(boolean isOn) {
-        if (isOn) {
-            table.getEntry("ledMode").setNumber(3);
-        } else {
-            table.getEntry("ledMode").setNumber(1);
-        }
     }
 
     public void smartDashboard() {
@@ -286,16 +292,15 @@ public class Feedback {
 
         SmartDashboard.putBoolean("CM_atBottom", CM_atBottom);
 
+        SmartDashboard.putBoolean("LN_left", LN_left);
+        SmartDashboard.putBoolean("LN_right", LN_right);
+
         SmartDashboard.putNumber("UL_leftDistance", UL_leftDistance);
         SmartDashboard.putNumber("UL_rightDistance", UL_rightDistance);
 
         SmartDashboard.putNumber("NT_targetOffset", NT_targetOffset);
         SmartDashboard.putBoolean("NT_targetExists", NT_targetExists);
         SmartDashboard.putBoolean("NT_isConnected", NT_instance.isConnected());
-
-        SmartDashboard.putNumber("LimelightX", x);
-        SmartDashboard.putNumber("LimelightY", y);
-        SmartDashboard.putNumber("LimelightArea", area);
     }
 
     public static Feedback getInstance() {
