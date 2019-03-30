@@ -109,7 +109,7 @@ public class Input {
 
     // ========== Lift ==========
 
-    private final double[] LF_setpoints = {0.0, 1.0, 2.6, 3.5, 5.0, 5.5, 2.2}; 
+    private final double[] LF_setpoints = {0.0, 1.0, 2.6, 3.5, 5.0, 5.5, 2.2, 0.7}; 
     private volatile int LF_setpoint = 0;
     private volatile int LF_modifier = 0;
     private volatile double LF_offset = 0;
@@ -141,12 +141,12 @@ public class Input {
                 LF_modifier = 0;
             }
             else if (operator.getRightYAxis() > 0.1) {
-                if (LF_offset > -1) {
+                if (LF_offset > -1.5) {
                     LF_offset -= 0.005;
                 }
             }
             else if (operator.getRightYAxis() < -0.1) {
-                if (LF_offset < 1) {
+                if (LF_offset < 1.5) {
                     LF_offset += 0.005;
                 }
             }
@@ -173,14 +173,14 @@ public class Input {
     }
 
     public void setLFSetpoint(int index) {
-        LF_modifier = index % 2;
-        LF_setpoint = index - LF_modifier;
+        LF_modifier = 0;
+        LF_setpoint = index;
     }
 
 
     // ========== Rotary ==========
 
-    private final double[] RT_setpoints = {0, 43, 74, 95, 50};
+    private final double[] RT_setpoints = {0, 43, 74, 95, 50, 8};
     private volatile int RT_setpoint = 0;
     private volatile double RT_offset = 0;
     private volatile TorqueToggle RT_manualMode = new TorqueToggle(false);
@@ -206,12 +206,12 @@ public class Input {
                 RT_setpoint = 4;
             }
             else if (operator.getLeftYAxis() > 0.1) {
-                if (RT_offset < 20) {
+                if (RT_offset < 35) {
                     RT_offset += 0.1;
                 }
             }
             else if (operator.getLeftYAxis() < -0.1) {
-                if (RT_offset > -20) {
+                if (RT_offset > -35) {
                     RT_offset -= 0.1;
                 }
             }
@@ -246,7 +246,7 @@ public class Input {
 
     private volatile boolean IN_active = false;
     private volatile boolean IN_hatchState = false;
-    private volatile boolean IN_clawEngaged = true;
+    private volatile boolean IN_clawEngaged = false;
     
     public void updateIntake() {
         IN_active = false;

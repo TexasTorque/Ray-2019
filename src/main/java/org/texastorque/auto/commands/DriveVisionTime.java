@@ -34,8 +34,8 @@ public class DriveVisionTime extends Command {
         currentOffset = feedback.getTargetOffset();
         double adjustment = visionPID.calculate(currentOffset);
 
-        double leftSpeed = 0.4 - adjustment;
-        double rightSpeed = 0.4 + adjustment;
+        double leftSpeed = 0.3 - adjustment;
+        double rightSpeed = 0.3 + adjustment;
 
         input.setDBLeftSpeed(leftSpeed);
         input.setDBRightSpeed(rightSpeed);

@@ -49,6 +49,9 @@ public abstract class Sequence {
                 startTime = Timer.getFPGATimestamp();
             }
         }
+        else {
+            System.out.println("Auto sequences done.");
+        }
     }
 
     public void reset() {

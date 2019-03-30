@@ -66,7 +66,7 @@ public class Climber extends Subsystem {
 
         else if (state == RobotState.TELEOP) {
             if (input.getCMEnabled()) {
-                tomSpeed = 0.7; // 0.6
+                tomSpeed = 0.65;
 
                 if (feedback.getCMAtBottom()) {
                     rearSpeed = 0;

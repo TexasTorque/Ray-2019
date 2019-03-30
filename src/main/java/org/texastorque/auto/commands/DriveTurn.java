@@ -16,11 +16,12 @@ public class DriveTurn extends Command {
     public DriveTurn(double delay, double angle) {
         super(delay);
         angle = Pathfinder.boundHalfDegrees(angle);
-        clockwise = Math.abs(angle - feedback.getYaw()) < 180 ? true : false;
+        currentYaw = -feedback.getYaw();
+        clockwise = Math.abs(angle - currentYaw) < 180;
         targetAngle = clockwise ? angle : reflectAngle(angle);
 
-        turnPID = new ScheduledPID.Builder(targetAngle, 0.8)
-                .setPGains(0.1)
+        turnPID = new ScheduledPID.Builder(targetAngle, 0.6)
+                .setPGains(0.015)
                 .build();
     }
 
@@ -40,20 +41,20 @@ public class DriveTurn extends Command {
 
     @Override
     protected void continuous() {
-        currentYaw = feedback.getYaw();
+        currentYaw = -feedback.getYaw();
 
         if (clockwise) {
             speed = turnPID.calculate(currentYaw);
 
-            input.setDBLeftSpeed(speed);
-            input.setDBRightSpeed(-speed);
+            input.setDBLeftSpeed(-speed);
+            input.setDBRightSpeed(speed);
         }
         else {
             currentYaw = reflectAngle(currentYaw);
             speed = turnPID.calculate(currentYaw);
 
-            input.setDBLeftSpeed(-speed);
-            input.setDBRightSpeed(speed);
+            input.setDBLeftSpeed(speed);
+            input.setDBRightSpeed(-speed);
         }
     }
 

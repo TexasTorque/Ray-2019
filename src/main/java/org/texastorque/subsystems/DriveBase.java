@@ -113,16 +113,16 @@ public class DriveBase extends Subsystem {
             // leftSpeed = 0.5 * input.getDBLeftSpeed();
             // rightSpeed = 0.5 * input.getDBRightSpeed();
 
-            if (feedback.getLNLeft()) {
+            if (feedback.getLNLeft() && !feedback.getLNRight()) {
                 // leftSpeed -= 0.4;
                 // rightSpeed += 0.4;
                 leftSpeed = 0;
-                rightSpeed = 0.2;
+                rightSpeed = 0.4;
             }
-            else if (feedback.getLNRight()) {
+            else if (!feedback.getLNLeft() && feedback.getLNRight()) {
                 // leftSpeed += 0.4;
                 // rightSpeed -= 0.4;
-                leftSpeed = 0.2;
+                leftSpeed = 0.4;
                 rightSpeed = 0;
             }
             else {

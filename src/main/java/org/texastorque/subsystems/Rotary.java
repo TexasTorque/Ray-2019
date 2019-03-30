@@ -74,7 +74,7 @@ public class Rotary extends Subsystem {
             if (input.getRTManualMode()) {
                 speed = input.getRTManualOutput();
             } else {
-                runRotaryPID(2);
+                runRotaryPID();
             }
         }
 

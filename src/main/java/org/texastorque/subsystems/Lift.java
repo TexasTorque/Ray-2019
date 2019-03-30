@@ -71,7 +71,7 @@ public class Lift extends Subsystem {
             if (input.getLFManualMode()) {
                 speed = input.getLFManualOutput();
             } else {
-                runLiftPID(0);
+                runLiftPID();
             }
         }
 

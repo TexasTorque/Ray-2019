@@ -130,5 +130,4 @@
 </dashboard>
 <live-window>
 </live-window>
-	<hidden field="NT_isConnected"/>
 </xml>
