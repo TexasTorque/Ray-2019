@@ -8,30 +8,17 @@ public class DriveTurn extends Command {
 
     private ScheduledPID turnPID;
     private double targetAngle;
-    private boolean clockwise;
 
     private double currentYaw;
     private double speed;
-    
-    public DriveTurn(double delay, double angle) {
+
+    public DriveTurn(double delay, double targetAngle) {
         super(delay);
-        angle = Pathfinder.boundHalfDegrees(angle);
-        currentYaw = -feedback.getYaw();
-        clockwise = Math.abs(angle - currentYaw) < 180;
-        targetAngle = clockwise ? angle : reflectAngle(angle);
+        this.targetAngle = Pathfinder.boundHalfDegrees(targetAngle);
 
-        turnPID = new ScheduledPID.Builder(targetAngle, 0.6)
-                .setPGains(0.015)
-                .build();
-    }
-
-    private double reflectAngle(double angle) {
-        if (angle < 0) {
-            return -180 - angle;
-        }
-        else {
-            return 180 - angle;
-        }
+        turnPID = new ScheduledPID.Builder(targetAngle, 0.5)
+            .setPGains(0.015)
+            .build();
     }
 
     @Override
@@ -41,26 +28,22 @@ public class DriveTurn extends Command {
 
     @Override
     protected void continuous() {
-        currentYaw = -feedback.getYaw();
+        currentYaw = -feedback.getYaw(); // navX yaw is (+) going CW
+        double reverseYaw = currentYaw - Math.signum(currentYaw) * 360;
+        
+        double currentError = Math.abs(targetAngle - currentYaw);
+        double reverseError = Math.abs(targetAngle - reverseYaw);
+        double effectiveYaw = currentError < reverseError ? currentYaw : reverseYaw;
 
-        if (clockwise) {
-            speed = turnPID.calculate(currentYaw);
+        speed = turnPID.calculate(effectiveYaw);
 
-            input.setDBLeftSpeed(-speed);
-            input.setDBRightSpeed(speed);
-        }
-        else {
-            currentYaw = reflectAngle(currentYaw);
-            speed = turnPID.calculate(currentYaw);
-
-            input.setDBLeftSpeed(speed);
-            input.setDBRightSpeed(-speed);
-        }
+        input.setDBLeftSpeed(-speed);
+        input.setDBRightSpeed(speed);
     }
 
     @Override
     protected boolean endCondition() {
-        return Math.abs(targetAngle - currentYaw) < 3.0 && Math.abs(speed) < 0.1;
+        return Math.abs(targetAngle - currentYaw) < 3.0 && Math.abs(feedback.getDBLeftSpeed()) < 0.5;
     }
 
     @Override

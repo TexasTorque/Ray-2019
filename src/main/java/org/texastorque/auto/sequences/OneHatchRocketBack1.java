@@ -19,7 +19,7 @@ public class OneHatchRocketBack1 extends Sequence {
         ArrayList<Command> block2 = new ArrayList<>();
         Waypoint[] points = new Waypoint[] {
             new Waypoint(0, 0, 0),
-            new Waypoint(18, 4.5, Pathfinder.d2r(45))
+            new Waypoint(18.5, 6, Pathfinder.d2r(45))
         };
         block2.add(new DrivePath(0, points, false));
         block2.add(new RotarySet(2, 3));
@@ -28,26 +28,24 @@ public class OneHatchRocketBack1 extends Sequence {
         block3.add(new DriveTurn(0, -30));
 
         ArrayList<Command> block4 = new ArrayList<>();
-        block4.add(new DriveVisionTime(0, 2.0));
+        block4.add(new DriveVisionTime(0.5, 1.5));
 
         ArrayList<Command> block5 = new ArrayList<>();
         points = new Waypoint[] {
             new Waypoint(0, 0, Pathfinder.d2r(-30)),
-            new Waypoint(2, 0, Pathfinder.d2r(45))
+            new Waypoint(3, 0, Pathfinder.d2r(45))
         };
         block5.add(new ClawSet(0.5, false));
-        block5.add(new DrivePath(1.5, points, false));
-        block5.add(new RotarySet(1.5, 2));
+        block5.add(new RotarySet(1, 2));
+        block5.add(new DrivePath(1, points, false));
 
         ArrayList<Command> block6 = new ArrayList<>();
         points = new Waypoint[] {
             new Waypoint(0, 0, Pathfinder.d2r(45)),
-            new Waypoint(3, 3, Pathfinder.d2r(0)),
-            new Waypoint(15, -3, Pathfinder.d2r(0))
+            new Waypoint(3, 2, Pathfinder.d2r(0)),
+            new Waypoint(21, 0, Pathfinder.d2r(0))
         };
-        block6.add(new DrivePath(0.5, points, true));
-        block6.add(new RotarySet(0.5, 2));
-
+        block6.add(new DrivePath(0, points, true));
 
         addBlock(block1);
         addBlock(block2);

@@ -21,27 +21,25 @@ public class OneHatchShip2 extends Sequence {
             new Waypoint(0, 0, 0),
             new Waypoint(7, 0, 0)
         };
-        block2.add(new TomInit(0));
         block2.add(new DrivePath(0, points, true));
-        block2.add(new LiftSet(0, 0));
         block2.add(new RotarySet(1, 3));
 
         ArrayList<Command> block3 = new ArrayList<>();
-        block3.add(new DriveVisionTime(0.5, 2));
+        block3.add(new DriveVisionTime(0.5, 1.5));
 
         ArrayList<Command> block4 = new ArrayList<>();
         points = new Waypoint[] {
             new Waypoint(0, 0, 0),
-            new Waypoint(5, 5, Pathfinder.d2r(120))
+            new Waypoint(5, 0, 0)
         };
         block4.add(new ClawSet(0.5, false));
-        block4.add(new RotarySet(1.5, 2));
-        block4.add(new DrivePath(1.5, points, false));
+        block4.add(new RotarySet(1, 2));
+        block4.add(new DrivePath(1, points, false));
 
         addBlock(block1);
         addBlock(block2);
         addBlock(block3);
-        // addBlock(block4);
+        addBlock(block4);
     }
 
 }
