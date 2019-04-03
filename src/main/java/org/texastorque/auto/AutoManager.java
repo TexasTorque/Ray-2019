@@ -19,17 +19,15 @@ public class AutoManager {
     private AutoManager() {
         autoSequences = new ArrayList<Sequence>();
         autoSequences.add(new BackupDrive());
-        autoSequences.add(new OneHatchRocketBack1());
+        autoSequences.add(new TwoHatchRocketBack1());
         autoSequences.add(new OneHatchShip2());
-        autoSequences.add(new OneHatchShipTeleop2());
-        autoSequences.add(new OneHatchRocket3());
+        autoSequences.add(new TwoHatchRocketBack3());
         autoSequences.add(new TestSequence());
 
         autoSelector.setDefaultOption("BackupDrive", "BackupDrive");
-        autoSelector.addOption("1 OneHatchRocketBack", "1 OneHatchRocketBack");
+        autoSelector.addOption("1 TwoHatchRocketBack", "1 TwoHatchRocketBack");
         autoSelector.addOption("2 OneHatchShip", "2 OneHatchShip");
-        autoSelector.addOption("2 OneHatchShipTeleop", "2 OneHatchShipTeleop");
-        autoSelector.addOption("3 OneHatchRocket", "3 OneHatchRocket");
+        autoSelector.addOption("3 TwoHatchRocketBack", "3 TwoHatchRocketBack");
 
         SmartDashboard.putData(autoSelector);
         System.out.println("Auto sequences loaded.");
@@ -41,14 +39,14 @@ public class AutoManager {
 
     public void chooseSequence() {
         String autoChoice = autoSelector.getSelected();
-        // autoChoice = "TestSequence";
+        autoChoice = "1 TwoHatchRocketBack";
 
         switch(autoChoice) {
             case "BackupDrive":
                 currentSequence = autoSequences.get(0);
                 break;
 
-            case "1 OneHatchRocketBack":
+            case "1 TwoHatchRocketBack":
                 currentSequence = autoSequences.get(1);
                 break;
 
@@ -56,16 +54,12 @@ public class AutoManager {
                 currentSequence = autoSequences.get(2);
                 break;
 
-            case "2 OneHatchShipTeleop":
+            case "3 TwoHatchRocketBack":
                 currentSequence = autoSequences.get(3);
                 break;
 
-            case "3 OneHatchRocket":
-                currentSequence = autoSequences.get(4);
-                break;
-
             case "TestSequence":
-                currentSequence = autoSequences.get(5);
+                currentSequence = autoSequences.get(4);
                 break;
         }
 

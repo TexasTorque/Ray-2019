@@ -99,7 +99,7 @@ public class DriveBase extends Subsystem {
         else if (state == RobotState.VISION) {
             lightRing.set(Relay.Value.kForward);
 
-            double currentOffset = feedback.getTargetOffset();
+            double currentOffset = feedback.getNTTargetOffset();
             double adjustment = visionPID.calculate(currentOffset);
 
             leftSpeed = 0.5 * input.getDBLeftSpeed() - adjustment;

@@ -4,6 +4,8 @@ import org.texastorque.inputs.State.RobotState;
 import org.texastorque.torquelib.util.GenericController;
 import org.texastorque.torquelib.util.TorqueToggle;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
+
 /**
  * All forms of input, including driver/operator controllers and input from the code itself.
  * 
@@ -32,17 +34,19 @@ public class Input {
         updateRotary();
         updateIntake();
         updateClimber();
+        updateNetworkTables();
     }
 
 
     // =========== RobotState ==========
 
-    private volatile boolean endFakeTeleop = false;
+    private volatile boolean endFakeTeleop = true;
 
     public void updateState() {
         if (driver.getXButtonPressed()) {
             if (state.getRobotState() == RobotState.TELEOP) {
                 state.setRobotState(RobotState.VISION);
+                NT_pipeline = 0;
             }
             else {
                 state.setRobotState(RobotState.TELEOP);
@@ -57,10 +61,10 @@ public class Input {
             }
         }
 
-        endFakeTeleop = false;
-        if (driver.getYButtonPressed()) {
-            endFakeTeleop = true;
-        }
+        // endFakeTeleop = false;
+        // if (driver.getYButtonPressed()) {
+        //     endFakeTeleop = true;
+        // }
     }
 
     public boolean getEndFakeTeleop() {
@@ -109,7 +113,7 @@ public class Input {
 
     // ========== Lift ==========
 
-    private final double[] LF_setpoints = {0.0, 1.0, 2.6, 3.5, 5.0, 5.5, 2.2, 0.7}; 
+    private final double[] LF_setpoints = {0.0, 1.0, 2.6, 3.5, 5.0, 5.3, 2.2, 0.7}; 
     private volatile int LF_setpoint = 0;
     private volatile int LF_modifier = 0;
     private volatile double LF_offset = 0;
@@ -141,12 +145,12 @@ public class Input {
                 LF_modifier = 0;
             }
             else if (operator.getRightYAxis() > 0.1) {
-                if (LF_offset > -1.5) {
+                if (LF_offset > -2.0) {
                     LF_offset -= 0.005;
                 }
             }
             else if (operator.getRightYAxis() < -0.1) {
-                if (LF_offset < 1.5) {
+                if (LF_offset < 2.0) {
                     LF_offset += 0.005;
                 }
             }
@@ -206,12 +210,12 @@ public class Input {
                 RT_setpoint = 4;
             }
             else if (operator.getLeftYAxis() > 0.1) {
-                if (RT_offset < 35) {
+                if (RT_offset < 40) {
                     RT_offset += 0.1;
                 }
             }
             else if (operator.getLeftYAxis() < -0.1) {
-                if (RT_offset > -35) {
+                if (RT_offset > -40) {
                     RT_offset -= 0.1;
                 }
             }
@@ -338,6 +342,18 @@ public class Input {
 
     public void setCMTomSpeed(double speed) {
         CM_tomSpeed = speed;
+    }
+
+
+    // ========== NetworkTables ==========
+    
+    private int NT_pipeline = 0;
+
+    public void updateNetworkTables() {
+        if (driver.getYButtonPressed()) {
+            NT_pipeline = 1 - NT_pipeline;
+        }
+        Feedback.getInstance().getNTPipelineEntry().setNumber(NT_pipeline);
     }
 
     

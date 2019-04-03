@@ -23,7 +23,7 @@ public class DriveVision extends Command {
 
     @Override
     protected void continuous() {
-        currentOffset = feedback.getTargetOffset();
+        currentOffset = feedback.getNTTargetOffset();
         double adjustment = visionPID.calculate(currentOffset);
 
         double baseOutput = 0.5;

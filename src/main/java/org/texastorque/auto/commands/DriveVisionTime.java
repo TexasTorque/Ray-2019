@@ -31,7 +31,7 @@ public class DriveVisionTime extends Command {
 
     @Override
     protected void continuous() {
-        currentOffset = feedback.getTargetOffset();
+        currentOffset = feedback.getNTTargetOffset();
         double adjustment = visionPID.calculate(currentOffset);
 
         double leftSpeed = 0.3 - adjustment;

@@ -28,7 +28,7 @@ public class Rotary extends Subsystem {
         setpoint = input.calcRTSetpoint(0);
 
         this.rotaryPID = new ScheduledPID.Builder(setpoint, -0.6, 0.6, 1)
-                .setPGains(0.02)
+                .setPGains(0.023)
                 // .setIGains(0.01)
                 // .setDGains(0.0)
                 .build();

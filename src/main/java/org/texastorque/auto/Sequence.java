@@ -49,6 +49,7 @@ public abstract class Sequence {
             if (blockEnded) {
                 blockIndex++;
                 startTime = Timer.getFPGATimestamp();
+                System.out.println("Block " + blockIndex + " ended.");
             }
         }
         else if (!ended) {

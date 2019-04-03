@@ -17,7 +17,7 @@ public class DriveTurn extends Command {
         this.targetAngle = Pathfinder.boundHalfDegrees(targetAngle);
 
         turnPID = new ScheduledPID.Builder(targetAngle, 0.5)
-            .setPGains(0.015)
+            .setPGains(0.023)
             .build();
     }
 

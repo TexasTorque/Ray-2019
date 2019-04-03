@@ -19,22 +19,21 @@ public class OneHatchShip2 extends Sequence {
         ArrayList<Command> block2 = new ArrayList<>();
         Waypoint[] points = new Waypoint[] {
             new Waypoint(0, 0, 0),
-            new Waypoint(7, 0, 0)
+            new Waypoint(6, 0, 0)
         };
         block2.add(new DrivePath(0, points, true));
         block2.add(new RotarySet(1, 3));
 
         ArrayList<Command> block3 = new ArrayList<>();
-        block3.add(new DriveVisionTime(0.5, 1.5));
+        block3.add(new DriveVisionTime(0, 1.5));
+        block3.add(new ClawSet(1.5, false));
 
         ArrayList<Command> block4 = new ArrayList<>();
         points = new Waypoint[] {
             new Waypoint(0, 0, 0),
-            new Waypoint(5, 0, 0)
+            new Waypoint(4, 0, 0)
         };
-        block4.add(new ClawSet(0.5, false));
-        block4.add(new RotarySet(1, 2));
-        block4.add(new DrivePath(1, points, false));
+        block4.add(new DrivePath(0.5, points, false));
 
         addBlock(block1);
         addBlock(block2);

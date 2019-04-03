@@ -71,7 +71,7 @@ public class DrivePath extends Command {
 
 	@Override
 	protected boolean endCondition() {
-		return leftFollower.isFinished() && rightFollower.isFinished();
+		return leftFollower.isFinished() || rightFollower.isFinished();
 	}
 
 	@Override
