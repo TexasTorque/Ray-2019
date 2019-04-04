@@ -39,7 +39,7 @@ public class AutoManager {
 
     public void chooseSequence() {
         String autoChoice = autoSelector.getSelected();
-        autoChoice = "1 TwoHatchRocketBack";
+        // autoChoice = "3 TwoHatchRocketBack";
 
         switch(autoChoice) {
             case "BackupDrive":

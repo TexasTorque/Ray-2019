@@ -4,8 +4,6 @@ import org.texastorque.inputs.State.RobotState;
 import org.texastorque.torquelib.util.GenericController;
 import org.texastorque.torquelib.util.TorqueToggle;
 
-import edu.wpi.first.networktables.NetworkTableEntry;
-
 /**
  * All forms of input, including driver/operator controllers and input from the code itself.
  * 
@@ -113,7 +111,7 @@ public class Input {
 
     // ========== Lift ==========
 
-    private final double[] LF_setpoints = {0.0, 1.0, 2.6, 3.5, 5.0, 5.3, 2.2, 0.7}; 
+    private final double[] LF_setpoints = {0.0, 1.0, 2.6, 3.5, 5.0, 5.3, 2.2}; 
     private volatile int LF_setpoint = 0;
     private volatile int LF_modifier = 0;
     private volatile double LF_offset = 0;
@@ -184,7 +182,7 @@ public class Input {
 
     // ========== Rotary ==========
 
-    private final double[] RT_setpoints = {0, 43, 74, 95, 50, 8};
+    private final double[] RT_setpoints = {0, 43, 74, 91, 50, 8};
     private volatile int RT_setpoint = 0;
     private volatile double RT_offset = 0;
     private volatile TorqueToggle RT_manualMode = new TorqueToggle(false);

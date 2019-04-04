@@ -46,10 +46,6 @@ public class DriveBase extends Subsystem {
 
         visionPID = new ScheduledPID.Builder(0, 0.5, 1)
                 .setPGains(0.5 / Constants.CAMERA_ANGLE_X)
-                // .setRegions(-0.4, -0.2, 0.2, 0.4)
-                // .setPGains(0.3, 0.5, 0.8, 0.5, 0.3)
-                // .setIGains(0.1, 0, 0, 0, 0.1)
-                // .setDGains(0, 0.02, 0, 0.02, 0)
                 .build();
     }
 
@@ -117,17 +113,17 @@ public class DriveBase extends Subsystem {
                 // leftSpeed -= 0.4;
                 // rightSpeed += 0.4;
                 leftSpeed = 0;
-                rightSpeed = 0.4;
+                rightSpeed = 0.3;
             }
             else if (!feedback.getLNLeft() && feedback.getLNRight()) {
                 // leftSpeed += 0.4;
                 // rightSpeed -= 0.4;
-                leftSpeed = 0.4;
+                leftSpeed = 0.3;
                 rightSpeed = 0;
             }
             else {
-                leftSpeed = 0.2;
-                rightSpeed = 0.2;
+                leftSpeed = 0.15;
+                rightSpeed = 0.15;
             }
             // Good work Jacob
         }

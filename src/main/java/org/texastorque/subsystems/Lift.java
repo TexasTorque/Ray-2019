@@ -32,12 +32,11 @@ public class Lift extends Subsystem {
         speed = 0;
         setpoint = input.calcLFSetpoint(0);
 
-        liftPID = new ScheduledPID.Builder(setpoint, -0.25, 0.8, 2)
+        liftPID = new ScheduledPID.Builder(setpoint, -0.2, 0.7, 2)
                 .setRegions(0)
-                //.setPGains(0.5, 1.0)
-                .setPGains(0.7, 1.5)
-                .setIGains(0.2, 0.8)
-                .setDGains(0.00002, 0)
+                .setPGains(0.6, 1.5)
+                .setIGains(0.1, 0.7)
+                .setDGains(0.00005, 0) // 0.00002
                 .build();
 
         lowPass = new LowPassFilter(0.5);

@@ -1,5 +1,6 @@
 package org.texastorque.auto.commands;
 
+import org.texastorque.constants.Constants;
 import org.texastorque.auto.Command;
 import org.texastorque.torquelib.controlLoop.ScheduledPID;
 
@@ -12,7 +13,7 @@ public class DriveVision extends Command {
         super(delay);
 
         visionPID = new ScheduledPID.Builder(0, 0.5, 1)
-                .setPGains(0.25)
+                .setPGains(0.5 / Constants.CAMERA_ANGLE_X)
                 .build();
 
         currentOffset = 0;

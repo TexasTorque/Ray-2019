@@ -27,7 +27,7 @@
 		<property name="Color to show when false" value="0.255.0.255"/>
 	</widget>
 	<widget field="RT_output" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
-		<location x="144" y="107"/>
+		<location x="144" y="128"/>
 	</widget>
 	<widget field="DB_highGear" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
 		<location x="480" y="0"/>
@@ -49,7 +49,7 @@
 		<property name="Background" value="153.255.204.255"/>
 	</widget>
 	<widget field="RT_setpoint" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
-		<location x="144" y="80"/>
+		<location x="144" y="107"/>
 	</widget>
 	<widget field="NT_targetOffset" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
 		<location x="0" y="315"/>
@@ -129,7 +129,7 @@
 		<location x="480" y="48"/>
 		<width>432</width>
 		<height>320</height>
-		<property name="Camera Choice" value=""/>
+		<property name="Camera Choice" value="USB Camera 0"/>
 	</static-widget>
 	<widget field="limelight_Stream" type="String" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
 		<location x="192" y="368"/>
@@ -141,6 +141,7 @@
 	</widget>
 	<widget field="limelight_PipelineName" type="String" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
 		<location x="192" y="320"/>
+		<width>224</width>
 	</widget>
 </dashboard>
 <live-window>
