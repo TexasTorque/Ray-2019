@@ -1,5 +1,17 @@
 <xml version="1.0">
 <dashboard>
+	<widget field="limelight_Stream" type="String" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
+		<location x="192" y="347"/>
+		<width>247</width>
+	</widget>
+	<widget field="limelight_Interface" type="String" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
+		<location x="192" y="368"/>
+		<width>261</width>
+	</widget>
+	<widget field="limelight_PipelineName" type="String" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
+		<location x="192" y="320"/>
+		<width>210</width>
+	</widget>
 	<widget field="LF_currentPos" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
 		<location x="0" y="80"/>
 		<width>138</width>
@@ -131,18 +143,6 @@
 		<height>320</height>
 		<property name="Camera Choice" value="USB Camera 0"/>
 	</static-widget>
-	<widget field="limelight_Stream" type="String" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="192" y="368"/>
-		<width>242</width>
-	</widget>
-	<widget field="limelight_Interface" type="String" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="192" y="347"/>
-		<width>264</width>
-	</widget>
-	<widget field="limelight_PipelineName" type="String" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="192" y="320"/>
-		<width>224</width>
-	</widget>
 </dashboard>
 <live-window>
 </live-window>

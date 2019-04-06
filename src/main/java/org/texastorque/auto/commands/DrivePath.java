@@ -42,8 +42,8 @@ public class DrivePath extends Command {
 
         leftFollower = new DistanceFollower(modifier.getLeftTrajectory());
         rightFollower = new DistanceFollower(modifier.getRightTrajectory());
-        leftFollower.configurePIDVA(0.8, 0.0, 0.1, 1/Constants.DB_LOW_MAX_SPEED, 0);
-        rightFollower.configurePIDVA(0.8, 0.0, 0.1, 1/Constants.DB_LOW_MAX_SPEED, 0);
+        leftFollower.configurePIDVA(0.8, 0.0, 0.05, 1/Constants.DB_LOW_MAX_SPEED, 0);
+        rightFollower.configurePIDVA(0.8, 0.0, 0.05, 1/Constants.DB_LOW_MAX_SPEED, 0);
     }
 
     @Override
@@ -59,14 +59,19 @@ public class DrivePath extends Command {
         double angleDifference = Pathfinder.boundHalfDegrees(targetHeading - currentHeading);
         double turn = 0.8 * (-1.0/80.0) * angleDifference;
 
+        double leftSpeed, rightSpeed;
         if (isForward) {
-            input.setDBLeftSpeed(leftFollower.calculate(feedback.getDBLeftDistance()) + turn);
-            input.setDBRightSpeed(rightFollower.calculate(feedback.getDBRightDistance()) - turn);
+            leftSpeed = leftFollower.calculate(feedback.getDBLeftDistance()) + turn;
+            rightSpeed = rightFollower.calculate(feedback.getDBRightDistance()) - turn;
         }
         else {
-            input.setDBLeftSpeed(-rightFollower.calculate(-feedback.getDBLeftDistance()) + turn);
-            input.setDBRightSpeed(-leftFollower.calculate(-feedback.getDBRightDistance()) - turn);
+            leftSpeed = -rightFollower.calculate(-feedback.getDBLeftDistance()) + turn;
+            rightSpeed = -leftFollower.calculate(-feedback.getDBRightDistance()) - turn;
         }
+
+        input.setDBLeftSpeed(leftSpeed);
+        input.setDBRightSpeed(rightSpeed);
+        System.out.println("L: " + leftSpeed + " | R: " + rightSpeed);
 	}
 
 	@Override

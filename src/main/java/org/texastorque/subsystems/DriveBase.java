@@ -83,13 +83,13 @@ public class DriveBase extends Subsystem {
             rightSpeed = input.getDBRightSpeed();
 
             if (input.calcLFSetpoint() > 4.0) {
-                leftSpeed *= 0.5;
-                rightSpeed *= 0.5;
+                leftSpeed *= 0.7;
+                rightSpeed *= 0.7;
             }
-            else if (input.calcLFSetpoint() > 2.0) {
-                leftSpeed *= 0.8;
-                rightSpeed *= 0.8;
-            }
+            // else if (input.calcLFSetpoint() > 2.0) {
+            //     leftSpeed *= 1;
+            //     rightSpeed *= 1;
+            // }
         }
 
         else if (state == RobotState.VISION) {

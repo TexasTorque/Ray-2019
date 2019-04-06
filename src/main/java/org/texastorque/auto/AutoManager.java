@@ -30,7 +30,7 @@ public class AutoManager {
         autoSelector.addOption("3 TwoHatchRocketBack", "3 TwoHatchRocketBack");
 
         SmartDashboard.putData(autoSelector);
-        System.out.println("Auto sequences loaded.");
+        System.out.println("All auto sequences loaded.");
     }
 
     public void displayChoices() {
@@ -40,6 +40,7 @@ public class AutoManager {
     public void chooseSequence() {
         String autoChoice = autoSelector.getSelected();
         // autoChoice = "3 TwoHatchRocketBack";
+        System.out.println(autoChoice);
 
         switch(autoChoice) {
             case "BackupDrive":

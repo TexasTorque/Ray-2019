@@ -49,7 +49,7 @@ public class FourBarIntake extends Subsystem {
                 if (input.getHatchState()) {
                     wheelSpeed = 1.0;
                 } else {
-                    wheelSpeed = -1.0;
+                    wheelSpeed = -0.8;
                 }
             } 
             else {
@@ -66,16 +66,16 @@ public class FourBarIntake extends Subsystem {
         else if (state == RobotState.TELEOP) {
             if (input.getINActive()) {
                 if (input.getHatchState()) {
-                    wheelSpeed = 0.5;
+                    wheelSpeed = 1.0;
                 } else {
-                    wheelSpeed = -0.5;
+                    wheelSpeed = -0.8;
                 }
             } 
             else {
                 if (input.getHatchState()) {
-                    wheelSpeed = 0.08;
+                    wheelSpeed = 0.15;
                 } else {
-                    wheelSpeed = -0.08;
+                    wheelSpeed = -0.15;
                 }
             }
 
@@ -85,16 +85,16 @@ public class FourBarIntake extends Subsystem {
         else if (state == RobotState.VISION) {
             if (input.getINActive()) {
                 if (input.getHatchState()) {
-                    wheelSpeed = 0.5;
+                    wheelSpeed = 1.0;
                 } else {
-                    wheelSpeed = -0.5;
+                    wheelSpeed = -0.8;
                 }
             } 
             else {
                 if (input.getHatchState()) {
-                    wheelSpeed = 0.08;
+                    wheelSpeed = 0.15;
                 } else {
-                    wheelSpeed = -0.08;
+                    wheelSpeed = -0.15;
                 }
             }
 

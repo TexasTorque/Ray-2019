@@ -13,8 +13,8 @@ public class OneHatchShip2 extends Sequence {
     protected void init() {
         ArrayList<Command> block1 = new ArrayList<>();
         block1.add(new TomInit(0));
-        block1.add(new RotarySet(0, 5));
-        block1.add(new ClawSet(1, true));
+        block1.add(new RotarySet(0, 6));
+        block1.add(new ClawSet(2, true));
         
         ArrayList<Command> block2 = new ArrayList<>();
         Waypoint[] points = new Waypoint[] {

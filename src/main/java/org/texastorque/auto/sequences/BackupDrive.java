@@ -12,12 +12,12 @@ public class BackupDrive extends Sequence {
     protected void init() {
         ArrayList<Command> block1 = new ArrayList<>();
         block1.add(new TomInit(0));
-        block1.add(new RotarySet(0, 5));
-        block1.add(new ClawSet(1, true));
+        block1.add(new RotarySet(0, 6));
+        block1.add(new ClawSet(2, true));
 
         ArrayList<Command> block2 = new ArrayList<>();
-        block2.add(new DriveTime(0, 1, 0.5));
-        block2.add(new DriveTime(1, 1.5, -0.1));
+        block2.add(new DriveTime(0.5, 1.5, 0.4));
+        block2.add(new DriveTime(1.5, 1, -0.1));
 
         addBlock(block1);
         addBlock(block2);
