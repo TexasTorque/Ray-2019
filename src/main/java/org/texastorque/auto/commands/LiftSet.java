@@ -13,7 +13,7 @@ public class LiftSet extends Command {
 
     @Override
     protected void init() {
-        input.setLFSetpoint(setpointIndex);
+        input.setLFPosition(setpointIndex);
     }
 
     @Override

@@ -7,6 +7,8 @@ import org.texastorque.auto.commands.*;
 import jaci.pathfinder.*;
 import java.util.ArrayList;
 
+// Do not use, currently untested
+
 public class TwoHatchRocketBack1 extends Sequence {
 
     @Override
@@ -25,7 +27,7 @@ public class TwoHatchRocketBack1 extends Sequence {
         block2.add(new RotarySet(2, 3));
 
         ArrayList<Command> block3 = new ArrayList<>();
-        block3.add(new DriveTurn(0, -35));
+        block3.add(new DriveTurn(0, -80));
 
         ArrayList<Command> block4 = new ArrayList<>();
         block4.add(new DriveVisionTime(0, 1.2));
@@ -33,16 +35,16 @@ public class TwoHatchRocketBack1 extends Sequence {
 
         ArrayList<Command> block5 = new ArrayList<>();
         points = new Waypoint[] {
-            new Waypoint(0, 0, Pathfinder.d2r(-35)),
-            new Waypoint(2.5, 0, Pathfinder.d2r(45))
+            new Waypoint(0, 0, Pathfinder.d2r(0)),
+            new Waypoint(2.5, 1, Pathfinder.d2r(80))
         };
         block5.add(new DrivePath(0.3, points, false));
 
         ArrayList<Command> block6 = new ArrayList<>();
         points = new Waypoint[] {
-            new Waypoint(0, 0, Pathfinder.d2r(45)),
-            new Waypoint(3, 1.5, Pathfinder.d2r(0)),
-            new Waypoint(20, -2, Pathfinder.d2r(0))
+            new Waypoint(0, 0, Pathfinder.d2r(0)),
+            new Waypoint(3, 0, Pathfinder.d2r(-45)),
+            new Waypoint(20, -10, Pathfinder.d2r(-45))
         };
         block6.add(new DrivePath(0, points, true));
 

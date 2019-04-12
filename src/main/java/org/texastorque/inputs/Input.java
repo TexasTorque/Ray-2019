@@ -28,11 +28,12 @@ public class Input {
     public void updateControllers() {
         updateState();
         updateDrive();
+        updatePositions();
         updateLift();
         updateRotary();
         updateIntake();
         updateClimber();
-        updateNetworkTables();
+        // updateNetworkTables();
     }
 
 
@@ -44,7 +45,7 @@ public class Input {
         if (driver.getXButtonPressed()) {
             if (state.getRobotState() == RobotState.TELEOP) {
                 state.setRobotState(RobotState.VISION);
-                NT_pipeline = 0;
+                // NT_pipeline = 0;
             }
             else {
                 state.setRobotState(RobotState.TELEOP);
@@ -77,8 +78,9 @@ public class Input {
     private volatile boolean DB_highGear = false;
 
     public void updateDrive() {
-		DB_leftSpeed = -driver.getLeftYAxis() + 0.55 * driver.getRightXAxis();
-        DB_rightSpeed = -driver.getLeftYAxis() - 0.55 * driver.getRightXAxis();
+        double rightX = driver.getRightXAxis();
+		DB_leftSpeed = -driver.getLeftYAxis() + 0.6 * Math.pow(rightX, 2) * Math.signum(rightX);
+        DB_rightSpeed = -driver.getLeftYAxis() - 0.6 * Math.pow(rightX, 2) * Math.signum(rightX);
 
         if (driver.getRightBumper()) {
             DB_highGear = true;
@@ -109,6 +111,62 @@ public class Input {
     }
 
 
+    // ========== Lift + Rotary ==========
+
+    private volatile int LF_position = 0;
+    private volatile int RT_position = 0;
+    
+
+    public void updatePositions() {
+        if (operator.getAButtonPressed()) {
+            LF_position = 0;
+            RT_position = 3;
+        }
+        else if (operator.getBButtonPressed()) {
+            LF_position = 2;
+            RT_position = 3;
+        }
+        else if (operator.getYButtonPressed()) {
+            LF_position = 4;
+            RT_position = 3;
+        }
+        else if (operator.getXButtonPressed()) {
+            LF_position = 6;
+            RT_position = 5;
+        }
+        
+        if (operator.getDPADLeft()) {
+            RT_position = 0;
+        }
+        else if (operator.getDPADDown()) {
+            RT_position = 4;
+        }
+        else if (operator.getDPADUp()) {
+            if (LF_position == 0 || LF_position == 2 || LF_position == 4) {
+                LF_position += 1;
+            }
+
+            if (LF_position == 1 || LF_position == 3) {
+                RT_position = 2;
+            }
+            else if (LF_position == 5) {
+                RT_position = 1;
+            }
+            else {}
+        }
+        else if (operator.getDPADRight()) {
+            if (LF_position == 1 || LF_position == 3 || LF_position == 5) {
+                LF_position -= 1;
+            }
+
+            if (LF_position == 0 || LF_position == 2 || LF_position == 4) {
+                RT_position = 3;
+            }
+            else {}
+        }
+    }
+
+
     // ========== Lift ==========
 
     private final double[] LF_setpoints = {0.0, 1.4, 2.6, 3.7, 5.0, 5.4, 2.2}; 
@@ -122,27 +180,28 @@ public class Input {
         LF_manualMode.calc(operator.getRightCenterButton());
 
         if (!LF_manualMode.get()) {
-            if (operator.getDPADUp()) {
-                LF_modifier = 1;
-            }
-            else if (operator.getDPADRight() || operator.getDPADDown() || operator.getDPADLeft()) {
-                LF_modifier = 0;
-            }
+            // if (operator.getDPADUp()) {
+            //     LF_modifier = 1;
+            // }
+            // else if (operator.getDPADRight() || operator.getDPADDown() || operator.getDPADLeft()) {
+            //     LF_modifier = 0;
+            // }
 
-            if (operator.getAButtonPressed()) {
-                LF_setpoint = 0;
-            }
-            else if (operator.getBButtonPressed()) {
-                LF_setpoint = 2;
-            }
-            else if (operator.getYButtonPressed()) {
-                LF_setpoint = 4;
-            }
-            else if (operator.getXButton()) { //HP station cargo
-                LF_setpoint = 6;
-                LF_modifier = 0;
-            }
-            else if (operator.getRightYAxis() > 0.1) {
+            // if (operator.getAButtonPressed()) {
+            //     LF_setpoint = 0;
+            // }
+            // else if (operator.getBButtonPressed()) {
+            //     LF_setpoint = 2;
+            // }
+            // else if (operator.getYButtonPressed()) {
+            //     LF_setpoint = 4;
+            // }
+            // else if (operator.getXButton()) { //HP station cargo
+            //     LF_setpoint = 6;
+            //     LF_modifier = 0;
+            // }
+
+            if (operator.getRightYAxis() > 0.1) {
                 if (LF_offset > -2.0) {
                     LF_offset -= 0.005;
                 }
@@ -159,7 +218,14 @@ public class Input {
     }
 
     public double calcLFSetpoint() {
-        return LF_setpoints[LF_setpoint + LF_modifier] + LF_offset;
+        // try {
+        //     return LF_setpoints[LF_setpoint + LF_modifier] + LF_offset;
+        // } 
+        // catch (IndexOutOfBoundsException e) {
+        //     e.printStackTrace();
+        //     return 0;
+        // }
+        return LF_setpoints[LF_position] + LF_offset;
     }
 
     public double calcLFSetpoint(int index) {
@@ -174,9 +240,8 @@ public class Input {
         return LF_manualOutput;
     }
 
-    public void setLFSetpoint(int index) {
-        LF_modifier = 0;
-        LF_setpoint = index;
+    public void setLFPosition(int index) {
+        LF_position = index;
     }
 
 
@@ -192,22 +257,23 @@ public class Input {
         RT_manualMode.calc(operator.getLeftCenterButton());
         
         if (!RT_manualMode.get()) {
-            if (operator.getDPADDown()) {
-                RT_setpoint = 4;
-            }
-            else if (operator.getDPADRight()) {
-                RT_setpoint = 3;
-            }
-            else if (operator.getDPADUp()) {
-                RT_setpoint = 2;
-            }
-            else if (operator.getDPADLeft()) {
-                RT_setpoint = 0;
-            }
-            else if (operator.getXButton()) { // HP station cargo
-                RT_setpoint = 5;
-            }
-            else if (operator.getLeftYAxis() > 0.1) {
+            // if (operator.getDPADDown()) {
+            //     RT_setpoint = 4;
+            // }
+            // else if (operator.getDPADRight()) {
+            //     RT_setpoint = 3;
+            // }
+            // else if (operator.getDPADUp()) {
+            //     RT_setpoint = 2;
+            // }
+            // else if (operator.getDPADLeft()) {
+            //     RT_setpoint = 0;
+            // }
+            // else if (operator.getXButton()) { // HP station cargo
+            //     RT_setpoint = 5;
+            // }
+
+            if (operator.getLeftYAxis() > 0.1) {
                 if (RT_offset < 40) {
                     RT_offset += 0.1;
                 }
@@ -218,9 +284,9 @@ public class Input {
                 }
             }
 
-            if (LF_setpoint + LF_modifier == 5) {
-                RT_setpoint = 1;
-            }
+            // if (LF_setpoint + LF_modifier == 5) {
+            //     RT_setpoint = 1;
+            // }
         }
         else {
             RT_manualOutput = 0.5 * operator.getLeftYAxis();
@@ -228,7 +294,7 @@ public class Input {
     }
 
     public double calcRTSetpoint() {
-        return RT_setpoints[RT_setpoint] + RT_offset;
+        return RT_setpoints[RT_position] + RT_offset;
     }
 
     public double calcRTSetpoint(int index) {
@@ -243,8 +309,8 @@ public class Input {
         return RT_manualOutput;
     }
 
-    public void setRTSetpoint(int index) {
-        RT_setpoint = index;
+    public void setRTPosition(int index) {
+        RT_position = index;
     }
 
 
@@ -358,14 +424,14 @@ public class Input {
 
     // ========== NetworkTables ==========
     
-    private int NT_pipeline = 0;
+    // private int NT_pipeline = 0;
 
-    public void updateNetworkTables() {
-        if (driver.getYButtonPressed()) {
-            NT_pipeline = 1 - NT_pipeline;
-        }
-        Feedback.getInstance().getNTPipelineEntry().setNumber(NT_pipeline);
-    }
+    // public void updateNetworkTables() {
+    //     if (driver.getYButtonPressed()) {
+    //         NT_pipeline = 1 - NT_pipeline;
+    //     }
+    //     Feedback.getInstance().getNTPipelineEntry().setNumber(NT_pipeline);
+    // }
 
     
     public static Input getInstance() {

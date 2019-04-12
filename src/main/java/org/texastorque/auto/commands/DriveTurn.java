@@ -24,18 +24,20 @@ public class DriveTurn extends Command {
     @Override
     protected void init() {
         feedback.resetDriveEncoders();
+        feedback.zeroYaw();
     }
 
     @Override
     protected void continuous() {
         currentYaw = -feedback.getYaw(); // navX yaw is (+) going CW
-        double reverseYaw = currentYaw - Math.signum(currentYaw) * 360;
+        // double reverseYaw = currentYaw - Math.signum(currentYaw) * 360;
         
-        double currentError = Math.abs(targetAngle - currentYaw);
-        double reverseError = Math.abs(targetAngle - reverseYaw);
-        double effectiveYaw = currentError < reverseError ? currentYaw : reverseYaw;
+        // double currentError = Math.abs(targetAngle - currentYaw);
+        // double reverseError = Math.abs(targetAngle - reverseYaw);
+        // double effectiveYaw = currentError < reverseError ? currentYaw : reverseYaw;
 
-        speed = turnPID.calculate(effectiveYaw);
+        // speed = turnPID.calculate(effectiveYaw);
+        speed = turnPID.calculate(currentYaw);
 
         input.setDBLeftSpeed(-speed);
         input.setDBRightSpeed(speed);

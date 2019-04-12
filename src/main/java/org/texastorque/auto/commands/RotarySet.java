@@ -12,7 +12,7 @@ public class RotarySet extends Command{
 
     @Override
     protected void init() {
-        input.setRTSetpoint(setpointIndex);
+        input.setRTPosition(setpointIndex);
     }
 
     @Override

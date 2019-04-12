@@ -45,8 +45,8 @@ public class Feedback {
     // NetworkTables
     private NetworkTableInstance NT_instance;
     private NetworkTableEntry NT_offsetEntry;
-    // private NetworkTableEntry NT_existsEntry;
-    private NetworkTableEntry NT_pipelineEntry;
+    private NetworkTableEntry NT_existsEntry;
+    // private NetworkTableEntry NT_pipelineEntry;
 
     private Feedback() {
         DB_leftEncoder = new TorqueEncoder(Ports.DB_LEFT_ENCODER_A, Ports.DB_LEFT_ENCODER_B, clockwise, EncodingType.k4X);
@@ -65,11 +65,11 @@ public class Feedback {
         UL_right = new AnalogInput(Ports.UL_RIGHT);
 
         NT_instance = NetworkTableInstance.getDefault();
-        // NT_offsetEntry = NT_instance.getTable("TargetDetection").getEntry("target_offset");
-        // NT_existsEntry = NT_instance.getTable("TargetDetection").getEntry("target_exists");
+        NT_offsetEntry = NT_instance.getTable("TargetDetection").getEntry("target_offset");
+        NT_existsEntry = NT_instance.getTable("TargetDetection").getEntry("target_exists");
 
-        NT_offsetEntry = NT_instance.getTable("limelight").getEntry("tx");
-        NT_pipelineEntry = NT_instance.getTable("limelight").getEntry("pipeline");
+        // NT_offsetEntry = NT_instance.getTable("limelight").getEntry("tx");
+        // NT_pipelineEntry = NT_instance.getTable("limelight").getEntry("pipeline");
     }
 
     public void update() {
@@ -177,6 +177,10 @@ public class Feedback {
         return NX_roll;
     }
 
+    public void zeroYaw() {
+        NX_gyro.zeroYaw();
+    }
+
 
     // ========== Limit switch ==========
 
@@ -236,16 +240,16 @@ public class Feedback {
 
     public void updateNetworkTables() {
         NT_targetOffset = NT_offsetEntry.getDouble(0);
-        // NT_targetExists = NT_existsEntry.getBoolean(false);
+        NT_targetExists = NT_existsEntry.getBoolean(false);
     }
 
     public double getNTTargetOffset() {
         return NT_targetOffset;
     }
 
-    public NetworkTableEntry getNTPipelineEntry() {
-        return NT_pipelineEntry;
-    }
+    // public NetworkTableEntry getNTPipelineEntry() {
+    //     return NT_pipelineEntry;
+    // }
     
 
     public void smartDashboard() {

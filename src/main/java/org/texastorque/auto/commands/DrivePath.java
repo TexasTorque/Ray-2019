@@ -7,6 +7,9 @@ import jaci.pathfinder.*;
 import jaci.pathfinder.modifiers.TankModifier;
 import jaci.pathfinder.followers.DistanceFollower;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 public class DrivePath extends Command {
 
     private DistanceFollower leftFollower;
@@ -34,7 +37,13 @@ public class DrivePath extends Command {
          * Max Acceleration (ft/s/s)
          * Max Jerk (ft/s/s/s)
          */
-        Trajectory.Config config = new Trajectory.Config(Trajectory.FitMethod.HERMITE_CUBIC, Trajectory.Config.SAMPLES_LOW, 0.01, Constants.DB_LOW_MAX_SPEED, Constants.DB_LOW_MAX_ACCEL, Constants.DB_LOW_MAX_JERK);
+        
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        }
+        catch (NoSuchAlgorithmException e) {}
+
+        Trajectory.Config config = new Trajectory.Config(Trajectory.FitMethod.HERMITE_CUBIC, Trajectory.Config.SAMPLES_FAST, 0.0125, Constants.DB_LOW_MAX_SPEED, Constants.DB_LOW_MAX_ACCEL, Constants.DB_LOW_MAX_JERK);
         
         Trajectory path = Pathfinder.generate(points, config);
         TankModifier modifier = new TankModifier(path);
@@ -49,6 +58,7 @@ public class DrivePath extends Command {
     @Override
     protected void init() {
         feedback.resetDriveEncoders();
+        feedback.zeroYaw();
     }
 
 	@Override
@@ -71,7 +81,7 @@ public class DrivePath extends Command {
 
         input.setDBLeftSpeed(leftSpeed);
         input.setDBRightSpeed(rightSpeed);
-        System.out.println("L: " + leftSpeed + " | R: " + rightSpeed);
+        // System.out.println("L: " + leftSpeed + " | R: " + rightSpeed);
 	}
 
 	@Override
