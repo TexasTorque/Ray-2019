@@ -27,6 +27,7 @@ public class DriveVisionTime extends Command {
     @Override
     protected void init() {
         startTime = Timer.getFPGATimestamp();
+        input.setDBHighGear(false);
     }
 
     @Override

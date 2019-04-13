@@ -110,6 +110,10 @@ public class Input {
         return DB_highGear;
     }
 
+    public void setDBHighGear(boolean gear) {
+        DB_highGear = gear;
+    }
+
 
     // ========== Lift + Rotary ==========
 
@@ -120,15 +124,15 @@ public class Input {
     public void updatePositions() {
         if (operator.getAButtonPressed()) {
             LF_position = 0;
-            RT_position = 3;
+            // RT_position = 3;
         }
         else if (operator.getBButtonPressed()) {
             LF_position = 2;
-            RT_position = 3;
+            // RT_position = 3;
         }
         else if (operator.getYButtonPressed()) {
             LF_position = 4;
-            RT_position = 3;
+            // RT_position = 3;
         }
         else if (operator.getXButtonPressed()) {
             LF_position = 6;

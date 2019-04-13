@@ -25,6 +25,7 @@ public class DriveTurn extends Command {
     protected void init() {
         feedback.resetDriveEncoders();
         feedback.zeroYaw();
+        input.setDBHighGear(false);
     }
 
     @Override

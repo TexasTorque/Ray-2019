@@ -155,10 +155,12 @@ public class DriveBase extends Subsystem {
 
     // Potential auto gear shift?
     private void setGears(RobotState state) {
-        if (state == RobotState.TELEOP)
+        if (state == RobotState.AUTO || state == RobotState.TELEOP) {
             highGear = input.getDBHighGear();
-        else
+        }
+        else {
             highGear = false;
+        }
     }
 
     @Override
