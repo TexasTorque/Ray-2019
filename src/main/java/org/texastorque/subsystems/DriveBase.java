@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import org.texastorque.auto.sequences.*;
 
 public class DriveBase extends Subsystem {
 
@@ -92,9 +93,15 @@ public class DriveBase extends Subsystem {
 
             double currentOffset = feedback.getTargetOffset();
             double adjustment = visionPID.calculate(currentOffset);
+            if(feedback.getULLeft() < 2 || feedback.getULRight() <2){
+                leftSpeed = 0.5 * input.getDBLeftSpeed() - adjustment +.2;
+                rightSpeed = 0.5 * input.getDBRightSpeed() + adjustment +.2;
+            }
+            else{
+                leftSpeed = 0;
+                rightSpeed = 0;
+            }
 
-            leftSpeed = 0.5 * input.getDBLeftSpeed() - adjustment;
-            rightSpeed = 0.5 * input.getDBRightSpeed() + adjustment;
 
             // leftSpeed = input.getDBLeftSpeed() * (0.5 - adjustment);
             // rightSpeed = input.getDBRightSpeed() * (adjustment + 0.5);

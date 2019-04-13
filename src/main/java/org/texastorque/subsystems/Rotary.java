@@ -74,7 +74,11 @@ public class Rotary extends Subsystem {
         }
 
         else if (state == RobotState.VISION) {
-            runRotaryPID(2);
+            if (input.getRTManualMode()) {
+                speed = input.getRTManualOutput();
+            } else {
+                runRotaryPID(2);
+            }
         }
 
         else if (state == RobotState.LINE) {
@@ -106,7 +110,7 @@ public class Rotary extends Subsystem {
     }
 
     private double startTime = Timer.getFPGATimestamp();
-    private double stallTime = 4.0;
+    private double stallTime = 5.0;
     private boolean isStalling = false;
 
     @Override

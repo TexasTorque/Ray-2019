@@ -1,5 +1,17 @@
 <xml version="1.0">
 <dashboard>
+	<widget field="RT_stall" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
+		<location x="144" y="128"/>
+		<width>80</width>
+		<property name="Color to show when true" value="255.0.0.255"/>
+		<property name="Color to show when false" value="0.255.0.255"/>
+	</widget>
+	<widget field="LF_stall" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
+		<location x="0" y="128"/>
+		<width>80</width>
+		<property name="Color to show when true" value="255.0.0.255"/>
+		<property name="Color to show when false" value="0.255.0.255"/>
+	</widget>
 	<widget field="RT_output" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
 		<location x="144" y="107"/>
 	</widget>
@@ -24,28 +36,29 @@
 		<location x="144" y="80"/>
 	</widget>
 	<widget field="NT_targetOffset" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
-		<location x="0" y="283"/>
+		<location x="0" y="315"/>
 		<property name="Background" value="153.255.204.255"/>
 	</widget>
 	<widget field="NT_isConnected" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
-		<location x="0" y="304"/>
+		<location x="0" y="336"/>
 	</widget>
 	<widget field="CM_enabled" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
-		<location x="0" y="187"/>
+		<location x="0" y="155"/>
 	</widget>
 	<widget field="UL_rightDistance" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
-		<location x="0" y="256"/>
+		<location x="0" y="288"/>
+		<height>21</height>
 		<property name="Background" value="153.255.204.255"/>
 	</widget>
 	<widget field="UL_leftDistance" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
-		<location x="0" y="235"/>
+		<location x="0" y="267"/>
 		<property name="Background" value="153.255.204.255"/>
 	</widget>
 	<widget field="NX_roll" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
-		<location x="116" y="139"/>
+		<location x="0" y="240"/>
 	</widget>
 	<widget field="DB_leftSpeed" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
-		<location x="160" y="11"/>
+		<location x="166" y="11"/>
 	</widget>
 	<widget field="LF_position" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
 		<location x="0" y="59"/>
@@ -60,15 +73,15 @@
 		<property name="Background" value="153.255.204.255"/>
 	</widget>
 	<widget field="NX_yaw" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
-		<location x="0" y="160"/>
+		<location x="128" y="219"/>
 		<property name="Background" value="153.255.204.255"/>
 	</widget>
 	<widget field="NX_pitch" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
-		<location x="0" y="139"/>
+		<location x="0" y="219"/>
 		<property name="Background" value="153.255.204.255"/>
 	</widget>
 	<widget field="CM_atBottom" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
-		<location x="0" y="208"/>
+		<location x="128" y="155"/>
 	</widget>
 	<widget field="LF_output" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
 		<location x="0" y="107"/>

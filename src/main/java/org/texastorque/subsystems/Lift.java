@@ -30,7 +30,7 @@ public class Lift extends Subsystem {
         speed = 0;
         setpoint = input.calcLFSetpoint(0);
 
-        liftPID = new ScheduledPID.Builder(setpoint, -0.2, 0.7, 2)
+        liftPID = new ScheduledPID.Builder(setpoint, -0.2, 0.8, 2)
                 .setRegions(0)
                 .setPGains(0.5, 1.0)
                 //.setIGains(0.0, 0.5) //0, 0.5
@@ -68,7 +68,11 @@ public class Lift extends Subsystem {
         }
 
         else if (state == RobotState.VISION) {
-            runLiftPID(0);
+            if (input.getLFManualMode()) {
+                speed = input.getLFManualOutput();
+            } else {
+                runLiftPID(0);
+            }
         }
 
         else if (state == RobotState.LINE) {
@@ -111,7 +115,7 @@ public class Lift extends Subsystem {
     }
 
     private double startTime = Timer.getFPGATimestamp();
-    private double stallTime = 4.0;
+    private double stallTime = 5.0;
     private boolean isStalling = false;
 
     @Override

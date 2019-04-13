@@ -10,6 +10,7 @@ import edu.wpi.first.networktables.*;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.Ultrasonic;
 
 /**
  * Retrieve values from all sensors and NetworkTables
@@ -31,8 +32,8 @@ public class Feedback {
     private final TorqueEncoder DB_rightEncoder;
     private final TorqueEncoder LF_encoder;
     private final TorqueEncoder RT_encoder;
-    private final DigitalInput LN_Right;
-    private final DigitalInput LN_Left;
+    private final AnalogInput LN_Right;
+    private final AnalogInput LN_Left;
 
     private final AHRS NX_gyro;
 
@@ -62,8 +63,8 @@ public class Feedback {
         NT_instance = NetworkTableInstance.getDefault();
         NT_target = NT_instance.getTable("TargetDetection");
 
-        LN_Right = new DigitalInput(Ports.LN_RIGHT);
-        LN_Left = new DigitalInput(Ports.LN_LEFT);
+        LN_Right = new AnalogInput(Ports.LN_RIGHT);
+        LN_Left = new AnalogInput(Ports.LN_LEFT);
 
     }
 
@@ -73,6 +74,7 @@ public class Feedback {
         updateSwitch();
         updateUltrasonics();
         updateNetworkTables();
+        updateLineSensors();
     }
 
 
@@ -206,12 +208,25 @@ public class Feedback {
 
 
     //===========Line Sensors============
+    private double lineLeft;
+    private double lineRight;
+    public void updateLineSensors(){
+        lineLeft = LN_Left.getVoltage();
+        lineRight = LN_Right.getVoltage();
+    }
+
     public boolean getLineLeft(){
-        return LN_Left.get();
+        if(lineLeft>100){
+            return true;
+        }
+        else return false;
     }
 
     public boolean getLineRight(){
-        return LN_Right.get();
+        if(lineRight>100){
+            return true;
+        }
+        else return false;
     }
 
     // ===== RPi feedback from NetworkTables =====
