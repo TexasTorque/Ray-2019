@@ -39,13 +39,15 @@ public class Feedback {
 
     private final DigitalInput CM_switch;
 
+
     private final AnalogInput UL_left;
     private final AnalogInput UL_right;
 
     // NetworkTables
     private NetworkTableInstance NT_instance;
-    private NetworkTable NT_target;
-    
+    private NetworkTableEntry NT_offsetEntry;
+    private NetworkTableEntry NT_existsEntry;
+    // private NetworkTableEntry NT_pipelineEntry;
 
     private Feedback() {
         DB_leftEncoder = new TorqueEncoder(Ports.DB_LEFT_ENCODER_A, Ports.DB_LEFT_ENCODER_B, clockwise, EncodingType.k4X);
@@ -57,21 +59,25 @@ public class Feedback {
 
         CM_switch = new DigitalInput(Ports.CM_SWITCH);
 
+        LN_Left = new AnalogInput(Ports.LN_LEFT);
+        LN_Right = new AnalogInput(Ports.LN_RIGHT);
+
         UL_left = new AnalogInput(Ports.UL_LEFT);
         UL_right = new AnalogInput(Ports.UL_RIGHT);
-        
+
         NT_instance = NetworkTableInstance.getDefault();
-        NT_target = NT_instance.getTable("TargetDetection");
+        NT_offsetEntry = NT_instance.getTable("TargetDetection").getEntry("target_offset");
+        NT_existsEntry = NT_instance.getTable("TargetDetection").getEntry("target_exists");
 
-        LN_Right = new AnalogInput(Ports.LN_RIGHT);
-        LN_Left = new AnalogInput(Ports.LN_LEFT);
-
+        // NT_offsetEntry = NT_instance.getTable("limelight").getEntry("tx");
+        // NT_pipelineEntry = NT_instance.getTable("limelight").getEntry("pipeline");
     }
 
     public void update() {
         updateEncoders();
         updateNavX();
         updateSwitch();
+        updateLineSensors();
         updateUltrasonics();
         updateNetworkTables();
         updateLineSensors();
@@ -174,6 +180,10 @@ public class Feedback {
         return NX_roll;
     }
 
+    public void zeroYaw() {
+        NX_gyro.zeroYaw();
+    }
+
 
     // ========== Limit switch ==========
 
@@ -187,7 +197,12 @@ public class Feedback {
         return CM_atBottom;
     }
 
-   
+
+    // ========== Line Sensor ==========
+
+    private boolean LN_left;
+    private boolean LN_right;
+
     // ========= Ultrasonic sensors ========
 
     private double UL_leftDistance;
@@ -235,13 +250,18 @@ public class Feedback {
     private boolean NT_targetExists;
 
     public void updateNetworkTables() {
-        NT_targetOffset = NT_target.getEntry("target_offset").getDouble(0);
-        NT_targetExists = NT_target.getEntry("target_exists").getBoolean(false);
+        NT_targetOffset = NT_offsetEntry.getDouble(0);
+        NT_targetExists = NT_existsEntry.getBoolean(false);
     }
 
-    public double getTargetOffset() {
+    public double getNTTargetOffset() {
         return NT_targetOffset;
     }
+
+    // public NetworkTableEntry getNTPipelineEntry() {
+    //     return NT_pipelineEntry;
+    // }
+    
 
     public void smartDashboard() {
         SmartDashboard.putString("State", State.getInstance().getRobotState().toString());
@@ -258,12 +278,14 @@ public class Feedback {
 
         SmartDashboard.putBoolean("CM_atBottom", CM_atBottom);
 
+        SmartDashboard.putBoolean("LN_left", LN_left);
+        SmartDashboard.putBoolean("LN_right", LN_right);
+
         SmartDashboard.putNumber("UL_leftDistance", UL_leftDistance);
         SmartDashboard.putNumber("UL_rightDistance", UL_rightDistance);
 
         SmartDashboard.putNumber("NT_targetOffset", NT_targetOffset);
         SmartDashboard.putBoolean("NT_targetExists", NT_targetExists);
-        SmartDashboard.putBoolean("NT_isConnected", NT_instance.isConnected());
     }
 
     public static Feedback getInstance() {

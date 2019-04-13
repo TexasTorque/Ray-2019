@@ -1,15 +1,19 @@
 package org.texastorque.auto.commands;
 
-import org.texastorque.constants.Constants;
 import org.texastorque.auto.Command;
 import org.texastorque.torquelib.controlLoop.ScheduledPID;
+import org.texastorque.constants.Constants;
 
-public class DriveVision extends Command {
+import edu.wpi.first.wpilibj.Timer;
+
+public class DriveVisionTime extends Command {
 
     private ScheduledPID visionPID;
     private double currentOffset;
+    private double startTime;
+    private double time;
     
-    public DriveVision(double delay) {
+    public DriveVisionTime(double delay, double time) {
         super(delay);
 
         visionPID = new ScheduledPID.Builder(0, 0.5, 1)
@@ -17,22 +21,22 @@ public class DriveVision extends Command {
                 .build();
 
         currentOffset = 0;
+        this.time = time;
     }
 
     @Override
-    protected void init() {}
+    protected void init() {
+        startTime = Timer.getFPGATimestamp();
+        input.setDBHighGear(false);
+    }
 
     @Override
     protected void continuous() {
         currentOffset = feedback.getNTTargetOffset();
         double adjustment = visionPID.calculate(currentOffset);
 
-        double baseOutput = 0.5;
-        if (feedback.getULLeft() < 1.5 && feedback.getULRight() < 1.5) {
-            baseOutput = 0;
-        }
-        double leftSpeed = baseOutput - adjustment;
-        double rightSpeed = baseOutput + adjustment;
+        double leftSpeed = 0.3 - adjustment;
+        double rightSpeed = 0.3 + adjustment;
 
         input.setDBLeftSpeed(leftSpeed);
         input.setDBRightSpeed(rightSpeed);
@@ -40,9 +44,7 @@ public class DriveVision extends Command {
 
     @Override
     protected boolean endCondition() {
-        return Math.abs(currentOffset) < 0.1 
-                && feedback.getULLeft() < 1.5 
-                && feedback.getULRight() < 1.5;
+        return Timer.getFPGATimestamp() - startTime > time;
     }
 
     @Override

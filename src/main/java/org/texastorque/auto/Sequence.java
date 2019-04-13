@@ -8,12 +8,14 @@ public abstract class Sequence {
 
     private ArrayList<ArrayList<Command>> sequence;
     private boolean started;
+    private boolean ended;
     private double startTime;
     private int blockIndex;
 
     protected Sequence() {
         sequence = new ArrayList<ArrayList<Command>>();
         started = false;
+        ended = false;
         blockIndex = 0;
         init();
     }
@@ -47,7 +49,12 @@ public abstract class Sequence {
             if (blockEnded) {
                 blockIndex++;
                 startTime = Timer.getFPGATimestamp();
+                System.out.println("Block " + blockIndex + " ended.");
             }
+        }
+        else if (!ended) {
+            System.out.println("Auto sequences done.");
+            ended = true;
         }
     }
 

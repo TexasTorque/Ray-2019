@@ -28,27 +28,29 @@ public class Input {
     public void updateControllers() {
         updateState();
         updateDrive();
+        updatePositions();
         updateLift();
         updateRotary();
         updateIntake();
         updateClimber();
+        // updateNetworkTables();
     }
 
 
     // =========== RobotState ==========
 
-    private volatile boolean endFakeTeleop = false;
+    private volatile boolean endFakeTeleop = true;
 
     public void updateState() {
         if (driver.getXButtonPressed()) {
             if (state.getRobotState() == RobotState.TELEOP) {
                 state.setRobotState(RobotState.VISION);
+                // NT_pipeline = 0;
             }
             else {
                 state.setRobotState(RobotState.TELEOP);
             }
         }
-
         else if (driver.getBButtonPressed()) {
             if (state.getRobotState() == RobotState.TELEOP) {
                 state.setRobotState(RobotState.LINE);
@@ -58,11 +60,10 @@ public class Input {
             }
         }
 
-
-        endFakeTeleop = false;
-        if (driver.getYButtonPressed()) {
-            endFakeTeleop = true;
-        }
+        // endFakeTeleop = false;
+        // if (driver.getYButtonPressed()) {
+        //     endFakeTeleop = true;
+        // }
     }
 
     public boolean getEndFakeTeleop() {
@@ -77,8 +78,9 @@ public class Input {
     private volatile boolean DB_highGear = false;
 
     public void updateDrive() {
-		DB_leftSpeed = -driver.getLeftYAxis() + 0.4 * driver.getRightXAxis();
-        DB_rightSpeed = -driver.getLeftYAxis() - 0.4 * driver.getRightXAxis();
+        double rightX = driver.getRightXAxis();
+		DB_leftSpeed = -driver.getLeftYAxis() + 0.6 * Math.pow(rightX, 2) * Math.signum(rightX);
+        DB_rightSpeed = -driver.getLeftYAxis() - 0.6 * Math.pow(rightX, 2) * Math.signum(rightX);
 
         if (driver.getRightBumper()) {
             DB_highGear = true;
@@ -108,12 +110,72 @@ public class Input {
         return DB_highGear;
     }
 
+    public void setDBHighGear(boolean gear) {
+        DB_highGear = gear;
+    }
+
+
+    // ========== Lift + Rotary ==========
+
+    private volatile int LF_position = 0;
+    private volatile int RT_position = 0;
+    
+
+    public void updatePositions() {
+        if (operator.getAButtonPressed()) {
+            LF_position = 0;
+            // RT_position = 3;
+        }
+        else if (operator.getBButtonPressed()) {
+            LF_position = 2;
+            // RT_position = 3;
+        }
+        else if (operator.getYButtonPressed()) {
+            LF_position = 4;
+            // RT_position = 3;
+        }
+        else if (operator.getXButtonPressed()) {
+            LF_position = 6;
+            RT_position = 5;
+        }
+        
+        if (operator.getDPADLeft()) {
+            RT_position = 0;
+        }
+        else if (operator.getDPADDown()) {
+            RT_position = 4;
+        }
+        else if (operator.getDPADUp()) {
+            if (LF_position == 0 || LF_position == 2 || LF_position == 4) {
+                LF_position += 1;
+            }
+
+            if (LF_position == 1 || LF_position == 3) {
+                RT_position = 2;
+            }
+            else if (LF_position == 5) {
+                RT_position = 1;
+            }
+            else {}
+        }
+        else if (operator.getDPADRight()) {
+            if (LF_position == 1 || LF_position == 3 || LF_position == 5) {
+                LF_position -= 1;
+            }
+
+            if (LF_position == 0 || LF_position == 2 || LF_position == 4) {
+                RT_position = 3;
+            }
+            else {}
+        }
+    }
+
 
     // ========== Lift ==========
 
-    private final double[] LF_setpoints = {0.0, 1.0, 2.4, 3.5, 4.8, 5.3}; // {0.0, 2.5, 5.0};
+    private final double[] LF_setpoints = {0.0, 1.4, 2.6, 3.7, 5.0, 5.4, 2.2}; 
     private volatile int LF_setpoint = 0;
-    private volatile int LF_modifier = 0; // problem?
+    private volatile int LF_modifier = 0;
     private volatile double LF_offset = 0;
     private volatile TorqueToggle LF_manualMode = new TorqueToggle(false);
     private volatile double LF_manualOutput = 0;
@@ -122,29 +184,34 @@ public class Input {
         LF_manualMode.calc(operator.getRightCenterButton());
 
         if (!LF_manualMode.get()) {
-            if (operator.getDPADUp()) {
-                LF_modifier = 1;
-            }
-            else if (operator.getDPADRight() || operator.getDPADDown() || operator.getDPADLeft()) {
-                LF_modifier = 0;
-            }
+            // if (operator.getDPADUp()) {
+            //     LF_modifier = 1;
+            // }
+            // else if (operator.getDPADRight() || operator.getDPADDown() || operator.getDPADLeft()) {
+            //     LF_modifier = 0;
+            // }
 
-            if (operator.getAButtonPressed()) {
-                LF_setpoint = 0;
-            }
-            else if (operator.getBButtonPressed()) {
-                LF_setpoint = 2;
-            }
-            else if (operator.getYButtonPressed()) {
-                LF_setpoint = 4;
-            }
-            else if (operator.getRightYAxis() > 0.1) {
-                if (calcLFSetpoint() > -0.3) {
+            // if (operator.getAButtonPressed()) {
+            //     LF_setpoint = 0;
+            // }
+            // else if (operator.getBButtonPressed()) {
+            //     LF_setpoint = 2;
+            // }
+            // else if (operator.getYButtonPressed()) {
+            //     LF_setpoint = 4;
+            // }
+            // else if (operator.getXButton()) { //HP station cargo
+            //     LF_setpoint = 6;
+            //     LF_modifier = 0;
+            // }
+
+            if (operator.getRightYAxis() > 0.1) {
+                if (LF_offset > -2.0) {
                     LF_offset -= 0.005;
                 }
             }
             else if (operator.getRightYAxis() < -0.1) {
-                if (calcLFSetpoint() < 5.3) {
+                if (LF_offset < 2.0) {
                     LF_offset += 0.005;
                 }
             }
@@ -155,7 +222,14 @@ public class Input {
     }
 
     public double calcLFSetpoint() {
-        return LF_setpoints[LF_setpoint + LF_modifier] + LF_offset;
+        // try {
+        //     return LF_setpoints[LF_setpoint + LF_modifier] + LF_offset;
+        // } 
+        // catch (IndexOutOfBoundsException e) {
+        //     e.printStackTrace();
+        //     return 0;
+        // }
+        return LF_setpoints[LF_position] + LF_offset;
     }
 
     public double calcLFSetpoint(int index) {
@@ -170,14 +244,14 @@ public class Input {
         return LF_manualOutput;
     }
 
-    public void setLFSetpoint(int index) {
-        LF_setpoint = index;
+    public void setLFPosition(int index) {
+        LF_position = index;
     }
 
 
     // ========== Rotary ==========
 
-    private final double[] RT_setpoints = {0, 45, 74, 96};
+    private final double[] RT_setpoints = {0, 43, 60, 74, 91, 50, 14}; //43
     private volatile int RT_setpoint = 0;
     private volatile double RT_offset = 0;
     private volatile TorqueToggle RT_manualMode = new TorqueToggle(false);
@@ -187,28 +261,36 @@ public class Input {
         RT_manualMode.calc(operator.getLeftCenterButton());
         
         if (!RT_manualMode.get()) {
-            if (operator.getDPADDown()) {
-                RT_setpoint = 3;
-            }
-            else if (operator.getDPADRight()) {
-                RT_setpoint = 2;
-            }
-            else if (operator.getDPADUp()) {
-                RT_setpoint = 1;
-            }
-            else if (operator.getDPADLeft()) {
-                RT_setpoint = 0;
-            }
-            else if (operator.getLeftYAxis() > 0.1) {
-                if (calcRTSetpoint() < 105) {
+            // if (operator.getDPADDown()) {
+            //     RT_setpoint = 4;
+            // }
+            // else if (operator.getDPADRight()) {
+            //     RT_setpoint = 3;
+            // }
+            // else if (operator.getDPADUp()) {
+            //     RT_setpoint = 2;
+            // }
+            // else if (operator.getDPADLeft()) {
+            //     RT_setpoint = 0;
+            // }
+            // else if (operator.getXButton()) { // HP station cargo
+            //     RT_setpoint = 5;
+            // }
+
+            if (operator.getLeftYAxis() > 0.1) {
+                if (RT_offset < 40) {
                     RT_offset += 0.1;
                 }
             }
             else if (operator.getLeftYAxis() < -0.1) {
-                if (calcRTSetpoint() > -5) {
+                if (RT_offset > -40) {
                     RT_offset -= 0.1;
                 }
             }
+
+            // if (LF_setpoint + LF_modifier == 5) {
+            //     RT_setpoint = 1;
+            // }
         }
         else {
             RT_manualOutput = 0.5 * operator.getLeftYAxis();
@@ -216,7 +298,7 @@ public class Input {
     }
 
     public double calcRTSetpoint() {
-        return RT_setpoints[RT_setpoint] + RT_offset;
+        return RT_setpoints[RT_position] + RT_offset;
     }
 
     public double calcRTSetpoint(int index) {
@@ -231,8 +313,8 @@ public class Input {
         return RT_manualOutput;
     }
 
-    public void setRTSetpoint(int index) {
-        RT_setpoint = index;
+    public void setRTPosition(int index) {
+        RT_position = index;
     }
 
 
@@ -240,7 +322,7 @@ public class Input {
 
     private volatile boolean IN_active = false;
     private volatile boolean IN_hatchState = false;
-    private volatile boolean IN_tuskEngaged = false;
+    private volatile boolean IN_clawEngaged = false;
     
     public void updateIntake() {
         IN_active = false;
@@ -255,7 +337,7 @@ public class Input {
         } // hatch outtake, cargo intake
         
         if (driver.getAButtonPressed()) {
-            IN_tuskEngaged = !IN_tuskEngaged;
+            IN_clawEngaged = !IN_clawEngaged;
         } 
     }
 
@@ -272,12 +354,12 @@ public class Input {
         return IN_hatchState;
     }
 
-    public void setINTuskEngaged(boolean a){
-        IN_tuskEngaged = a;
+    public boolean getINClawEngaged() {
+        return IN_clawEngaged;
     }
 
-    public boolean getINTuskEngaged() {
-        return IN_tuskEngaged;
+    public void setINClawEngaged(boolean engaged) {
+        IN_clawEngaged = engaged;
     }
 
     public void setINActive(boolean active) {
@@ -302,13 +384,22 @@ public class Input {
     private volatile double CM_rearSpeed;
     
     public void updateClimber() {
-        CM_retract = false;
-        CM_enabled.calc(driver.getLeftCenterButton());
+        // CM_retract = false;
+        // CM_enabled.calc(driver.getLeftCenterButton());
 
-        if (!CM_enabled.get()) {
-            if (driver.getRightCenterButton()) {
-                CM_retract = true;
-            }
+        // if (!CM_enabled.get()) {
+        //     if (driver.getRightCenterButton()) {
+        //         CM_retract = true;
+        //     }
+        // }
+
+        CM_retract = false;
+        if (driver.getRightCenterButton()) {
+            CM_retract = true;
+            CM_enabled.set(false);
+        } 
+        else {
+            CM_enabled.calc(driver.getLeftCenterButton());
         }
 
         CM_tomSpeed = 0;
@@ -338,6 +429,18 @@ public class Input {
     public void setCMTomSpeed(double speed) {
         CM_tomSpeed = speed;
     }
+
+
+    // ========== NetworkTables ==========
+    
+    // private int NT_pipeline = 0;
+
+    // public void updateNetworkTables() {
+    //     if (driver.getYButtonPressed()) {
+    //         NT_pipeline = 1 - NT_pipeline;
+    //     }
+    //     Feedback.getInstance().getNTPipelineEntry().setNumber(NT_pipeline);
+    // }
 
     
     public static Input getInstance() {

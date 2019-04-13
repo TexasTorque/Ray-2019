@@ -4,6 +4,7 @@ import org.texastorque.inputs.State.RobotState;
 import org.texastorque.constants.Ports;
 import org.texastorque.torquelib.component.TorqueMotor;
 import org.texastorque.torquelib.controlLoop.ScheduledPID;
+import org.texastorque.torquelib.controlLoop.LowPassFilter;
 
 import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.Timer;
@@ -17,6 +18,7 @@ public class Lift extends Subsystem {
     private TorqueMotor pulleyB;
 
     private final ScheduledPID liftPID;
+    private final LowPassFilter lowPass;
     private double speed;
     private double currentPos;
     private double setpoint;
@@ -30,12 +32,14 @@ public class Lift extends Subsystem {
         speed = 0;
         setpoint = input.calcLFSetpoint(0);
 
-        liftPID = new ScheduledPID.Builder(setpoint, -0.2, 0.8, 2)
+        liftPID = new ScheduledPID.Builder(setpoint, -0.2, 0.7, 2)
                 .setRegions(0)
-                .setPGains(0.5, 1.0)
-                //.setIGains(0.0, 0.5) //0, 0.5
-                //.setDGains(0.01)
+                .setPGains(0.6, 1.5)
+                .setIGains(0.1, 0.7)
+                .setDGains(0.00005, 0) // 0.00002
                 .build();
+
+        lowPass = new LowPassFilter(0.5);
     }
 
     @Override
@@ -71,7 +75,7 @@ public class Lift extends Subsystem {
             if (input.getLFManualMode()) {
                 speed = input.getLFManualOutput();
             } else {
-                runLiftPID(0);
+                runLiftPID();
             }
         }
 
@@ -84,7 +88,7 @@ public class Lift extends Subsystem {
 
     private void runLiftPID() {
         setpoint = input.calcLFSetpoint();
-        currentPos = feedback.getLFPosition();
+        currentPos = lowPass.filter(feedback.getLFPosition());
         if (setpoint != prevSetpoint) {
             liftPID.changeSetpoint(setpoint);
             prevSetpoint = setpoint;
@@ -95,7 +99,7 @@ public class Lift extends Subsystem {
 
     private void runLiftPID(int position) {
         setpoint = input.calcLFSetpoint(position);
-        currentPos = feedback.getLFPosition();
+        currentPos = lowPass.filter(feedback.getLFPosition());
         if (setpoint != prevSetpoint) {
             liftPID.changeSetpoint(setpoint);
             prevSetpoint = setpoint;
@@ -150,6 +154,7 @@ public class Lift extends Subsystem {
         SmartDashboard.putNumber("LF_setpoint", setpoint);
         SmartDashboard.putNumber("LF_output", speed);
         SmartDashboard.putBoolean("LF_stall", isStalling);
+        SmartDashboard.putNumber("LF_currentPos", currentPos);
     }
 
     public static Lift getInstance() {

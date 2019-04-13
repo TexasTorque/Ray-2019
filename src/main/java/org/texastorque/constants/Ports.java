@@ -47,7 +47,6 @@ public class Ports {
     public static final int CM_SWITCH = 8;
 
     public static final int LN_LEFT = 3;
-//    public static final int LN_MID = 8;
     public static final int LN_RIGHT = 2;
 
     public static final int UL_LEFT = 0;

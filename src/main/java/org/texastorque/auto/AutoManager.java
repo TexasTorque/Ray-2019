@@ -19,20 +19,22 @@ public class AutoManager {
     private AutoManager() {
         autoSequences = new ArrayList<Sequence>();
         autoSequences.add(new BackupDrive());
-        autoSequences.add(new OneHatchRocket1());
+        autoSequences.add(new TwoHatchRocketFront1());
+        autoSequences.add(new TwoHatchRocketBack1());
         autoSequences.add(new OneHatchShip2());
-        autoSequences.add(new OneHatchShipTeleop2());
-        autoSequences.add(new OneHatchRocket3());
+        autoSequences.add(new TwoHatchRocketFront3());
+        autoSequences.add(new TwoHatchRocketBack3());
         autoSequences.add(new TestSequence());
 
         autoSelector.setDefaultOption("BackupDrive", "BackupDrive");
-        autoSelector.addOption("1 OneHatchRocket", "1 OneHatchRocket");
+        autoSelector.addOption("1 TwoHatchRocketFront", "1 TwoHatchRocketFront");
+        autoSelector.addOption("1 TwoHatchRocketBack", "1 TwoHatchRocketBack");
         autoSelector.addOption("2 OneHatchShip", "2 OneHatchShip");
-        autoSelector.addOption("2 OneHatchShipTeleop", "2 OneHatchShipTeleop");
-        autoSelector.addOption("3 OneHatchRocket", "3 OneHatchRocket");
+        autoSelector.addOption("3 TwoHatchRocketFront", "3 TwoHatchRocketFront");
+        autoSelector.addOption("3 TwoHatchRocketBack", "3 TwoHatchRocketBack");
 
         SmartDashboard.putData(autoSelector);
-        System.out.println("Auto sequences loaded.");
+        System.out.println("All auto sequences loaded.");
     }
 
     public void displayChoices() {
@@ -41,31 +43,36 @@ public class AutoManager {
 
     public void chooseSequence() {
         String autoChoice = autoSelector.getSelected();
-        // autoChoice = "BackupDrive";
+        // autoChoice = "3 TwoHatchRocketBack";
+        System.out.println(autoChoice);
 
         switch(autoChoice) {
             case "BackupDrive":
                 currentSequence = autoSequences.get(0);
                 break;
 
-            case "1 OneHatchRocket":
+            case "1 TwoHatchRocketFront":
                 currentSequence = autoSequences.get(1);
                 break;
 
-            case "2 OneHatchShip":
+            case "1 TwoHatchRocketBack":
                 currentSequence = autoSequences.get(2);
                 break;
 
-            case "2 OneHatchShipTeleop":
+            case "2 OneHatchShip":
                 currentSequence = autoSequences.get(3);
                 break;
 
-            case "3 OneHatchRocket":
+            case "3 TwoHatchRocketFront":
                 currentSequence = autoSequences.get(4);
                 break;
 
-            case "TestSequence":
+            case "3 TwoHatchRocketBack":
                 currentSequence = autoSequences.get(5);
+                break;
+
+            case "TestSequence":
+                currentSequence = autoSequences.get(6);
                 break;
         }
 

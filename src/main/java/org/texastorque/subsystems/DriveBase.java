@@ -1,7 +1,7 @@
 package org.texastorque.subsystems;
 
 import org.texastorque.inputs.State.RobotState;
-import org.texastorque.constants.Ports;
+import org.texastorque.constants.*;
 import org.texastorque.torquelib.component.TorqueMotor;
 import org.texastorque.torquelib.controlLoop.ScheduledPID;
 
@@ -46,11 +46,7 @@ public class DriveBase extends Subsystem {
         lightRing = new Relay(Ports.LR_RELAY);
 
         visionPID = new ScheduledPID.Builder(0, 0.5, 1)
-                .setPGains(0.25)
-                // .setRegions(-0.4, -0.2, 0.2, 0.4)
-                // .setPGains(0.3, 0.5, 0.8, 0.5, 0.3)
-                // .setIGains(0.1, 0, 0, 0, 0.1)
-                // .setDGains(0, 0.02, 0, 0.02, 0)
+                .setPGains(0.5 / Constants.CAMERA_ANGLE_X)
                 .build();
     }
 
@@ -86,12 +82,21 @@ public class DriveBase extends Subsystem {
 
             leftSpeed = input.getDBLeftSpeed();
             rightSpeed = input.getDBRightSpeed();
+
+            if (input.calcLFSetpoint() > 4.0) {
+                leftSpeed *= 0.7;
+                rightSpeed *= 0.7;
+            }
+            // else if (input.calcLFSetpoint() > 2.0) {
+            //     leftSpeed *= 1;
+            //     rightSpeed *= 1;
+            // }
         }
 
         else if (state == RobotState.VISION) {
             lightRing.set(Relay.Value.kForward);
 
-            double currentOffset = feedback.getTargetOffset();
+            double currentOffset = feedback.getNTTargetOffset();
             double adjustment = visionPID.calculate(currentOffset);
             if(feedback.getULLeft() < 2 || feedback.getULRight() <2){
                 leftSpeed = 0.5 * input.getDBLeftSpeed() - adjustment +.2;
@@ -108,17 +113,26 @@ public class DriveBase extends Subsystem {
         }
 
         else if (state == RobotState.LINE) {
-            // Read feedback for NetworkTables input, calculate output
-            leftSpeed = input.getDBLeftSpeed();
-            rightSpeed = input.getDBRightSpeed();
-            if(feedback.getLineLeft()){
-                leftSpeed -= .2;
-                rightSpeed += .2;
+            // leftSpeed = 0.5 * input.getDBLeftSpeed();
+            // rightSpeed = 0.5 * input.getDBRightSpeed();
+
+            if (feedback.getLNLeft() && !feedback.getLNRight()) {
+                // leftSpeed -= 0.4;
+                // rightSpeed += 0.4;
+                leftSpeed = 0;
+                rightSpeed = 0.3;
             }
-            if(feedback.getLineRight()){
-                rightSpeed -= .2;
-                leftSpeed += .2;
+            else if (!feedback.getLNLeft() && feedback.getLNRight()) {
+                // leftSpeed += 0.4;
+                // rightSpeed -= 0.4;
+                leftSpeed = 0.3;
+                rightSpeed = 0;
             }
+            else {
+                leftSpeed = 0.15;
+                rightSpeed = 0.15;
+            }
+            // Good work Jacob
         }
         
         setGears(state);
@@ -146,14 +160,14 @@ public class DriveBase extends Subsystem {
         return highGear;
     }
 
-    /**
-     * auto transmission
-     */
+    // Potential auto gear shift?
     private void setGears(RobotState state) {
-        if (state == RobotState.TELEOP)
+        if (state == RobotState.AUTO || state == RobotState.TELEOP) {
             highGear = input.getDBHighGear();
-        else
+        }
+        else {
             highGear = false;
+        }
     }
 
     @Override

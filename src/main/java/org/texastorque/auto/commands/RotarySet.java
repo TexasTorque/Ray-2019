@@ -12,7 +12,7 @@ public class RotarySet extends Command{
 
     @Override
     protected void init() {
-        input.setRTSetpoint(setpointIndex);
+        input.setRTPosition(setpointIndex);
     }
 
     @Override
@@ -21,7 +21,7 @@ public class RotarySet extends Command{
 
     @Override
     protected boolean endCondition() {
-        return Math.abs(feedback.getRTPosition() - input.calcRTSetpoint(setpointIndex)) < 4.0;
+        return Math.abs(feedback.getRTPosition() - input.calcRTSetpoint(setpointIndex)) < 5.0;
     }
 
     @Override
