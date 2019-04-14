@@ -15,6 +15,7 @@ public class AutoManager {
     private SendableChooser<String> autoSelector = new SendableChooser<String>();
 
     private Sequence currentSequence;
+    private boolean sequenceEnded;
 
     private AutoManager() {
         autoSequences = new ArrayList<Sequence>();
@@ -28,10 +29,10 @@ public class AutoManager {
 
         autoSelector.setDefaultOption("BackupDrive", "BackupDrive");
         autoSelector.addOption("1 TwoHatchRocketFront", "1 TwoHatchRocketFront");
-        autoSelector.addOption("1 TwoHatchRocketBack", "1 TwoHatchRocketBack");
+        autoSelector.addOption("1 TwoHatchRocketBack (Broken)", "1 TwoHatchRocketBack");
         autoSelector.addOption("2 OneHatchShip", "2 OneHatchShip");
         autoSelector.addOption("3 TwoHatchRocketFront", "3 TwoHatchRocketFront");
-        autoSelector.addOption("3 TwoHatchRocketBack", "3 TwoHatchRocketBack");
+        autoSelector.addOption("3 TwoHatchRocketBack (Broken)", "3 TwoHatchRocketBack");
 
         SmartDashboard.putData(autoSelector);
         System.out.println("All auto sequences loaded.");
@@ -79,8 +80,17 @@ public class AutoManager {
         currentSequence.reset();
     }
 
+    public void setSequence(int index) {
+        currentSequence = autoSequences.get(index);
+    }
+
     public void runSequence() {
         currentSequence.run();
+        sequenceEnded = currentSequence.hasEnded();
+    }
+
+    public boolean sequenceEnded() {
+        return sequenceEnded;
     }
 
     public static AutoManager getInstance() {

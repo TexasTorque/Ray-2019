@@ -17,7 +17,7 @@ public class Robot extends TorqueIterative {
 	private Subsystem driveBase = DriveBase.getInstance();
 	private Subsystem lift = Lift.getInstance();
 	private Subsystem rotary = Rotary.getInstance();
-	private Subsystem intake = FourBarIntake.getInstance();
+	private Subsystem intake = Intake.getInstance();
 	private Subsystem climber = Climber.getInstance();
 	
 	private State state = State.getInstance();

@@ -4,19 +4,18 @@ import org.texastorque.auto.Command;
 
 import edu.wpi.first.wpilibj.Timer;
 
-public class ClawSet extends Command {
+public class ClawExtenderSet extends Command {
 
-    // true = holding hatch, false = open
-    private boolean clawEngaged;
+    private boolean extended;
 
-    public ClawSet(double delay, boolean engaged) { 
+    public ClawExtenderSet(double delay, boolean extended) { 
         super(delay);
-        this.clawEngaged = engaged;
+        this.extended = extended;
     }
 
     @Override
     protected void init() {
-        input.setINClawEngaged(clawEngaged);
+        input.setINClawExtended(extended);
     }
 
 	@Override

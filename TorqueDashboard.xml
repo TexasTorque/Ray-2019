@@ -1,5 +1,8 @@
 <xml version="1.0">
 <dashboard>
+	<widget field="Auto Selector" type="String" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="385"/>
+	</widget>
 	<widget field="limelight_Stream" type="String" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
 		<location x="192" y="347"/>
 		<width>247</width>

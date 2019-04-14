@@ -9,22 +9,25 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 import edu.wpi.first.wpilibj.VictorSP;
 
-public class FourBarIntake extends Subsystem {
+public class Intake extends Subsystem {
 
-    private static volatile FourBarIntake instance;
+    private static volatile Intake instance;
     
     private TorqueMotor intakeWheels;
     private DoubleSolenoid hatchClaw;
+    private DoubleSolenoid extender;
 
     private double wheelSpeed;
     private boolean clawEngaged;
+    private boolean clawExtended;
 
     private boolean clockwise = true;
 
-    private FourBarIntake() {
-        intakeWheels = new TorqueMotor(new VictorSP(Ports.IN_MOTOR), !clockwise);
+    private Intake() {
+        intakeWheels = new TorqueMotor(new VictorSP(Ports.IN_MOTOR), clockwise);
 
         hatchClaw = new DoubleSolenoid(0, Ports.IN_HATCH_SOLE_A, Ports.IN_HATCH_SOLE_B);
+        extender = new DoubleSolenoid(0, Ports.IN_EXTEND_SOLE_A, Ports.IN_EXTEND_SOLE_B);
     }
 
     @Override
@@ -99,6 +102,7 @@ public class FourBarIntake extends Subsystem {
             }
 
             clawEngaged = input.getINClawEngaged();
+            clawExtended = input.getINClawExtended();
         }
 
         else if (state == RobotState.LINE) {
@@ -117,6 +121,12 @@ public class FourBarIntake extends Subsystem {
         } else {
             hatchClaw.set(Value.kReverse);
         }
+
+        if (clawExtended) {
+            extender.set(Value.kForward);
+        } else {
+            extender.set(Value.kReverse);
+        }
     }
 
     @Override
@@ -131,11 +141,11 @@ public class FourBarIntake extends Subsystem {
     @Override
     public void smartDashboard() {}
 
-    public static FourBarIntake getInstance() {
+    public static Intake getInstance() {
         if (instance == null) {
-            synchronized (FourBarIntake.class) {
+            synchronized (Intake.class) {
                 if (instance == null)
-                    instance = new FourBarIntake();
+                    instance = new Intake();
             }
         }
         return instance;

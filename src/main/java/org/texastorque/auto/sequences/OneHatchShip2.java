@@ -12,9 +12,8 @@ public class OneHatchShip2 extends Sequence {
     @Override
     protected void init() {
         ArrayList<Command> block1 = new ArrayList<>();
-        block1.add(new TomInit(0));
-        block1.add(new RotarySet(0, 6));
-        block1.add(new ClawSet(2, true));
+        block1.add(new RotarySet(0, 2));
+        block1.add(new ClawExtenderSet(0.5, false));
         
         ArrayList<Command> block2 = new ArrayList<>();
         Waypoint[] points = new Waypoint[] {
@@ -22,7 +21,6 @@ public class OneHatchShip2 extends Sequence {
             new Waypoint(6, 0, 0)
         };
         block2.add(new DrivePath(0, points, true, false));
-        block2.add(new RotarySet(1, 3));
 
         ArrayList<Command> block3 = new ArrayList<>();
         block3.add(new DriveVisionTime(0, 1.5));

@@ -12,10 +12,9 @@ public class TwoHatchRocketFront1 extends Sequence {
     @Override
     protected void init() {
         ArrayList<Command> block1 = new ArrayList<>();
-        block1.add(new TomInit(0));
-        block1.add(new RotarySet(0, 6));
-        block1.add(new ClawSet(1.5, true));
-        block1.add(new DriveTime(1.5, 1.5, 0.3));
+        block1.add(new RotarySet(0, 1));
+        block1.add(new ClawExtenderSet(0.5, false));
+        block1.add(new DriveTime(0.5, 1.5, 0.3));
 
         ArrayList<Command> block2 = new ArrayList<>();
         Waypoint[] points = new Waypoint[] {
@@ -23,9 +22,9 @@ public class TwoHatchRocketFront1 extends Sequence {
             new Waypoint(8, 7, Pathfinder.d2r(35))
         };
         block2.add(new DrivePath(0, points, true, false));
-        block2.add(new RotarySet(2, 3));
-        block2.add(new DriveVisionTime(2.8, 1.2));
-        block2.add(new ClawSet(4, false));
+        block2.add(new RotarySet(1, 2));
+        block2.add(new DriveVisionTime(1.8, 1.2));
+        block2.add(new ClawSet(3, false));
 
         ArrayList<Command> block3 = new ArrayList<>();
         // block3.add(new DriveVisionTime(0, 1.2));
