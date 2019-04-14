@@ -1,5 +1,6 @@
 package org.texastorque.subsystems;
 
+import org.texastorque.auto.sequences.PreClimb;
 import org.texastorque.inputs.State.RobotState;
 import org.texastorque.constants.Ports;
 import org.texastorque.torquelib.component.TorqueMotor;
@@ -36,6 +37,8 @@ public class Climber extends Subsystem {
             // .setIGains(0)
             // .setDGains(0)
             .build();
+
+
     }
 
     @Override
@@ -64,7 +67,7 @@ public class Climber extends Subsystem {
             rearSpeed = 0;
         }
 
-        else if (state == RobotState.TELEOP) {
+        else if (state == RobotState.TELEOP || state == RobotState.PRECLIMB) {
             if (input.getCMEnabled()) {
                 tomSpeed = 0.6;
 
@@ -97,6 +100,7 @@ public class Climber extends Subsystem {
             tomSpeed = 0;
             rearSpeed = 0;
         }
+
         
         output();
     }

@@ -63,7 +63,7 @@ public class Lift extends Subsystem {
             runLiftPID();
         }
 
-        else if (state == RobotState.TELEOP) {
+        else if (state == RobotState.TELEOP || state == RobotState.PRECLIMB) {
             if (input.getLFManualMode()) {
                 speed = input.getLFManualOutput();
             } else {

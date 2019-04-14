@@ -4,6 +4,7 @@ import org.texastorque.subsystems.*;
 import org.texastorque.auto.AutoManager;
 import org.texastorque.inputs.*;
 import org.texastorque.inputs.State.RobotState;
+import org.texastorque.auto.sequences.PreClimb;
 
 import org.texastorque.torquelib.base.TorqueIterative;
 
@@ -25,6 +26,7 @@ public class Robot extends TorqueIterative {
 	private Feedback feedback = Feedback.getInstance();
 	private AutoManager autoManager = AutoManager.getInstance();
 
+	private PreClimb  preClimb;
 	public void robotInit() {
 		initSubsystems();
 		feedback.resetNavX();
@@ -58,6 +60,7 @@ public class Robot extends TorqueIterative {
 	@Override
 	public void teleopInit() {
 		state.setRobotState(RobotState.TELEOP);
+		preClimb = new PreClimb();
 
 		for (Subsystem system : subsystems) {
 			system.teleopInit();
@@ -88,7 +91,14 @@ public class Robot extends TorqueIterative {
 
 	@Override
 	public void teleopContinuous() {
-		input.updateControllers();
+		if(state.getRobotState() == RobotState.PRECLIMB){
+			preClimb.run();
+			input.updateDrive();
+			input.updateState();
+		}
+		else if (state.getRobotState() == RobotState.TELEOP){
+			input.updateControllers();
+		}
 		for (Subsystem system : subsystems) {
 			system.run(state.getRobotState());
 		}

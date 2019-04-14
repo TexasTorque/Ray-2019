@@ -62,7 +62,7 @@ public class Rotary extends Subsystem {
             runRotaryPID();
         }
 
-        else if (state == RobotState.TELEOP) {
+        else if (state == RobotState.TELEOP || state == RobotState.PRECLIMB) {
             if (input.getRTManualMode()) {
                 speed = input.getRTManualOutput();
             } else {

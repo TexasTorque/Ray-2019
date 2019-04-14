@@ -6,6 +6,7 @@ import org.texastorque.torquelib.component.TorqueMotor;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.Solenoid;
 
 import edu.wpi.first.wpilibj.VictorSP;
 
@@ -15,16 +16,19 @@ public class FourBarIntake extends Subsystem {
     
     private TorqueMotor intakeWheels;
     private DoubleSolenoid hatchClaw;
+    private DoubleSolenoid hatchExtend;
 
     private double wheelSpeed;
     private boolean clawEngaged;
+    private boolean clawExtended;
 
     private boolean clockwise = true;
 
     private FourBarIntake() {
-        intakeWheels = new TorqueMotor(new VictorSP(Ports.IN_MOTOR), !clockwise);
+        intakeWheels = new TorqueMotor(new VictorSP(Ports.IN_MOTOR), clockwise);
 
-        hatchClaw = new DoubleSolenoid(0, Ports.IN_HATCH_SOLE_A, Ports.IN_HATCH_SOLE_B);
+        hatchExtend = new DoubleSolenoid(0, Ports.IN_HATCH_SOLE_A, Ports.IN_HATCH_SOLE_B);
+        hatchClaw = new DoubleSolenoid(0, Ports.IN_HATCH_EXT_SOLE_A, Ports.IN_HATCH_EXT_SOLE_B);
     }
 
     @Override
@@ -63,7 +67,7 @@ public class FourBarIntake extends Subsystem {
             clawEngaged = input.getINClawEngaged();
         }
 
-        else if (state == RobotState.TELEOP) {
+        else if (state == RobotState.TELEOP || state == RobotState.PRECLIMB) {
             if (input.getINActive()) {
                 if (input.getHatchState()) {
                     wheelSpeed = 1.0;
@@ -80,6 +84,7 @@ public class FourBarIntake extends Subsystem {
             }
 
             clawEngaged = input.getINClawEngaged();
+            clawExtended = input.getINClawExtended();
         }
 
         else if (state == RobotState.VISION) {
@@ -116,6 +121,12 @@ public class FourBarIntake extends Subsystem {
             hatchClaw.set(Value.kForward);
         } else {
             hatchClaw.set(Value.kReverse);
+        }
+        if (clawExtended){
+            hatchExtend.set(Value.kForward);
+        }
+        else{
+            hatchExtend.set(Value.kReverse);
         }
     }
 
