@@ -64,6 +64,7 @@ public class Intake extends Subsystem {
             }
 
             clawEngaged = input.getINClawEngaged();
+            clawExtended = input.getINClawExtended();
         }
 
         else if (state == RobotState.TELEOP) {
@@ -83,6 +84,7 @@ public class Intake extends Subsystem {
             }
 
             clawEngaged = input.getINClawEngaged();
+            clawExtended = input.getINClawExtended();
         }
 
         else if (state == RobotState.VISION) {

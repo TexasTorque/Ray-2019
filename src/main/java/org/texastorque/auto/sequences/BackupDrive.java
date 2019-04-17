@@ -16,8 +16,9 @@ public class BackupDrive extends Sequence {
         // block1.add(new ClawSet(2, true));
 
         ArrayList<Command> block1 = new ArrayList<>();
+        block1.add(new TomInit(0, 0.1));
         block1.add(new RotarySet(0, 2));
-        block1.add(new ClawExtenderSet(0.5, false));
+        // block1.add(new ClawExtenderSet(0.5, false));
 
         ArrayList<Command> block2 = new ArrayList<>();
         block2.add(new DriveTime(0.5, 1.5, 0.4));

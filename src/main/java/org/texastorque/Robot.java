@@ -76,6 +76,19 @@ public class Robot extends TorqueIterative {
 		if (state.getRobotState() == RobotState.AUTO) {
 			autoManager.runSequence();
 			input.updateState();
+
+			if (autoManager.sequenceEnded()) {
+				state.setRobotState(RobotState.TELEOP);
+			}
+		}
+		else if (state.getRobotState() == RobotState.DB_ONLY) {
+			autoManager.runSequence();
+			input.updateState();
+			input.updateDrive();
+
+			if (autoManager.sequenceEnded()) {
+				state.setRobotState(RobotState.TELEOP);
+			}
 		}
 		else {
 			input.updateControllers();
@@ -88,7 +101,18 @@ public class Robot extends TorqueIterative {
 
 	@Override
 	public void teleopContinuous() {
-		input.updateControllers();
+		if (state.getRobotState() == RobotState.DB_ONLY) {
+			autoManager.runSequence();
+			input.updateState();
+			input.updateDrive();
+
+			if (autoManager.sequenceEnded()) {
+				state.setRobotState(RobotState.TELEOP);
+			}
+		}
+		else {
+			input.updateControllers();
+		}
 		for (Subsystem system : subsystems) {
 			system.run(state.getRobotState());
 		}

@@ -59,7 +59,7 @@ public class Climber extends Subsystem {
 
     @Override
     public void run(RobotState state) {
-        if (state == RobotState.AUTO) {
+        if (state == RobotState.AUTO || state == RobotState.DB_ONLY) {
             tomSpeed = input.getCMTomSpeed();
             rearSpeed = 0;
         }

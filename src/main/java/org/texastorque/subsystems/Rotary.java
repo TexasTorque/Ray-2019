@@ -58,7 +58,7 @@ public class Rotary extends Subsystem {
 
     @Override
     public void run(RobotState state) {
-        if (state == RobotState.AUTO) {
+        if (state == RobotState.AUTO || state == RobotState.DB_ONLY) {
             runRotaryPID();
         }
 

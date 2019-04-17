@@ -46,8 +46,8 @@ public class DrivePath extends Command {
 
             leftFollower = new DistanceFollower(modifier.getLeftTrajectory());
             rightFollower = new DistanceFollower(modifier.getRightTrajectory());
-            leftFollower.configurePIDVA(0.8, 0.0, 0.05, 1/Constants.DB_LOW_MAX_SPEED, 0);
-            rightFollower.configurePIDVA(0.8, 0.0, 0.05, 1/Constants.DB_LOW_MAX_SPEED, 0);
+            leftFollower.configurePIDVA(0.8, 0.0, 0.05, 1/Constants.DB_HIGH_MAX_SPEED, 0);
+            rightFollower.configurePIDVA(0.8, 0.0, 0.05, 1/Constants.DB_HIGH_MAX_SPEED, 0);
         }
         else {
             Trajectory.Config config = new Trajectory.Config(Trajectory.FitMethod.HERMITE_CUBIC, Trajectory.Config.SAMPLES_FAST, 1.0/80, Constants.DB_LOW_MAX_SPEED, Constants.DB_LOW_MAX_ACCEL, Constants.DB_LOW_MAX_JERK);

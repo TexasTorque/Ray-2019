@@ -20,17 +20,21 @@ public class AutoManager {
     private AutoManager() {
         autoSequences = new ArrayList<Sequence>();
         autoSequences.add(new BackupDrive());
+        autoSequences.add(new OneHatchShip1());
         autoSequences.add(new TwoHatchRocketFront1());
         autoSequences.add(new TwoHatchRocketBack1());
         autoSequences.add(new OneHatchShip2());
+        autoSequences.add(new OneHatchShip3());
         autoSequences.add(new TwoHatchRocketFront3());
         autoSequences.add(new TwoHatchRocketBack3());
         autoSequences.add(new TestSequence());
 
         autoSelector.setDefaultOption("BackupDrive", "BackupDrive");
+        autoSelector.addOption("1 OneHatchShip", "1 OneHatchShip");
         autoSelector.addOption("1 TwoHatchRocketFront", "1 TwoHatchRocketFront");
         autoSelector.addOption("1 TwoHatchRocketBack (Broken)", "1 TwoHatchRocketBack");
         autoSelector.addOption("2 OneHatchShip", "2 OneHatchShip");
+        autoSelector.addOption("3 OneHatchShip", "3 OneHatchShip");
         autoSelector.addOption("3 TwoHatchRocketFront", "3 TwoHatchRocketFront");
         autoSelector.addOption("3 TwoHatchRocketBack (Broken)", "3 TwoHatchRocketBack");
 
@@ -44,7 +48,7 @@ public class AutoManager {
 
     public void chooseSequence() {
         String autoChoice = autoSelector.getSelected();
-        // autoChoice = "3 TwoHatchRocketBack";
+        // autoChoice = "PreClimb";
         System.out.println(autoChoice);
 
         switch(autoChoice) {
@@ -52,36 +56,50 @@ public class AutoManager {
                 currentSequence = autoSequences.get(0);
                 break;
 
-            case "1 TwoHatchRocketFront":
+            case "1 OneHatchShip":
                 currentSequence = autoSequences.get(1);
                 break;
 
-            case "1 TwoHatchRocketBack":
+            case "1 TwoHatchRocketFront":
                 currentSequence = autoSequences.get(2);
                 break;
 
-            case "2 OneHatchShip":
+            case "1 TwoHatchRocketBack":
                 currentSequence = autoSequences.get(3);
                 break;
 
-            case "3 TwoHatchRocketFront":
+            case "2 OneHatchShip":
                 currentSequence = autoSequences.get(4);
                 break;
 
-            case "3 TwoHatchRocketBack":
+            case "3 OneHatchShip":
                 currentSequence = autoSequences.get(5);
                 break;
 
-            case "TestSequence":
+            case "3 TwoHatchRocketFront":
                 currentSequence = autoSequences.get(6);
+                break;
+
+            case "3 TwoHatchRocketBack":
+                currentSequence = autoSequences.get(7);
+                break;
+
+            case "TestSequence":
+                currentSequence = autoSequences.get(8);
+                break;
+
+            default:
                 break;
         }
 
         currentSequence.reset();
+        sequenceEnded = false;
     }
 
-    public void setSequence(int index) {
-        currentSequence = autoSequences.get(index);
+    public void setPreClimb() {
+        currentSequence = new PreClimb();
+        currentSequence.reset();
+        sequenceEnded = false;
     }
 
     public void runSequence() {

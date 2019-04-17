@@ -3,6 +3,7 @@ package org.texastorque.inputs;
 import org.texastorque.inputs.State.RobotState;
 import org.texastorque.torquelib.util.GenericController;
 import org.texastorque.torquelib.util.TorqueToggle;
+import org.texastorque.auto.AutoManager;
 
 /**
  * All forms of input, including driver/operator controllers and input from the code itself.
@@ -40,14 +41,17 @@ public class Input {
     // =========== RobotState ==========
 
     private volatile boolean endFakeTeleop = true;
+    private volatile TorqueToggle DBOnly = new TorqueToggle(false);
 
     public void updateState() {
+        DBOnly.calc(operator.getRightBumper());
+
         if (driver.getXButtonPressed()) {
             if (state.getRobotState() == RobotState.TELEOP) {
                 state.setRobotState(RobotState.VISION);
                 // NT_pipeline = 0;
             }
-            else if (state.getRobotState() == RobotState.VISION) {
+            else {
                 state.setRobotState(RobotState.TELEOP);
             }
         }
@@ -58,6 +62,16 @@ public class Input {
             else if (state.getRobotState() == RobotState.LINE) {
                 state.setRobotState(RobotState.TELEOP);
             }
+        }
+        else if (DBOnly.get()) {
+            if (state.getRobotState() == RobotState.TELEOP) {
+                state.setRobotState(RobotState.DB_ONLY);
+                AutoManager.getInstance().setPreClimb();
+            }
+            else if (state.getRobotState() == RobotState.DB_ONLY) {
+                state.setRobotState(RobotState.TELEOP);
+            }
+            DBOnly.set(false);
         }
 
         // endFakeTeleop = false;
@@ -79,8 +93,8 @@ public class Input {
 
     public void updateDrive() {
         double rightX = driver.getRightXAxis();
-		DB_leftSpeed = -driver.getLeftYAxis() + 0.6 * Math.pow(rightX, 2) * Math.signum(rightX);
-        DB_rightSpeed = -driver.getLeftYAxis() - 0.6 * Math.pow(rightX, 2) * Math.signum(rightX);
+		DB_leftSpeed = -driver.getLeftYAxis() + 0.4 * Math.pow(rightX, 2) * Math.signum(rightX);
+        DB_rightSpeed = -driver.getLeftYAxis() - 0.4 * Math.pow(rightX, 2) * Math.signum(rightX);
 
         if (driver.getRightBumper()) {
             DB_highGear = true;
@@ -135,29 +149,24 @@ public class Input {
         if (operator.getDPADLeft()) {
             LF_modifier = 0;
             RT_position = 0;
-            IN_extended.set(true);
         }
         else if (operator.getDPADDown()) {
             LF_modifier = 0;
             RT_position = 3;
-            IN_extended.set(false);
         }
         else if (operator.getDPADUp()) {
             LF_modifier = 1;
             RT_position = 1;
-            IN_extended.set(false);
         }
         else if (operator.getDPADRight()) {
             LF_modifier = 0;
             RT_position = 2;
-            IN_extended.set(false);
         }
 
         if (operator.getXButtonPressed()) {
             LF_position = 6;
             LF_modifier = 0;
             RT_position = 4;
-            IN_extended.set(false);
         }
     }
 
@@ -165,7 +174,7 @@ public class Input {
     // ========== Lift ==========
 
     // private final double[] LF_setpoints = {0.0, 1.4, 2.6, 3.7, 5.0, 5.4, 2.2}; 
-    private final double[] LF_setpoints = {0.0, 0.5, 2.4, 2.9, 4.5, 5.0, 2.2}; 
+    private final double[] LF_setpoints = {0.0, 0.6, 2.5, 3.1, 4.7, 5.2, 2.2}; 
     // private volatile int LF_setpoint = 0;
     // private volatile int LF_modifier = 0;
     private volatile double LF_offset = 0;
@@ -198,14 +207,16 @@ public class Input {
             // }
 
             if (operator.getRightYAxis() > 0.1) {
-                if (LF_offset > -2.0) {
-                    LF_offset -= 0.005;
-                }
+                // if (LF_offset > -3.0) {
+                //     LF_offset -= 0.005;
+                // }
+                LF_offset -= 0.005;
             }
             else if (operator.getRightYAxis() < -0.1) {
-                if (LF_offset < 2.0) {
-                    LF_offset += 0.005;
-                }
+                // if (LF_offset < 3.0) {
+                //     LF_offset += 0.005;
+                // }
+                LF_offset += 0.005;
             }
         }
         else {
@@ -237,7 +248,7 @@ public class Input {
     // ========== Rotary ==========
 
     // private final double[] RT_setpoints = {0, 60, 74, 91, 50, 14};
-    private final double[] RT_setpoints = {0, 60, 190, 205, 55};
+    private final double[] RT_setpoints = {0, 50, 170, 195, 55};
     // private volatile int RT_setpoint = 0;
     private volatile double RT_offset = 0;
     private volatile TorqueToggle RT_manualMode = new TorqueToggle(false);
@@ -264,14 +275,16 @@ public class Input {
             // }
 
             if (operator.getLeftYAxis() > 0.1) {
-                if (RT_offset < 40) {
-                    RT_offset += 0.1;
-                }
+                // if (RT_offset < 100) {
+                //     RT_offset += 0.1;
+                // }
+                RT_offset += 0.2;
             }
             else if (operator.getLeftYAxis() < -0.1) {
-                if (RT_offset > -40) {
-                    RT_offset -= 0.1;
-                }
+                // if (RT_offset > -100) {
+                //     RT_offset -= 0.1;
+                // }
+                RT_offset -= 0.2;
             }
 
             // if (LF_setpoint + LF_modifier == 5) {
@@ -309,7 +322,7 @@ public class Input {
     private volatile boolean IN_active = false;
     private volatile boolean IN_hatchState = false;
     private volatile boolean IN_clawEngaged = true;
-    private volatile TorqueToggle IN_extended = new TorqueToggle(true);
+    private volatile TorqueToggle IN_extended = new TorqueToggle(false);
     
     public void updateIntake() {
         IN_active = false;
