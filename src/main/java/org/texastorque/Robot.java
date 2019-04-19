@@ -9,7 +9,10 @@ import org.texastorque.torquelib.base.TorqueIterative;
 
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.cameraserver.CameraServer;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class Robot extends TorqueIterative {
 
@@ -26,13 +29,17 @@ public class Robot extends TorqueIterative {
 	private AutoManager autoManager = AutoManager.getInstance();
 
 	public void robotInit() {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		Date date = new Date();
+		System.out.println("Init time: " + dateFormat.format(date));
+
 		initSubsystems();
 		feedback.resetNavX();
 		feedback.resetDriveEncoders();
 
 		UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
 		camera.setResolution(320, 240);
-		camera.setFPS(10);
+		camera.setFPS(16);
 	}
 
 	private void initSubsystems() {

@@ -28,13 +28,19 @@ public class Input {
     
     public void updateControllers() {
         updateState();
-        updateDrive();
-        updatePositions();
-        updateLift();
-        updateRotary();
-        updateIntake();
-        updateClimber();
-        // updateNetworkTables();
+
+        if (!driver.getName().equals("")) {
+            updateDrive();
+            updateIntake();
+            updateClimber();
+            // updateNetworkTables();
+        }
+
+        if (!operator.getName().equals("")) {
+            updatePositions();
+            updateLift();
+            updateRotary();
+        }
     }
 
 
@@ -164,9 +170,9 @@ public class Input {
         }
 
         if (operator.getXButtonPressed()) {
-            LF_position = 6;
+            LF_position = 2;
             LF_modifier = 0;
-            RT_position = 4;
+            RT_position = 2;
         }
     }
 
@@ -174,7 +180,7 @@ public class Input {
     // ========== Lift ==========
 
     // private final double[] LF_setpoints = {0.0, 1.4, 2.6, 3.7, 5.0, 5.4, 2.2}; 
-    private final double[] LF_setpoints = {0.0, 0.6, 2.5, 3.1, 4.7, 5.2, 2.2}; 
+    private final double[] LF_setpoints = {0.0, 0.6, 2.7, 3.2, 5.0, 5.4, 2.2}; 
     // private volatile int LF_setpoint = 0;
     // private volatile int LF_modifier = 0;
     private volatile double LF_offset = 0;
@@ -242,13 +248,14 @@ public class Input {
 
     public void setLFPosition(int index) {
         LF_position = index;
+        LF_modifier = 0;
     }
 
 
     // ========== Rotary ==========
 
     // private final double[] RT_setpoints = {0, 60, 74, 91, 50, 14};
-    private final double[] RT_setpoints = {0, 50, 170, 195, 55};
+    private final double[] RT_setpoints = {0, 50, 185, 210, 55};
     // private volatile int RT_setpoint = 0;
     private volatile double RT_offset = 0;
     private volatile TorqueToggle RT_manualMode = new TorqueToggle(false);
@@ -384,8 +391,8 @@ public class Input {
     private volatile TorqueToggle CM_enabled = new TorqueToggle(false);
     private volatile boolean CM_retract = false;
 
-    private volatile double CM_tomSpeed;
-    private volatile double CM_rearSpeed;
+    private volatile double CM_tomSpeed = 0;
+    // private volatile double CM_rearSpeed;
     
     public void updateClimber() {
         // CM_retract = false;

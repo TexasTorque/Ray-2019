@@ -10,7 +10,7 @@ public class Constants {
     public static final double DB_LOW_MAX_JERK = 60.0; // Low gear max jerk (ft/s/s/s)
 
     public static final double DB_HIGH_MAX_SPEED = 15.0;
-    public static final double DB_HIGH_MAX_ACCEL = 6.0;
+    public static final double DB_HIGH_MAX_ACCEL = 5.0;
     public static final double DB_HIGH_MAX_JERK = 60.0;
 
     public static final double CAMERA_ANGLE_X = 60;

@@ -42,7 +42,7 @@ public class DrivePath extends Command {
             
             Trajectory path = Pathfinder.generate(points, config);
             TankModifier modifier = new TankModifier(path);
-            modifier.modify(2.25); // DriveBase width (ft)
+            modifier.modify(2.3); // DriveBase width (ft)
 
             leftFollower = new DistanceFollower(modifier.getLeftTrajectory());
             rightFollower = new DistanceFollower(modifier.getRightTrajectory());
@@ -54,7 +54,7 @@ public class DrivePath extends Command {
             
             Trajectory path = Pathfinder.generate(points, config);
             TankModifier modifier = new TankModifier(path);
-            modifier.modify(2.25); // DriveBase width (ft)
+            modifier.modify(2.3); // DriveBase width (ft)
 
             leftFollower = new DistanceFollower(modifier.getLeftTrajectory());
             rightFollower = new DistanceFollower(modifier.getRightTrajectory());

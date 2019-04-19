@@ -27,8 +27,8 @@ public class Ports {
     public static final int IN_MOTOR = 13;
     public static final int IN_HATCH_SOLE_A = 4;
     public static final int IN_HATCH_SOLE_B = 5;
-    public static final int IN_EXTEND_SOLE_A = 3;
-    public static final int IN_EXTEND_SOLE_B = 2;
+    public static final int IN_EXTEND_SOLE_A = 2;
+    public static final int IN_EXTEND_SOLE_B = 3;
 
     //Climber
     public static final int CM_LEFT_TOM_MOTOR = 6;
