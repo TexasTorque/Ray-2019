@@ -58,11 +58,11 @@ public class Rotary extends Subsystem {
 
     @Override
     public void run(RobotState state) {
-        if (state == RobotState.AUTO) {
+        if (state == RobotState.AUTO || state == RobotState.DB_ONLY) {
             runRotaryPID();
         }
 
-        else if (state == RobotState.TELEOP || state == RobotState.PRECLIMB) {
+        else if (state == RobotState.TELEOP) {
             if (input.getRTManualMode()) {
                 speed = input.getRTManualOutput();
             } else {

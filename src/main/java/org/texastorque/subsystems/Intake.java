@@ -10,13 +10,13 @@ import edu.wpi.first.wpilibj.Solenoid;
 
 import edu.wpi.first.wpilibj.VictorSP;
 
-public class FourBarIntake extends Subsystem {
+public class Intake extends Subsystem {
 
-    private static volatile FourBarIntake instance;
+    private static volatile Intake instance;
     
     private TorqueMotor intakeWheels;
     private DoubleSolenoid hatchClaw;
-    private DoubleSolenoid hatchExtend;
+    private DoubleSolenoid extender;
 
     private double wheelSpeed;
     private boolean clawEngaged;
@@ -24,11 +24,11 @@ public class FourBarIntake extends Subsystem {
 
     private boolean clockwise = true;
 
-    private FourBarIntake() {
+    private Intake() {
         intakeWheels = new TorqueMotor(new VictorSP(Ports.IN_MOTOR), clockwise);
 
-        hatchExtend = new DoubleSolenoid(0, Ports.IN_HATCH_SOLE_A, Ports.IN_HATCH_SOLE_B);
-        hatchClaw = new DoubleSolenoid(0, Ports.IN_HATCH_EXT_SOLE_A, Ports.IN_HATCH_EXT_SOLE_B);
+        hatchClaw = new DoubleSolenoid(0, Ports.IN_HATCH_SOLE_A, Ports.IN_HATCH_SOLE_B);
+        extender = new DoubleSolenoid(0, Ports.IN_EXTEND_SOLE_A, Ports.IN_EXTEND_SOLE_B);
     }
 
     @Override
@@ -65,9 +65,10 @@ public class FourBarIntake extends Subsystem {
             }
 
             clawEngaged = input.getINClawEngaged();
+            clawExtended = input.getINClawExtended();
         }
 
-        else if (state == RobotState.TELEOP || state == RobotState.PRECLIMB) {
+        else if (state == RobotState.TELEOP) {
             if (input.getINActive()) {
                 if (input.getHatchState()) {
                     wheelSpeed = 1.0;
@@ -104,6 +105,7 @@ public class FourBarIntake extends Subsystem {
             }
 
             clawEngaged = input.getINClawEngaged();
+            clawExtended = input.getINClawExtended();
         }
 
         else if (state == RobotState.LINE) {
@@ -122,11 +124,11 @@ public class FourBarIntake extends Subsystem {
         } else {
             hatchClaw.set(Value.kReverse);
         }
-        if (clawExtended){
-            hatchExtend.set(Value.kForward);
-        }
-        else{
-            hatchExtend.set(Value.kReverse);
+
+        if (clawExtended) {
+            extender.set(Value.kForward);
+        } else {
+            extender.set(Value.kReverse);
         }
     }
 
@@ -142,11 +144,11 @@ public class FourBarIntake extends Subsystem {
     @Override
     public void smartDashboard() {}
 
-    public static FourBarIntake getInstance() {
+    public static Intake getInstance() {
         if (instance == null) {
-            synchronized (FourBarIntake.class) {
+            synchronized (Intake.class) {
                 if (instance == null)
-                    instance = new FourBarIntake();
+                    instance = new Intake();
             }
         }
         return instance;

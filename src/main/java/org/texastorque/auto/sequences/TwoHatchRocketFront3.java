@@ -12,20 +12,18 @@ public class TwoHatchRocketFront3 extends Sequence {
     @Override
     protected void init() {
         ArrayList<Command> block1 = new ArrayList<>();
-        block1.add(new TomInit(0));
-        block1.add(new RotarySet(0, 6));
-        block1.add(new ClawSet(1.5, true));
-        block1.add(new DriveTime(1.5, 1.5, 0.3));
+        block1.add(new RotarySet(0, 1));
+        // block1.add(new DriveTime(0.5, 1.5, 0.3));
 
         ArrayList<Command> block2 = new ArrayList<>();
         Waypoint[] points = new Waypoint[] {
             new Waypoint(0, 0, 0),
-            new Waypoint(8, -7, Pathfinder.d2r(-35))
+            new Waypoint(8, -7.5, Pathfinder.d2r(-35))
         };
         block2.add(new DrivePath(0, points, true, false));
-        block2.add(new RotarySet(2, 3));
-        block2.add(new DriveVisionTime(2.8, 1.2));
-        block2.add(new ClawSet(4, false));
+        block2.add(new RotarySet(1, 2));
+        block2.add(new DriveVisionTime(1.8, 1.2));
+        block2.add(new ClawSet(3, false));
 
         ArrayList<Command> block3 = new ArrayList<>();
         // block3.add(new DriveVisionTime(0, 1.2));
@@ -41,11 +39,11 @@ public class TwoHatchRocketFront3 extends Sequence {
         ArrayList<Command> block5 = new ArrayList<>();
         points = new Waypoint[] {
             new Waypoint(0, 0, Pathfinder.d2r(0)),
-            new Waypoint(4, -7, Pathfinder.d2r(-85))
+            new Waypoint(5, -5, Pathfinder.d2r(-85))
         };
         block5.add(new DrivePath(0, points, true, false));
         block5.add(new DriveVisionTime(1.8, 1.2));
-        block5.add(new ClawSet(3, true));
+        block5.add(new ClawSet(3.0, true));
 
         ArrayList<Command> block6 = new ArrayList<>();
         // block6.add(new DriveVisionTime(0, 1.2));
@@ -54,7 +52,7 @@ public class TwoHatchRocketFront3 extends Sequence {
         ArrayList<Command> block7 = new ArrayList<>();
         points = new Waypoint[] {
             new Waypoint(0, 0, Pathfinder.d2r(0)),
-            new Waypoint(8, 4, Pathfinder.d2r(85))
+            new Waypoint(8, 4.5, Pathfinder.d2r(85))
         };
         block7.add(new DrivePath(0, points, false, false));
 

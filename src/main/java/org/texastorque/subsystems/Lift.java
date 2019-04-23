@@ -36,7 +36,7 @@ public class Lift extends Subsystem {
                 .setRegions(0)
                 .setPGains(0.6, 1.5)
                 .setIGains(0.1, 0.7)
-                .setDGains(0.00005, 0) // 0.00002
+                .setDGains(0.00008, 0) // 0.00002
                 .build();
 
         lowPass = new LowPassFilter(0.5);
@@ -59,11 +59,11 @@ public class Lift extends Subsystem {
 
     @Override
     public void run(RobotState state) {
-        if (state == RobotState.AUTO) {
+        if (state == RobotState.AUTO || state == RobotState.DB_ONLY) {
             runLiftPID();
         }
 
-        else if (state == RobotState.TELEOP || state == RobotState.PRECLIMB) {
+        else if (state == RobotState.TELEOP) {
             if (input.getLFManualMode()) {
                 speed = input.getLFManualOutput();
             } else {

@@ -2,7 +2,7 @@ package org.texastorque.auto.commands;
 
 import org.texastorque.auto.Command;
 
-public class RotarySet extends Command{
+public class RotarySet extends Command {
     private int setpointIndex = 0;
 
     public RotarySet(double delay, int index) {

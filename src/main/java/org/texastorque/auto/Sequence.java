@@ -58,8 +58,13 @@ public abstract class Sequence {
         }
     }
 
+    public boolean hasEnded() {
+        return ended;
+    }
+
     public void reset() {
         blockIndex = 0;
         started = false;
+        ended = false;
     }
 }

@@ -10,7 +10,10 @@ import org.texastorque.torquelib.base.TorqueIterative;
 
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.cameraserver.CameraServer;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class Robot extends TorqueIterative {
 
@@ -18,7 +21,7 @@ public class Robot extends TorqueIterative {
 	private Subsystem driveBase = DriveBase.getInstance();
 	private Subsystem lift = Lift.getInstance();
 	private Subsystem rotary = Rotary.getInstance();
-	private Subsystem intake = FourBarIntake.getInstance();
+	private Subsystem intake = Intake.getInstance();
 	private Subsystem climber = Climber.getInstance();
 	
 	private State state = State.getInstance();
@@ -28,13 +31,17 @@ public class Robot extends TorqueIterative {
 
 	private PreClimb  preClimb;
 	public void robotInit() {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		Date date = new Date();
+		System.out.println("Init time: " + dateFormat.format(date));
+
 		initSubsystems();
 		feedback.resetNavX();
 		feedback.resetDriveEncoders();
 
 		UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
 		camera.setResolution(320, 240);
-		camera.setFPS(10);
+		camera.setFPS(16);
 	}
 
 	private void initSubsystems() {
@@ -51,6 +58,7 @@ public class Robot extends TorqueIterative {
 		state.setRobotState(RobotState.AUTO);
 		autoManager.chooseSequence();
 		feedback.resetDriveEncoders();
+		input.resetAll();
 
 		for (Subsystem system : subsystems) {
 			system.autoInit();
@@ -79,6 +87,19 @@ public class Robot extends TorqueIterative {
 		if (state.getRobotState() == RobotState.AUTO) {
 			autoManager.runSequence();
 			input.updateState();
+
+			if (autoManager.sequenceEnded()) {
+				state.setRobotState(RobotState.TELEOP);
+			}
+		}
+		else if (state.getRobotState() == RobotState.DB_ONLY) {
+			autoManager.runSequence();
+			input.updateState();
+			input.updateDrive();
+
+			if (autoManager.sequenceEnded()) {
+				state.setRobotState(RobotState.TELEOP);
+			}
 		}
 		else {
 			input.updateControllers();
@@ -91,12 +112,16 @@ public class Robot extends TorqueIterative {
 
 	@Override
 	public void teleopContinuous() {
-		if(state.getRobotState() == RobotState.PRECLIMB){
-			preClimb.run();
-			input.updateDrive();
+		if (state.getRobotState() == RobotState.DB_ONLY) {
+			autoManager.runSequence();
 			input.updateState();
+			input.updateDrive();
+
+			if (autoManager.sequenceEnded()) {
+				state.setRobotState(RobotState.TELEOP);
+			}
 		}
-		else if (state.getRobotState() == RobotState.TELEOP){
+		else {
 			input.updateControllers();
 		}
 		for (Subsystem system : subsystems) {

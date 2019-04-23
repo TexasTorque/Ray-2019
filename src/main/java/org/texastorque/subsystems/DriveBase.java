@@ -76,7 +76,7 @@ public class DriveBase extends Subsystem {
             rightSpeed = input.getDBRightSpeed();
         }
 
-        else if (state == RobotState.TELEOP || state==RobotState.PRECLIMB) {
+        else if (state == RobotState.TELEOP || state == RobotState.DB_ONLY) {
             lightRing.set(Relay.Value.kOff);
 
             leftSpeed = input.getDBLeftSpeed();

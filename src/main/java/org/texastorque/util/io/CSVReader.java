@@ -16,7 +16,7 @@ public class CSVReader<T> {
         this.mapper = mapper;
     }
 
-    public static CSVReader<String[]> defaultReader(String fileName) {
+    public static CSVReader<String[]> getDefaultReader(String fileName) {
         return new CSVReader<>(fileName, new StringTransform());
     }
 
