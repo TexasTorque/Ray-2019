@@ -13,8 +13,8 @@ public class TwoHatchRocketFront1 extends Sequence {
     protected void init() {
         ArrayList<Command> block1 = new ArrayList<>();
         block1.add(new RotarySet(0, 1));
-        block1.add(new DriveTime(0, 1.8, 0.6));
-        block1.add(new DriveTime(1.8, 0.3, -0.1));
+        block1.add(new DriveTime(0, 1.8, 0.7));
+        block1.add(new DriveTime(1.8, 0.5, -0.1));
 
         ArrayList<Command> block2 = new ArrayList<>();
         Waypoint[] points = new Waypoint[] {

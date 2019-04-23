@@ -43,6 +43,13 @@ public class Input {
         }
     }
 
+    public void resetAll() {
+        resetDrive();
+        resetPositions();
+        resetIntake();
+        resetClimber();
+    }
+
 
     // =========== RobotState ==========
 
@@ -110,6 +117,12 @@ public class Input {
         }
     }
 
+    public void resetDrive() {
+        DB_leftSpeed = 0;
+        DB_rightSpeed = 0;
+        DB_highGear = false;
+    }
+
     public double getDBLeftSpeed() {
         return DB_leftSpeed;
     }
@@ -174,6 +187,12 @@ public class Input {
             LF_modifier = 0;
             RT_position = 2;
         }
+    }
+
+    public void resetPositions() {
+        LF_position = 0;
+        LF_modifier = 0;
+        RT_position = 0;
     }
 
 
@@ -349,6 +368,13 @@ public class Input {
         IN_extended.calc(operator.getLeftBumper());
     }
 
+    public void resetIntake() {
+        IN_active = false;
+        IN_hatchState = false;
+        IN_clawEngaged = true;
+        IN_extended = new TorqueToggle(false);
+    }
+
     public boolean getINActive() {
         return IN_active;
     }
@@ -423,6 +449,12 @@ public class Input {
 
         // CM_rearSpeed = tester.getLeftYAxis();
         // CM_tomSpeed = tester.getRightYAxis();
+    }
+
+    public void resetClimber() {
+        CM_enabled = new TorqueToggle(false);
+        CM_retract = false;
+        CM_tomSpeed = 0;
     }
 
     public boolean getCMEnabled() {

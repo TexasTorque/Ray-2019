@@ -56,6 +56,7 @@ public class Robot extends TorqueIterative {
 		state.setRobotState(RobotState.AUTO);
 		autoManager.chooseSequence();
 		feedback.resetDriveEncoders();
+		input.resetAll();
 
 		for (Subsystem system : subsystems) {
 			system.autoInit();

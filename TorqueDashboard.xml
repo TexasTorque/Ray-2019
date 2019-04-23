@@ -1,5 +1,10 @@
 <xml version="1.0">
 <dashboard>
+	<widget field="CM_enabled" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.BooleanBox">
+		<location x="752" y="0"/>
+		<width>96</width>
+		<height>32</height>
+	</widget>
 	<widget field="Auto Selector" type="String" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
 		<location x="0" y="385"/>
 	</widget>
@@ -70,9 +75,6 @@
 		<location x="0" y="315"/>
 		<property name="Background" value="153.255.204.255"/>
 	</widget>
-	<widget field="CM_enabled" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
-		<location x="0" y="176"/>
-	</widget>
 	<widget field="UL_rightDistance" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
 		<location x="0" y="288"/>
 		<height>21</height>
@@ -109,7 +111,7 @@
 		<property name="Background" value="153.255.204.255"/>
 	</widget>
 	<widget field="CM_atBottom" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
-		<location x="144" y="176"/>
+		<location x="0" y="176"/>
 	</widget>
 	<widget field="LF_output" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.FormattedField">
 		<location x="0" y="128"/>
