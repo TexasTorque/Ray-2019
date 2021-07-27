@@ -2,10 +2,9 @@ package org.texastorque.subsystems;
 
 import org.texastorque.inputs.State.RobotState;
 import org.texastorque.constants.*;
-import org.texastorque.torquelib.component.TorqueMotor;
+import org.texastorque.torquelib.component.TorqueVictor;
 import org.texastorque.torquelib.controlLoop.ScheduledPID;
 
-import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Relay;
@@ -15,38 +14,36 @@ public class DriveBase extends Subsystem {
 
     private static volatile DriveBase instance;
 
-    private TorqueMotor leftFore;
-    private TorqueMotor leftMid;
-	private TorqueMotor leftRear;
-    private TorqueMotor rightFore;
-    private TorqueMotor rightMid;
-    private TorqueMotor rightRear;
+    private TorqueVictor leftFore;
+    private TorqueVictor leftMid;
+    private TorqueVictor leftRear;
+    private TorqueVictor rightFore;
+    private TorqueVictor rightMid;
+    private TorqueVictor rightRear;
     private DoubleSolenoid gearShift;
     private Relay lightRing;
-    
+
     private final ScheduledPID visionPID;
     private double leftSpeed = 0.0;
     private double rightSpeed = 0.0;
     private boolean highGear = false;
-    
+
     private boolean clockwise = true;
 
     private DriveBase() {
-        leftFore = new TorqueMotor(new VictorSP(Ports.DB_LEFT_FORE_MOTOR), !clockwise);
-        leftMid = new TorqueMotor(new VictorSP(Ports.DB_LEFT_MID_MOTOR), !clockwise);
-        leftRear = new TorqueMotor(new VictorSP(Ports.DB_LEFT_REAR_MOTOR), !clockwise);
-        
-        rightFore = new TorqueMotor(new VictorSP(Ports.DB_RIGHT_FORE_MOTOR), clockwise);
-        rightMid = new TorqueMotor(new VictorSP(Ports.DB_RIGHT_MID_MOTOR), clockwise);
-        rightRear = new TorqueMotor(new VictorSP(Ports.DB_RIGHT_REAR_MOTOR), clockwise);
-        
+        leftFore = new TorqueVictor(Ports.DB_LEFT_FORE_MOTOR, !clockwise);
+        leftMid = new TorqueVictor(Ports.DB_LEFT_MID_MOTOR, !clockwise);
+        leftRear = new TorqueVictor(Ports.DB_LEFT_REAR_MOTOR, !clockwise);
+
+        rightFore = new TorqueVictor(Ports.DB_RIGHT_FORE_MOTOR, clockwise);
+        rightMid = new TorqueVictor(Ports.DB_RIGHT_MID_MOTOR, clockwise);
+        rightRear = new TorqueVictor(Ports.DB_RIGHT_REAR_MOTOR, clockwise);
+
         gearShift = new DoubleSolenoid(0, Ports.DB_SOLE_A, Ports.DB_SOLE_B);
 
         lightRing = new Relay(Ports.LR_RELAY);
 
-        visionPID = new ScheduledPID.Builder(0, 0.5, 1)
-                .setPGains(0.5 / Constants.CAMERA_ANGLE_X)
-                .build();
+        visionPID = new ScheduledPID.Builder(0, 0.5, 1).setPGains(0.5 / Constants.CAMERA_ANGLE_X).build();
     }
 
     @Override
@@ -87,8 +84,8 @@ public class DriveBase extends Subsystem {
                 rightSpeed *= 0.7;
             }
             // else if (input.calcLFSetpoint() > 2.0) {
-            //     leftSpeed *= 1;
-            //     rightSpeed *= 1;
+            // leftSpeed *= 1;
+            // rightSpeed *= 1;
             // }
         }
 
@@ -114,20 +111,18 @@ public class DriveBase extends Subsystem {
                 // rightSpeed += 0.4;
                 leftSpeed = 0;
                 rightSpeed = 0.3;
-            }
-            else if (!feedback.getLNLeft() && feedback.getLNRight()) {
+            } else if (!feedback.getLNLeft() && feedback.getLNRight()) {
                 // leftSpeed += 0.4;
                 // rightSpeed -= 0.4;
                 leftSpeed = 0.3;
                 rightSpeed = 0;
-            }
-            else {
+            } else {
                 leftSpeed = 0.15;
                 rightSpeed = 0.15;
             }
             // Good work Jacob
         }
-        
+
         setGears(state);
         output();
     }
@@ -139,13 +134,13 @@ public class DriveBase extends Subsystem {
         } else {
             gearShift.set(Value.kReverse);
         }
-        
+
         leftFore.set(leftSpeed);
         leftMid.set(leftSpeed);
         leftRear.set(leftSpeed);
-        
-		rightFore.set(rightSpeed);
-		rightMid.set(rightSpeed);
+
+        rightFore.set(rightSpeed);
+        rightMid.set(rightSpeed);
         rightRear.set(rightSpeed);
     }
 
@@ -157,26 +152,28 @@ public class DriveBase extends Subsystem {
     private void setGears(RobotState state) {
         if (state == RobotState.AUTO || state == RobotState.TELEOP) {
             highGear = input.getDBHighGear();
-        }
-        else {
+        } else {
             highGear = false;
         }
     }
 
     @Override
-    public void disabledContinuous() {}
+    public void disabledContinuous() {
+    }
 
     @Override
-    public void autoContinuous() {}
+    public void autoContinuous() {
+    }
 
     @Override
-    public void teleopContinuous() {}
+    public void teleopContinuous() {
+    }
 
     @Override
     public void smartDashboard() {
         SmartDashboard.putBoolean("DB_highGear", highGear);
     }
-    
+
     public static DriveBase getInstance() {
         if (instance == null) {
             synchronized (DriveBase.class) {

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>grpl.pathfinder.testing</groupId>
+  <artifactId>Pathfinder-Bench</artifactId>
+  <versioning>
+    <release>2.0.0-prealpha</release>
+    <versions>
+      <version>2.0.0-prealpha</version>
+    </versions>
+    <lastUpdated>20190417092138</lastUpdated>
+  </versioning>
+</metadata>

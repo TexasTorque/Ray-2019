@@ -2,11 +2,10 @@ package org.texastorque.subsystems;
 
 import org.texastorque.inputs.State.RobotState;
 import org.texastorque.constants.Ports;
-import org.texastorque.torquelib.component.TorqueMotor;
+import org.texastorque.torquelib.component.TorqueVictor;
 import org.texastorque.torquelib.controlLoop.ScheduledPID;
 import org.texastorque.torquelib.controlLoop.LowPassFilter;
 
-import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -14,8 +13,8 @@ public class Lift extends Subsystem {
 
     private static volatile Lift instance;
 
-    private TorqueMotor pulleyA;
-    private TorqueMotor pulleyB;
+    private TorqueVictor pulleyA;
+    private TorqueVictor pulleyB;
 
     private final ScheduledPID liftPID;
     private final LowPassFilter lowPass;
@@ -26,16 +25,13 @@ public class Lift extends Subsystem {
     private boolean clockwise = true;
 
     private Lift() {
-        pulleyA = new TorqueMotor(new VictorSP(Ports.LF_MOTOR_A), clockwise);
-        pulleyB = new TorqueMotor(new VictorSP(Ports.LF_MOTOR_B), clockwise);
+        pulleyA = new TorqueVictor(Ports.LF_MOTOR_A, clockwise);
+        pulleyB = new TorqueVictor(Ports.LF_MOTOR_B, clockwise);
 
         speed = 0;
         setpoint = input.calcLFSetpoint(0);
 
-        liftPID = new ScheduledPID.Builder(setpoint, -0.2, 0.7, 2)
-                .setRegions(0)
-                .setPGains(0.6, 1.5)
-                .setIGains(0.1, 0.7)
+        liftPID = new ScheduledPID.Builder(setpoint, -0.2, 0.7, 2).setRegions(0).setPGains(0.6, 1.5).setIGains(0.1, 0.7)
                 .setDGains(0.00008, 0) // 0.00002
                 .build();
 
@@ -82,7 +78,7 @@ public class Lift extends Subsystem {
         else if (state == RobotState.LINE) {
             runLiftPID();
         }
-        
+
         output();
     }
 
@@ -111,8 +107,7 @@ public class Lift extends Subsystem {
     private double addBaseOutput(double speed) {
         if (feedback.getLFPosition() < input.calcLFSetpoint(1)) {
             return speed + 0.05;
-        }
-        else if (feedback.getLFPosition() < input.calcLFSetpoint(2)) {
+        } else if (feedback.getLFPosition() < input.calcLFSetpoint(2)) {
             return speed + 0.08;
         }
         return speed;
@@ -141,13 +136,16 @@ public class Lift extends Subsystem {
     }
 
     @Override
-    public void disabledContinuous() {}
+    public void disabledContinuous() {
+    }
 
     @Override
-    public void autoContinuous() {}
+    public void autoContinuous() {
+    }
 
     @Override
-    public void teleopContinuous() {}
+    public void teleopContinuous() {
+    }
 
     @Override
     public void smartDashboard() {

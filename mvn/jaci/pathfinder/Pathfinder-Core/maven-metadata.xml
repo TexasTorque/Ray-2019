@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>jaci.pathfinder</groupId>
+  <artifactId>Pathfinder-Core</artifactId>
+  <versioning>
+    <release>2019.3.06-UNSTABLE</release>
+    <versions>
+      <version>2019.1.12</version>
+      <version>2019.2.19</version>
+      <version>2019.1.10</version>
+      <version>1.8</version>
+      <version>2019.1.11</version>
+      <version>2019.3.06-UNSTABLE</version>
+    </versions>
+    <lastUpdated>20190417092215</lastUpdated>
+  </versioning>
+</metadata>

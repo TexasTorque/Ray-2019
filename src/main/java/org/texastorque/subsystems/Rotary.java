@@ -1,18 +1,18 @@
 package org.texastorque.subsystems;
+
 import org.texastorque.inputs.State.RobotState;
 import org.texastorque.constants.Ports;
-import org.texastorque.torquelib.component.TorqueMotor;
+import org.texastorque.torquelib.component.TorqueVictor;
 import org.texastorque.torquelib.controlLoop.ScheduledPID;
 
-import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Rotary extends Subsystem {
 
     private static volatile Rotary instance;
-    
-    private TorqueMotor rotary;
+
+    private TorqueVictor rotary;
 
     private final ScheduledPID rotaryPID;
     private double speed;
@@ -22,13 +22,12 @@ public class Rotary extends Subsystem {
     private boolean clockwise = true;
 
     private Rotary() {
-        rotary = new TorqueMotor(new VictorSP(Ports.RT_MOTOR), clockwise);
+        rotary = new TorqueVictor(Ports.RT_MOTOR, clockwise);
 
         speed = 0;
         setpoint = input.calcRTSetpoint(0);
 
-        this.rotaryPID = new ScheduledPID.Builder(setpoint, -0.6, 0.4, 1)
-                .setPGains(0.025)
+        this.rotaryPID = new ScheduledPID.Builder(setpoint, -0.6, 0.4, 1).setPGains(0.025)
                 // .setIGains(0.01)
                 // .setDGains(0.0)
                 .build();
@@ -81,7 +80,7 @@ public class Rotary extends Subsystem {
         else if (state == RobotState.LINE) {
             runRotaryPID();
         }
-        
+
         output();
     }
 
@@ -126,10 +125,12 @@ public class Rotary extends Subsystem {
     }
 
     @Override
-    public void autoContinuous() {}
+    public void autoContinuous() {
+    }
 
     @Override
-    public void teleopContinuous() {}
+    public void teleopContinuous() {
+    }
 
     @Override
     public void smartDashboard() {

@@ -1,0 +1,27 @@
+{
+    "fileName": "gainput.json",
+    "name": "gainput",
+    "version": "1.0.0",
+    "uuid": "a7d3881c-d3ba-4952-a374-526577802300",
+    "mavenUrls": [
+        "https://dev.imjac.in/maven/"
+    ],
+    "jsonUrl": "https://dev.imjac.in/maven/thirdparty/gainput/gainput-latest.json",
+    "cppDependencies": [
+        {
+            "groupId": "thirdparty.gainput",
+            "artifactId": "gainput",
+            "version": "1.0.0",
+            "libName": "gainput",
+            "configuration": "native_gainput",
+            "headerClassifier": "headers",
+            "sharedLibrary": true,
+            "skipInvalidPlatforms": true,
+            "binaryPlatforms": [
+                "linuxx86-64",
+                "windowsx86-64",
+                "osxx86-64"
+            ]
+        }
+    ]
+}

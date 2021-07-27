@@ -1,0 +1,27 @@
+{
+    "fileName": "OIS.json",
+    "name": "OIS",
+    "version": "1.0.0-a",
+    "uuid": "0217deef-2fcc-41cd-96d8-fa7ae499ac32",
+    "mavenUrls": [
+        "https://dev.imjac.in/maven/"
+    ],
+    "jsonUrl": "https://dev.imjac.in/maven/thirdparty/ois/OIS-latest.json",
+    "cppDependencies": [
+        {
+            "groupId": "thirdparty.ois",
+            "artifactId": "OIS",
+            "version": "1.0.0-a",
+            "libName": "ois",
+            "configuration": "native_ois",
+            "headerClassifier": "headers",
+            "sharedLibrary": true,
+            "skipInvalidPlatforms": true,
+            "binaryPlatforms": [
+                "linuxx86-64",
+                "windowsx86-64",
+                "osxx86-64"
+            ]
+        }
+    ]
+}

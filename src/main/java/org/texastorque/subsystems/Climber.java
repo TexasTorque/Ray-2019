@@ -1,43 +1,39 @@
 package org.texastorque.subsystems;
 
-import org.texastorque.auto.sequences.PreClimb;
 import org.texastorque.inputs.State.RobotState;
 import org.texastorque.constants.Ports;
-import org.texastorque.torquelib.component.TorqueMotor;
+import org.texastorque.torquelib.component.TorqueVictor;
 import org.texastorque.torquelib.controlLoop.ScheduledPID;
 
-import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Climber extends Subsystem {
 
     private static volatile Climber instance;
 
-    private TorqueMotor leftTom;
-    private TorqueMotor rightTom;
-	private TorqueMotor rearA;
-    private TorqueMotor rearB;
-    
+    private TorqueVictor leftTom;
+    private TorqueVictor rightTom;
+    private TorqueVictor rearA;
+    private TorqueVictor rearB;
+
     private final ScheduledPID rearPID;
     private double tomSpeed = 0;
     private double rearSpeed = 0;
     private boolean clockwise = true;
 
     private Climber() {
-        leftTom = new TorqueMotor(new VictorSP(Ports.CM_LEFT_TOM_MOTOR), !clockwise);
-        rightTom = new TorqueMotor(new VictorSP(Ports.CM_RIGHT_TOM_MOTOR), clockwise);
-        rearA = new TorqueMotor(new VictorSP(Ports.CM_REAR_A_MOTOR), clockwise);
-        rearB = new TorqueMotor(new VictorSP(Ports.CM_REAR_B_MOTOR), clockwise);
+        leftTom = new TorqueVictor(Ports.CM_LEFT_TOM_MOTOR, !clockwise);
+        rightTom = new TorqueVictor(Ports.CM_RIGHT_TOM_MOTOR, clockwise);
+        rearA = new TorqueVictor(Ports.CM_REAR_A_MOTOR, clockwise);
+        rearB = new TorqueVictor(Ports.CM_REAR_B_MOTOR, clockwise);
 
         tomSpeed = 0;
         rearSpeed = 0;
 
-        rearPID = new ScheduledPID.Builder(0, -1.0, 1.0, 1)
-            .setPGains(0.25)
-            // .setIGains(0)
-            // .setDGains(0)
-            .build();
-
+        rearPID = new ScheduledPID.Builder(0, -1.0, 1.0, 1).setPGains(0.25)
+                // .setIGains(0)
+                // .setDGains(0)
+                .build();
 
     }
 
@@ -77,12 +73,10 @@ public class Climber extends Subsystem {
                     double currentPitch = feedback.getPitch();
                     rearSpeed = rearPID.calculate(-currentPitch);
                 }
-            }
-            else if (input.getCMRetract()) {
+            } else if (input.getCMRetract()) {
                 tomSpeed = 0;
                 rearSpeed = -0.3;
-            }
-            else {
+            } else {
                 tomSpeed = input.getCMTomSpeed();
                 rearSpeed = 0;
             }
@@ -101,7 +95,6 @@ public class Climber extends Subsystem {
             rearSpeed = 0;
         }
 
-        
         output();
     }
 
@@ -114,13 +107,16 @@ public class Climber extends Subsystem {
     }
 
     @Override
-    public void disabledContinuous() {}
+    public void disabledContinuous() {
+    }
 
     @Override
-    public void autoContinuous() {}
+    public void autoContinuous() {
+    }
 
     @Override
-    public void teleopContinuous() {}
+    public void teleopContinuous() {
+    }
 
     @Override
     public void smartDashboard() {

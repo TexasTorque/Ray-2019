@@ -1,0 +1,60 @@
+{
+    "fileName": "Pathfinder.json",
+    "name": "Pathfinder",
+    "version": "2.0.0-prealpha",
+    "uuid": "44237bb3-7675-43ba-894a-302083a37bd8",
+    "mavenUrls": [
+        "https://dev.imjac.in/maven"
+    ],
+    "jsonUrl": "https://dev.imjac.in/maven/grpl/pathfinder/Pathfinder-latest.json",
+    "cppDependencies": [
+        {
+            "groupId": "grpl.pathfinder",
+            "artifactId": "Pathfinder",
+            "version": "2.0.0-prealpha",
+            "libName": "Pathfinder",
+            "configuration": "native_pathfinder",
+            "headerClassifier": "headers",
+            "binaryPlatforms": [
+                
+            ]
+        },
+        {
+            "groupId": "grpl.thirdparty.tuxfamily.eigen",
+            "artifactId": "Eigen",
+            "version": "3.3.5",
+            "libName": "Eigen",
+            "configuration": "native_pathfinder",
+            "headerClassifier": "headers",
+            "binaryPlatforms": [
+                
+            ]
+        }
+    ],
+    "javaDependencies": [
+        {
+            "groupId": "grpl.pathfinder",
+            "artifactId": "Pathfinder-Java",
+            "version": "2.0.0-prealpha"
+        }
+    ],
+    "jniDependencies": [
+        {
+            "groupId": "grpl.pathfinder",
+            "artifactId": "Pathfinder-JNI",
+            "version": "2.0.0-prealpha",
+            "isJar": true,
+            "skipInvalidPlatforms": true,
+            "validPlatforms": [
+                "linuxx86-64",
+                "windowsx86-64",
+                "osxx86-64",
+                "linuxx86",
+                "windowsx86",
+                "osxx86",
+                "linuxathena",
+                "linuxraspbian"
+            ]
+        }
+    ]
+}

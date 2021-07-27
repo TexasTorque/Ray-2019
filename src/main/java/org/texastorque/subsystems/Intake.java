@@ -2,19 +2,16 @@ package org.texastorque.subsystems;
 
 import org.texastorque.inputs.State.RobotState;
 import org.texastorque.constants.Ports;
-import org.texastorque.torquelib.component.TorqueMotor;
+import org.texastorque.torquelib.component.TorqueVictor;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.Solenoid;
-
-import edu.wpi.first.wpilibj.VictorSP;
 
 public class Intake extends Subsystem {
 
     private static volatile Intake instance;
-    
-    private TorqueMotor intakeWheels;
+
+    private TorqueVictor intakeWheels;
     private DoubleSolenoid hatchClaw;
     private DoubleSolenoid extender;
 
@@ -25,7 +22,7 @@ public class Intake extends Subsystem {
     private boolean clockwise = true;
 
     private Intake() {
-        intakeWheels = new TorqueMotor(new VictorSP(Ports.IN_MOTOR), clockwise);
+        intakeWheels = new TorqueVictor(Ports.IN_MOTOR, clockwise);
 
         hatchClaw = new DoubleSolenoid(0, Ports.IN_HATCH_SOLE_A, Ports.IN_HATCH_SOLE_B);
         extender = new DoubleSolenoid(0, Ports.IN_EXTEND_SOLE_A, Ports.IN_EXTEND_SOLE_B);
@@ -55,8 +52,7 @@ public class Intake extends Subsystem {
                 } else {
                     wheelSpeed = -0.8;
                 }
-            } 
-            else {
+            } else {
                 if (input.getHatchState()) {
                     wheelSpeed = 0.15;
                 } else {
@@ -75,8 +71,7 @@ public class Intake extends Subsystem {
                 } else {
                     wheelSpeed = -0.8;
                 }
-            } 
-            else {
+            } else {
                 if (input.getHatchState()) {
                     wheelSpeed = 0.15;
                 } else {
@@ -95,8 +90,7 @@ public class Intake extends Subsystem {
                 } else {
                     wheelSpeed = -0.8;
                 }
-            } 
-            else {
+            } else {
                 if (input.getHatchState()) {
                     wheelSpeed = 0.15;
                 } else {
@@ -111,7 +105,7 @@ public class Intake extends Subsystem {
         else if (state == RobotState.LINE) {
             wheelSpeed = 0;
         }
-        
+
         output();
     }
 
@@ -133,16 +127,20 @@ public class Intake extends Subsystem {
     }
 
     @Override
-    public void disabledContinuous() {}
+    public void disabledContinuous() {
+    }
 
     @Override
-    public void autoContinuous() {}
+    public void autoContinuous() {
+    }
 
     @Override
-    public void teleopContinuous() {}
+    public void teleopContinuous() {
+    }
 
     @Override
-    public void smartDashboard() {}
+    public void smartDashboard() {
+    }
 
     public static Intake getInstance() {
         if (instance == null) {
