@@ -15,8 +15,7 @@ public class Ports {
     public static final int DB_SOLE_B = 1;
 
     // Lift
-    public static final int LF_MOTOR_A = 8;
-    public static final int LF_MOTOR_B = 9;
+    public static final int LF_MOTOR = 14;
 
     // Rotary
     public static final int RT_MOTOR = 12;

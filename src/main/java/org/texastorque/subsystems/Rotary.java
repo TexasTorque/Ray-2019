@@ -19,7 +19,7 @@ public class Rotary extends Subsystem {
     private double currentPos;
     private double setpoint;
     private double prevSetpoint;
-    private boolean clockwise = true;
+    private boolean clockwise = false;
 
     private Rotary() {
         rotary = new TorqueVictor(Ports.RT_MOTOR, clockwise);

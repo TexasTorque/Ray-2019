@@ -2,6 +2,7 @@ package org.texastorque.subsystems;
 
 import org.texastorque.inputs.State.RobotState;
 import org.texastorque.constants.Ports;
+import org.texastorque.torquelib.component.TorqueSparkMax;
 import org.texastorque.torquelib.component.TorqueVictor;
 import org.texastorque.torquelib.controlLoop.ScheduledPID;
 import org.texastorque.torquelib.controlLoop.LowPassFilter;
@@ -13,8 +14,7 @@ public class Lift extends Subsystem {
 
     private static volatile Lift instance;
 
-    private TorqueVictor pulleyA;
-    private TorqueVictor pulleyB;
+    private TorqueSparkMax pulley;
 
     private final ScheduledPID liftPID;
     private final LowPassFilter lowPass;
@@ -25,8 +25,7 @@ public class Lift extends Subsystem {
     private boolean clockwise = true;
 
     private Lift() {
-        pulleyA = new TorqueVictor(Ports.LF_MOTOR_A, clockwise);
-        pulleyB = new TorqueVictor(Ports.LF_MOTOR_B, clockwise);
+        pulley = new TorqueSparkMax(Ports.LF_MOTOR);
 
         speed = 0;
         setpoint = input.calcLFSetpoint(0);
@@ -89,6 +88,7 @@ public class Lift extends Subsystem {
             liftPID.changeSetpoint(setpoint);
             prevSetpoint = setpoint;
         }
+        System.out.println("Setpoint: " + setpoint);
 
         speed = liftPID.calculate(currentPos);
     }
@@ -130,9 +130,8 @@ public class Lift extends Subsystem {
             isStalling = true;
             // speed = 0
         }
-
-        pulleyA.set(speed);
-        pulleyB.set(speed);
+        // System.out.println(speed);
+        pulley.set((clockwise ? -1 : 1) * speed);
     }
 
     @Override

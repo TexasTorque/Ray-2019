@@ -30,10 +30,7 @@ public class Climber extends Subsystem {
         tomSpeed = 0;
         rearSpeed = 0;
 
-        rearPID = new ScheduledPID.Builder(0, -1.0, 1.0, 1).setPGains(0.25)
-                // .setIGains(0)
-                // .setDGains(0)
-                .build();
+        rearPID = new ScheduledPID.Builder(0, -1.0, 1.0, 1).setPGains(0.25).build();
 
     }
 
