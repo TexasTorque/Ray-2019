@@ -21,7 +21,8 @@ public class Feedback {
     // Conversions
     public final double DISTANCE_PER_PULSE = Math.PI * Constants.WHEEL_DIAMETER / Constants.PULSES_PER_ROTATION;
     public final double ANGLE_PER_PULSE = 360.0 / Constants.PULSES_PER_ROTATION;
-    public final double LF_FEET_CONVERSION = Math.PI * (1.0/20) / Constants.PULSES_PER_ROTATION; // Using approximate shaft diameter
+    public final double LF_FEET_CONVERSION = Math.PI * (1.0 / 20) / Constants.PULSES_PER_ROTATION; // Using approximate
+                                                                                                   // shaft diameter
     public final double ULTRA_CONVERSION = 1.0 / 84;
 
     public static boolean clockwise = true;
@@ -49,8 +50,10 @@ public class Feedback {
     // private NetworkTableEntry NT_pipelineEntry;
 
     private Feedback() {
-        DB_leftEncoder = new TorqueEncoder(Ports.DB_LEFT_ENCODER_A, Ports.DB_LEFT_ENCODER_B, clockwise, EncodingType.k4X);
-        DB_rightEncoder = new TorqueEncoder(Ports.DB_RIGHT_ENCODER_A, Ports.DB_RIGHT_ENCODER_B, !clockwise, EncodingType.k4X);
+        DB_leftEncoder = new TorqueEncoder(Ports.DB_LEFT_ENCODER_A, Ports.DB_LEFT_ENCODER_B, clockwise,
+                EncodingType.k4X);
+        DB_rightEncoder = new TorqueEncoder(Ports.DB_RIGHT_ENCODER_A, Ports.DB_RIGHT_ENCODER_B, !clockwise,
+                EncodingType.k4X);
         LF_encoder = new TorqueEncoder(Ports.LF_ENCODER_A, Ports.LF_ENCODER_B, !clockwise, EncodingType.k4X);
         RT_encoder = new TorqueEncoder(Ports.RT_ENCODER_A, Ports.RT_ENCODER_B, !clockwise, EncodingType.k4X);
 
@@ -65,8 +68,10 @@ public class Feedback {
         UL_right = new AnalogInput(Ports.UL_RIGHT);
 
         NT_instance = NetworkTableInstance.getDefault();
-        // NT_offsetEntry = NT_instance.getTable("TargetDetection").getEntry("target_offset");
-        // NT_existsEntry = NT_instance.getTable("TargetDetection").getEntry("target_exists");
+        // NT_offsetEntry =
+        // NT_instance.getTable("TargetDetection").getEntry("target_offset");
+        // NT_existsEntry =
+        // NT_instance.getTable("TargetDetection").getEntry("target_exists");
 
         NT_offsetEntry = NT_instance.getTable("limelight").getEntry("tx");
         // NT_pipelineEntry = NT_instance.getTable("limelight").getEntry("pipeline");
@@ -81,7 +86,6 @@ public class Feedback {
         updateNetworkTables();
     }
 
-
     // ========== Encoders ==========
 
     private int DB_leftRaw;
@@ -95,7 +99,7 @@ public class Feedback {
     private double RT_angle;
 
     public void resetDriveEncoders() {
-		DB_leftEncoder.reset();
+        DB_leftEncoder.reset();
         DB_rightEncoder.reset();
     }
 
@@ -108,7 +112,7 @@ public class Feedback {
         DB_leftRaw = DB_leftEncoder.get();
         DB_rightRaw = DB_rightEncoder.get();
         DB_leftSpeed = DB_leftEncoder.getRate() * DISTANCE_PER_PULSE;
-		DB_rightSpeed = DB_rightEncoder.getRate() * DISTANCE_PER_PULSE;
+        DB_rightSpeed = DB_rightEncoder.getRate() * DISTANCE_PER_PULSE;
         DB_leftDistance = DB_leftEncoder.get() * DISTANCE_PER_PULSE;
         DB_rightDistance = DB_rightEncoder.get() * DISTANCE_PER_PULSE;
 
@@ -143,11 +147,10 @@ public class Feedback {
     public double getLFPosition() {
         return LF_position;
     }
-    
+
     public double getRTPosition() {
         return RT_angle;
     }
-
 
     // ========== Gyro ==========
 
@@ -181,7 +184,6 @@ public class Feedback {
         NX_gyro.zeroYaw();
     }
 
-
     // ========== Limit switch ==========
 
     private boolean CM_atBottom;
@@ -193,7 +195,6 @@ public class Feedback {
     public boolean getCMAtBottom() {
         return CM_atBottom;
     }
-
 
     // ========== Line Sensor ==========
 
@@ -213,7 +214,6 @@ public class Feedback {
         return LN_right;
     }
 
-   
     // ========= Ultrasonic sensors ========
 
     private double UL_leftDistance;
@@ -232,7 +232,6 @@ public class Feedback {
         return UL_rightDistance;
     }
 
-
     // ===== RPi feedback from NetworkTables =====
 
     private double NT_targetOffset;
@@ -248,9 +247,8 @@ public class Feedback {
     }
 
     // public NetworkTableEntry getNTPipelineEntry() {
-    //     return NT_pipelineEntry;
+    // return NT_pipelineEntry;
     // }
-    
 
     public void smartDashboard() {
         SmartDashboard.putString("State", State.getInstance().getRobotState().toString());
@@ -269,6 +267,8 @@ public class Feedback {
 
         SmartDashboard.putBoolean("LN_left", LN_left);
         SmartDashboard.putBoolean("LN_right", LN_right);
+
+        SmartDashboard.putNumber("RT_Position", RT_angle);
 
         SmartDashboard.putNumber("UL_leftDistance", UL_leftDistance);
         SmartDashboard.putNumber("UL_rightDistance", UL_rightDistance);

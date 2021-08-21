@@ -255,7 +255,7 @@ public class Input {
 
     // private final double[] RT_setpoints = {0, 60, 74, 91, 50, 14};
     // private final double[] RT_setpoints = { 0, 50, 185, 210, 55 };
-    private final double[] RT_setpoints = { 0, 50, 185, 150, 55 };
+    private final double[] RT_setpoints = { 0, 50, 165, 210, 55 };
     // private volatile int RT_setpoint = 0;
     private volatile double RT_offset = 0;
     private volatile TorqueToggle RT_manualMode = new TorqueToggle(false);

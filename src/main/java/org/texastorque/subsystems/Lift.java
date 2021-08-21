@@ -34,7 +34,7 @@ public class Lift extends Subsystem {
                 .setDGains(0.00008, 0) // 0.00002
                 .build();
 
-        lowPass = new LowPassFilter(0.5);
+        lowPass = new LowPassFilter(0.2);
     }
 
     @Override
@@ -88,8 +88,6 @@ public class Lift extends Subsystem {
             liftPID.changeSetpoint(setpoint);
             prevSetpoint = setpoint;
         }
-        System.out.println("Setpoint: " + setpoint);
-
         speed = liftPID.calculate(currentPos);
     }
 
